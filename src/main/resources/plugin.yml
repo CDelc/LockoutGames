@@ -1,0 +1,7 @@
+name: LockoutGames
+version: '${project.version}'
+main: org.carden.lockoutgames.LockoutGames
+api-version: '1.21'
+prefix: Lockout
+authors: [Carden]
+description: Offers a variety of competitive survival games with various objectives
