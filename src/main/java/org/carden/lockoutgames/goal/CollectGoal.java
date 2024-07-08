@@ -8,10 +8,7 @@ import org.bukkit.plugin.Plugin;
 import org.carden.lockoutgames.events.GoalObtainedEvent;
 import org.carden.lockoutgames.game.GameWorld;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 enum rngSettings {
     /**
@@ -23,7 +20,12 @@ enum rngSettings {
      * Exclusive maximum different items from set required]
      */
 
-    SINGLE(new int[]{1, 2, 1, 2});
+    SINGLE(new int[]{1, 2, 1, 2}),
+    DOUBLE(new int[]{1, 2, 2, 3}),
+    COBBLESTONE(new int[]{32, 65, 1, 2}),
+    FLINT(new int[]{1, 9, 1, 2}),
+    GLOW_LICHEN(new int[]{1, 13, 1, 2}),
+    DEEPSLATE(new int[]{16, 49, 1, 2});
 
     final int[] settings;
 
@@ -38,7 +40,7 @@ public enum CollectGoal implements Goal {
      * These are goals that involve obtaining an item or a set of items.
      */
 
-    OBTAIN_CRAFTINGTABLE(new Material[]{Material.CRAFTING_TABLE}, Option.AND, rngSettings.SINGLE, 0),
+    OBTAIN_CRAFTINGTABLE(new Material[]{Material.CRAFTING_TABLE}, Option.OR, rngSettings.SINGLE, 0),
     OBTAIN_PICKAXE(new Material[]{Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE},
             Option.OR, rngSettings.SINGLE, 0),
     OBTAIN_SWORD(new Material[]{Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD},
@@ -46,13 +48,20 @@ public enum CollectGoal implements Goal {
     OBTAIN_HOE(new Material[]{Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE},
             Option.OR, rngSettings.SINGLE, 0),
     OBTAIN_SHOVEL(new Material[]{Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL},
-            Option.OR, rngSettings.SINGLE, 0);
+            Option.OR, rngSettings.SINGLE, 0),
+    OBTAIN_COBBLESTONE(new Material[]{Material.COBBLESTONE}, Option.OR, rngSettings.COBBLESTONE, 0),
+    OBTAIN_SPOREBLOSSOM(new Material[]{Material.SPORE_BLOSSOM}, Option.OR, rngSettings.SINGLE, 1),
+    OBTAIN_AZALEA(new Material[]{Material.FLOWERING_AZALEA, Material.AZALEA}, Option.OR, rngSettings.DOUBLE, 1),
+    OBTAIN_FLINT(new Material[]{Material.FLINT}, Option.OR, rngSettings.FLINT, 1),
+    OBTAIN_GLOWLICHEN(new Material[]{Material.GLOW_LICHEN}, Option.OR, rngSettings.GLOW_LICHEN, 1),
+    OBTAIN_DEEPSLATE(new Material[]{Material.DEEPSLATE}, Option.OR, rngSettings.DEEPSLATE, 1);
 
 
     public final ArrayList<Material> items;
     public final Integer amount;
     public final Option option;
     public final Integer difficulty;
+    public final PlayerChecklist<Material> checklist;
 
     /**
      *
@@ -78,6 +87,7 @@ public enum CollectGoal implements Goal {
         this.amount = rng.nextInt(settings[2], settings[3]);
         this.option = option;
         this.difficulty = difficulty;
+        this.checklist = new PlayerChecklist<Material>(this.items);
     }
 
 
@@ -85,18 +95,12 @@ public enum CollectGoal implements Goal {
     public void validate(Player p, Plugin plugin) {
         Inventory inv = p.getInventory();
 
-        if(this.option == Option.AND) {
-            for(Material m : items) {
-                if (!inv.contains(m, amount)) {
-                    return;
-                }
-            }
-            plugin.getServer().getPluginManager().callEvent(new GoalObtainedEvent(p, this));
-        }
-        else if(this.option == Option.OR) {
-            for(Material m : items) {
-                if (inv.contains(m, amount)) {
+        boolean isComplete;
+        for(Material m : items) {
+            if (inv.contains(m, amount)) {
+                if (option == Option.OR || checklist.checkItem(p, m)) {
                     plugin.getServer().getPluginManager().callEvent(new GoalObtainedEvent(p, this));
+                    return;
                 }
             }
         }
@@ -105,7 +109,16 @@ public enum CollectGoal implements Goal {
     @Override
     public String getDescription() {
         //Special Cases
-
+        switch(this) {
+            case OBTAIN_HOE:
+                return "Collect any hoe";
+            case OBTAIN_PICKAXE:
+                return "Collect any pickaxe";
+            case OBTAIN_SHOVEL:
+                return "Collect any shovel";
+            case OBTAIN_SWORD:
+                return "Collect any sword";
+        }
 
         if(items.size() == 1) {
             return "Collect" + amount + " " + items.get(0).name().toLowerCase();
