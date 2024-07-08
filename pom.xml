@@ -12,10 +12,11 @@
   <name>LockoutGames</name>
 
     <description>Offers a variety of competitive survival games with various objectives</description>
+
     <properties>
-    <java.version>1.8</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+    </properties>
 
   <build>
     <plugins>

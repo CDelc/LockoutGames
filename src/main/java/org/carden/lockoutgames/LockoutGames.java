@@ -2,16 +2,20 @@ package org.carden.lockoutgames;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Base plugin class
+ */
 public final class LockoutGames extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
+
+        EventListener listener = new EventListener(this);
+        getServer().getPluginManager().registerEvents(listener, this);
 
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
     }
 }
