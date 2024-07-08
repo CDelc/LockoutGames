@@ -16,20 +16,17 @@ enum rngSettings {
      * Structure is as follows:
      * [Minimum items required,
      * Exclusive maximum items required,
-     * Minimum different items from set required,
-     * Exclusive maximum different items from set required]
+     * OPTIONAL: Minimum different items from set required (Default all items),
+     * OPTIONAL: Exclusive maximum different items from set required] (Default all items)
      */
 
-    SINGLE(new int[]{1, 2, 1, 2}),
-    DOUBLE(new int[]{1, 2, 2, 3}),
-    COBBLESTONE(new int[]{32, 65, 1, 2}),
-    FLINT(new int[]{1, 9, 1, 2}),
-    GLOW_LICHEN(new int[]{1, 13, 1, 2}),
-    DEEPSLATE(new int[]{16, 49, 1, 2}),
-    ALLTOOLS(new int[]{1, 2, 1, 7}),
-    TOOLSET(new int[]{1, 2, 1, 6}),
-    OREBLOCK(new int[]{12, 25, 1, 2});
-
+    SINGLE(new int[]{1, 2}),
+    COBBLESTONE(new int[]{32, 65}),
+    FLINT(new int[]{1, 9}),
+    GLOW_LICHEN(new int[]{1, 13}),
+    INGOT(new int[]{16, 49}),
+    OREBLOCK(new int[]{12, 25}),
+    MULTISTACK(new int[]{64*2, 64*4+1});
     final int[] settings;
 
     rngSettings(int[] settings) {
@@ -45,26 +42,33 @@ public enum CollectGoal implements Goal {
 
     CRAFTINGTABLE(new Material[]{Material.CRAFTING_TABLE}, Option.OR, rngSettings.SINGLE, 0),
     PICKAXE(new Material[]{Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE},
-            Option.OR, rngSettings.ALLTOOLS, 0),
+            Option.OR, rngSettings.SINGLE, 0),
     SWORD(new Material[]{Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD},
-            Option.OR, rngSettings.ALLTOOLS, 0),
+            Option.OR, rngSettings.SINGLE, 0),
     HOE(new Material[]{Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE},
-            Option.OR, rngSettings.ALLTOOLS, 0),
+            Option.OR, rngSettings.SINGLE, 0),
     SHOVEL(new Material[]{Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL},
-            Option.OR, rngSettings.ALLTOOLS, 0),
+            Option.OR, rngSettings.SINGLE, 0),
     COBBLESTONE(new Material[]{Material.COBBLESTONE}, Option.OR, rngSettings.COBBLESTONE, 0),
     SPOREBLOSSOM(new Material[]{Material.SPORE_BLOSSOM}, Option.OR, rngSettings.SINGLE, 1),
-    AZALEA(new Material[]{Material.FLOWERING_AZALEA, Material.AZALEA}, Option.OR, rngSettings.DOUBLE, 1),
+    AZALEA(new Material[]{Material.FLOWERING_AZALEA, Material.AZALEA}, Option.OR, rngSettings.SINGLE, 1),
     FLINT(new Material[]{Material.FLINT}, Option.OR, rngSettings.FLINT, 1),
     GLOWLICHEN(new Material[]{Material.GLOW_LICHEN}, Option.OR, rngSettings.GLOW_LICHEN, 1),
-    DEEPSLATE(new Material[]{Material.DEEPSLATE}, Option.OR, rngSettings.DEEPSLATE, 1),
-    STONETOOLS(new Material[]{Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_HOE, Material.STONE_SHOVEL, Material.STONE_SWORD}, Option.AND, rngSettings.TOOLSET, 0),
-    IRONTOOLS(new Material[]{Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_HOE, Material.IRON_SHOVEL, Material.IRON_SWORD}, Option.AND, rngSettings.TOOLSET, 1),
-    DIAMONDTOOLS(new Material[]{Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_HOE, Material.DIAMOND_SHOVEL, Material.DIAMOND_SWORD}, Option.AND, rngSettings.TOOLSET, 3),
-    COAL(new Material[]{Material.COAL}, Option.OR, rngSettings.DEEPSLATE, 1),
+    DEEPSLATE(new Material[]{Material.DEEPSLATE}, Option.OR, rngSettings.INGOT, 1),
+    STONETOOLS(new Material[]{Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_HOE, Material.STONE_SHOVEL, Material.STONE_SWORD}, Option.AND, rngSettings.SINGLE, 0),
+    IRONTOOLS(new Material[]{Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_HOE, Material.IRON_SHOVEL, Material.IRON_SWORD}, Option.AND, rngSettings.SINGLE, 1),
+    DIAMONDTOOLS(new Material[]{Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_HOE, Material.DIAMOND_SHOVEL, Material.DIAMOND_SWORD}, Option.AND, rngSettings.SINGLE, 3),
+    COAL(new Material[]{Material.COAL}, Option.OR, rngSettings.COBBLESTONE, 1),
     COALBLOCK(new Material[]{Material.COAL_BLOCK}, Option.OR, rngSettings.OREBLOCK, 2),
     FURNACE(new Material[]{Material.FURNACE}, Option.OR, rngSettings.SINGLE, 0),
-    CHARCOAL(new Material[]{Material.CHARCOAL}, Option.OR, rngSettings.DEEPSLATE, 1);
+    CHARCOAL(new Material[]{Material.CHARCOAL}, Option.OR, rngSettings.INGOT, 1),
+    SMOKER(new Material[]{Material.SMOKER}, Option.OR, rngSettings.SINGLE, 0),
+    COPPER(new Material[]{Material.COPPER_INGOT}, Option.OR, rngSettings.INGOT, 1),
+    COPPERBLOCK(new Material[]{Material.COPPER_BLOCK}, Option.OR, rngSettings.OREBLOCK, 1),
+    LIGHTNINGROD(new Material[]{Material.LIGHTNING_ROD}, Option.OR, rngSettings.SINGLE, 1),
+    OXIDIZED_COPPER(new Material[]{Material.OXIDIZED_COPPER}, Option.OR, rngSettings.SINGLE, 2),
+    IRONINGOT(new Material[]{Material.IRON_INGOT}, Option.OR, rngSettings.INGOT, 1),
+    IRONNUGGET(new Material[]{Material.IRON_NUGGET}, Option.OR, rngSettings.MULTISTACK, 1);
 
 
     public final ArrayList<Material> items;
@@ -83,18 +87,24 @@ public enum CollectGoal implements Goal {
     CollectGoal(Material[] target, Option option, rngSettings rngSettings, Integer difficulty) {
         Random rng = new Random();
         int[] settings = rngSettings.settings;
-        int numItems = rng.nextInt(settings[0], settings[1]);
-        ArrayList<Material> tmpItems = new ArrayList<Material>();
+        if(settings.length < 2) throw new IllegalArgumentException("Missing rng Settings");
+        if(settings.length > 2) {
+            int minItems = settings[2];
+            int maxItems = (settings.length > 3) ? settings[3] : target.length;
+            int numItems = rng.nextInt(minItems, maxItems);
+            ArrayList<Material> tmpItems = new ArrayList<Material>();
 
-        Set<Integer> chosenIndices = new HashSet<>();
-        while(chosenIndices.size() < numItems) {
-            chosenIndices.add(rng.nextInt(0, target.length));
+            Set<Integer> chosenIndices = new HashSet<>();
+            while(chosenIndices.size() < numItems) {
+                chosenIndices.add(rng.nextInt(0, target.length));
+            }
+            for (int index : chosenIndices) {
+                tmpItems.add(target[index]);
+            }
+            this.items = tmpItems;
         }
-        for (int index : chosenIndices) {
-            tmpItems.add(target[index]);
-        }
-        this.items = tmpItems;
-        this.amount = rng.nextInt(settings[2], settings[3]);
+        else this.items = new ArrayList<Material>(Arrays.asList(target));
+        this.amount = rng.nextInt(settings[0], settings[1]);
         this.option = option;
         this.difficulty = difficulty;
         this.checklist = new PlayerChecklist<Material>(this.items);
