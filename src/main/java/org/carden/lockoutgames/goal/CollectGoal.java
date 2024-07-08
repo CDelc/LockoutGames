@@ -25,7 +25,10 @@ enum rngSettings {
     COBBLESTONE(new int[]{32, 65, 1, 2}),
     FLINT(new int[]{1, 9, 1, 2}),
     GLOW_LICHEN(new int[]{1, 13, 1, 2}),
-    DEEPSLATE(new int[]{16, 49, 1, 2});
+    DEEPSLATE(new int[]{16, 49, 1, 2}),
+    ALLTOOLS(new int[]{1, 2, 1, 7}),
+    TOOLSET(new int[]{1, 2, 1, 6}),
+    OREBLOCK(new int[]{12, 25, 1, 2});
 
     final int[] settings;
 
@@ -40,21 +43,28 @@ public enum CollectGoal implements Goal {
      * These are goals that involve obtaining an item or a set of items.
      */
 
-    OBTAIN_CRAFTINGTABLE(new Material[]{Material.CRAFTING_TABLE}, Option.OR, rngSettings.SINGLE, 0),
-    OBTAIN_PICKAXE(new Material[]{Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE},
-            Option.OR, rngSettings.SINGLE, 0),
-    OBTAIN_SWORD(new Material[]{Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD},
-            Option.OR, rngSettings.SINGLE, 0),
-    OBTAIN_HOE(new Material[]{Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE},
-            Option.OR, rngSettings.SINGLE, 0),
-    OBTAIN_SHOVEL(new Material[]{Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL},
-            Option.OR, rngSettings.SINGLE, 0),
-    OBTAIN_COBBLESTONE(new Material[]{Material.COBBLESTONE}, Option.OR, rngSettings.COBBLESTONE, 0),
-    OBTAIN_SPOREBLOSSOM(new Material[]{Material.SPORE_BLOSSOM}, Option.OR, rngSettings.SINGLE, 1),
-    OBTAIN_AZALEA(new Material[]{Material.FLOWERING_AZALEA, Material.AZALEA}, Option.OR, rngSettings.DOUBLE, 1),
-    OBTAIN_FLINT(new Material[]{Material.FLINT}, Option.OR, rngSettings.FLINT, 1),
-    OBTAIN_GLOWLICHEN(new Material[]{Material.GLOW_LICHEN}, Option.OR, rngSettings.GLOW_LICHEN, 1),
-    OBTAIN_DEEPSLATE(new Material[]{Material.DEEPSLATE}, Option.OR, rngSettings.DEEPSLATE, 1);
+    CRAFTINGTABLE(new Material[]{Material.CRAFTING_TABLE}, Option.OR, rngSettings.SINGLE, 0),
+    PICKAXE(new Material[]{Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE},
+            Option.OR, rngSettings.ALLTOOLS, 0),
+    SWORD(new Material[]{Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD},
+            Option.OR, rngSettings.ALLTOOLS, 0),
+    HOE(new Material[]{Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE},
+            Option.OR, rngSettings.ALLTOOLS, 0),
+    SHOVEL(new Material[]{Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL},
+            Option.OR, rngSettings.ALLTOOLS, 0),
+    COBBLESTONE(new Material[]{Material.COBBLESTONE}, Option.OR, rngSettings.COBBLESTONE, 0),
+    SPOREBLOSSOM(new Material[]{Material.SPORE_BLOSSOM}, Option.OR, rngSettings.SINGLE, 1),
+    AZALEA(new Material[]{Material.FLOWERING_AZALEA, Material.AZALEA}, Option.OR, rngSettings.DOUBLE, 1),
+    FLINT(new Material[]{Material.FLINT}, Option.OR, rngSettings.FLINT, 1),
+    GLOWLICHEN(new Material[]{Material.GLOW_LICHEN}, Option.OR, rngSettings.GLOW_LICHEN, 1),
+    DEEPSLATE(new Material[]{Material.DEEPSLATE}, Option.OR, rngSettings.DEEPSLATE, 1),
+    STONETOOLS(new Material[]{Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_HOE, Material.STONE_SHOVEL, Material.STONE_SWORD}, Option.AND, rngSettings.TOOLSET, 0),
+    IRONTOOLS(new Material[]{Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_HOE, Material.IRON_SHOVEL, Material.IRON_SWORD}, Option.AND, rngSettings.TOOLSET, 1),
+    DIAMONDTOOLS(new Material[]{Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_HOE, Material.DIAMOND_SHOVEL, Material.DIAMOND_SWORD}, Option.AND, rngSettings.TOOLSET, 3),
+    COAL(new Material[]{Material.COAL}, Option.OR, rngSettings.DEEPSLATE, 1),
+    COALBLOCK(new Material[]{Material.COAL_BLOCK}, Option.OR, rngSettings.OREBLOCK, 2),
+    FURNACE(new Material[]{Material.FURNACE}, Option.OR, rngSettings.SINGLE, 0),
+    CHARCOAL(new Material[]{Material.CHARCOAL}, Option.OR, rngSettings.DEEPSLATE, 1);
 
 
     public final ArrayList<Material> items;
@@ -110,14 +120,20 @@ public enum CollectGoal implements Goal {
     public String getDescription() {
         //Special Cases
         switch(this) {
-            case OBTAIN_HOE:
+            case HOE:
                 return "Collect any hoe";
-            case OBTAIN_PICKAXE:
+            case PICKAXE:
                 return "Collect any pickaxe";
-            case OBTAIN_SHOVEL:
+            case SHOVEL:
                 return "Collect any shovel";
-            case OBTAIN_SWORD:
+            case SWORD:
                 return "Collect any sword";
+            case STONETOOLS:
+                return "Collect a full stone toolset";
+            case IRONTOOLS:
+                return "Collect a full iron toolset";
+            case DIAMONDTOOLS:
+                return "Collect a full diamond toolset";
         }
 
         if(items.size() == 1) {
