@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class PlayerChecklist<T> {
+    /**
+     * Tool for goals that use AND logic that allows tracking of progress on a goal.
+     */
 
     HashMap<Player, HashSet<T>> tracker;
     HashSet<T> list;
