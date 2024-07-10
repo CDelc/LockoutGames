@@ -1,6 +1,7 @@
 package org.carden.lockoutgames;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -9,12 +10,18 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public final class LockoutGames extends JavaPlugin {
 
-    MultiverseCore multiverseCore;
+    private MultiverseCore multiverseCore;
+    private MultiverseNetherPortals mvnetherPortals;
 
     @Override
     public void onEnable() {
         if(!setupMultiverseCore()) {
             getLogger().severe("Multiverse-Core not found! Please install the Multiverse-core plugin to your server.\n" +
+                    "Plugin disabled.");
+            getServer().getPluginManager().disablePlugin(this);
+        }
+        if(!setupNetherPortals()) {
+            getLogger().severe("Multiverse-NetherPortals not found! Please install the Multiverse-netherportals plugin to your server.\n" +
                     "Plugin disabled.");
             getServer().getPluginManager().disablePlugin(this);
         }
@@ -35,5 +42,22 @@ public final class LockoutGames extends JavaPlugin {
         }
         multiverseCore = (MultiverseCore) plugin;
         return true;
+    }
+
+    private boolean setupNetherPortals() {
+        Plugin plugin = getServer().getPluginManager().getPlugin("Multiverse-NetherPortals");
+        if (plugin == null || !(plugin instanceof MultiverseNetherPortals)) {
+            return false;
+        }
+        mvnetherPortals = (MultiverseNetherPortals) plugin;
+        return true;
+    }
+
+    public MultiverseCore getMultiverseCore() {
+        return multiverseCore;
+    }
+
+    public MultiverseNetherPortals getMvnetherPortals() {
+        return mvnetherPortals;
     }
 }

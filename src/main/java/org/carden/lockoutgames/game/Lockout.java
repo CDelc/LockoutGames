@@ -1,8 +1,17 @@
 package org.carden.lockoutgames.game;
 
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
+import org.bukkit.World;
+import org.carden.lockoutgames.LockoutGames;
+
 public class Lockout {
-    /**
-     * Implementation not yet started -
-     * This will contain and control critical information about a game, its state, and its settings
-     */
+
+    LockoutGames plugin;
+    GameWorld world;
+    MVWorldManager worldManager;
+
+    public Lockout(LockoutGames plugin) {
+        this.plugin = plugin;
+    }
+
 }
