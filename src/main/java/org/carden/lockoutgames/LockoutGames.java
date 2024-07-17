@@ -4,6 +4,8 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.carden.lockoutgames.events.EventListener;
+import org.carden.lockoutgames.game.GameSettings;
 
 /**
  * Base plugin class
@@ -13,6 +15,9 @@ public final class LockoutGames extends JavaPlugin {
     private MultiverseCore multiverseCore;
     private MultiverseNetherPortals mvnetherPortals;
 
+    private GameSettings game;
+
+
     @Override
     public void onEnable() {
         if(!setupMultiverseCore()) {
@@ -21,13 +26,15 @@ public final class LockoutGames extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
         if(!setupNetherPortals()) {
-            getLogger().severe("Multiverse-NetherPortals not found! Please install the Multiverse-netherportals plugin to your server.\n" +
+            getLogger().severe("Multiverse-NetherPortals not found! Please install the Multiverse-NetherPortals plugin to your server.\n" +
                     "Plugin disabled.");
             getServer().getPluginManager().disablePlugin(this);
         }
 
         EventListener listener = new EventListener(this);
         getServer().getPluginManager().registerEvents(listener, this);
+
+        game = new GameSettings(this);
 
     }
 
@@ -59,5 +66,9 @@ public final class LockoutGames extends JavaPlugin {
 
     public MultiverseNetherPortals getMvnetherPortals() {
         return mvnetherPortals;
+    }
+
+    public GameSettings getGameSettings() {
+        return game;
     }
 }

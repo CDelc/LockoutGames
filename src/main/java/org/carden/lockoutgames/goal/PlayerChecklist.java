@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class PlayerChecklist<T> {
     /**
@@ -15,9 +16,9 @@ public class PlayerChecklist<T> {
     HashMap<Player, HashSet<T>> tracker;
     HashSet<T> list;
 
-    PlayerChecklist(ArrayList<T> list) {
+    PlayerChecklist(HashSet<T> list) {
         this.tracker = new HashMap<Player, HashSet<T>>();
-        this.list = new HashSet<T>(list);
+        this.list = list;
     }
 
     public boolean checkItem(Player p, Material m) {

@@ -7,10 +7,11 @@ import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 import org.carden.lockoutgames.events.GoalObtainedEvent;
 import org.carden.lockoutgames.game.GameWorld;
+import org.carden.lockoutgames.info.WorldRequirements;
 
 import java.util.*;
 
-enum rngSettings {
+enum RNGSettings {
     /**
      * This should make organizing randomization settings easier.
      * Structure is as follows:
@@ -33,7 +34,14 @@ enum rngSettings {
     PICK_ONE(new int[]{1, 2, 1, 2});
     final int[] settings;
 
-    rngSettings(int[] settings) {
+    RNGSettings(int[] settings) {
+        if(settings.length < 2 || settings[0] >= settings[1] ||
+                (settings.length > 3 && settings[2] >= settings[3])) {
+            throw new IllegalArgumentException("Illegal rng settings");
+        }
+        for(int i : settings) {
+            if(i < 1) throw new IllegalArgumentException("RNG settings values must be positive.");
+        }
         this.settings = settings;
     }
 }
@@ -44,58 +52,58 @@ public enum CollectGoal implements Goal {
      * These are goals that involve obtaining an item or a set of items.
      */
 
-    CRAFTING_TABLE(new Material[]{Material.CRAFTING_TABLE}, Option.OR, rngSettings.SINGLE, 0),
+    CRAFTING_TABLE(new Material[]{Material.CRAFTING_TABLE}, Option.OR, RNGSettings.SINGLE, 0),
     PICKAXE(new Material[]{Material.WOODEN_PICKAXE, Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.GOLDEN_PICKAXE, Material.DIAMOND_PICKAXE, Material.NETHERITE_PICKAXE},
-            Option.OR, rngSettings.SINGLE, 0),
+            Option.OR, RNGSettings.SINGLE, 0),
     SWORD(new Material[]{Material.WOODEN_SWORD, Material.STONE_SWORD, Material.IRON_SWORD, Material.GOLDEN_SWORD, Material.DIAMOND_SWORD, Material.NETHERITE_SWORD},
-            Option.OR, rngSettings.SINGLE, 0),
+            Option.OR, RNGSettings.SINGLE, 0),
     HOE(new Material[]{Material.WOODEN_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLDEN_HOE, Material.DIAMOND_HOE, Material.NETHERITE_HOE},
-            Option.OR, rngSettings.SINGLE, 0),
+            Option.OR, RNGSettings.SINGLE, 0),
     SHOVEL(new Material[]{Material.WOODEN_SHOVEL, Material.STONE_SHOVEL, Material.IRON_SHOVEL, Material.GOLDEN_SHOVEL, Material.DIAMOND_SHOVEL, Material.NETHERITE_SHOVEL},
-            Option.OR, rngSettings.SINGLE, 0),
-    COBBLESTONE(new Material[]{Material.COBBLESTONE}, Option.OR, rngSettings.COBBLESTONE, 0),
-    SPORE_BLOSSOM(new Material[]{Material.SPORE_BLOSSOM}, Option.OR, rngSettings.SINGLE, 1),
-    AZALEA(new Material[]{Material.FLOWERING_AZALEA, Material.AZALEA}, Option.OR, rngSettings.SINGLE, 1),
-    FLINT(new Material[]{Material.FLINT}, Option.OR, rngSettings.DIAMOND, 1),
-    GLOW_LICHEN(new Material[]{Material.GLOW_LICHEN}, Option.OR, rngSettings.GLOW_LICHEN, 1),
-    DEEPSLATE(new Material[]{Material.DEEPSLATE}, Option.OR, rngSettings.INGOT, 1),
-    STONE_TOOLS(new Material[]{Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_HOE, Material.STONE_SHOVEL, Material.STONE_SWORD}, Option.AND, rngSettings.SINGLE, 0),
-    IRON_TOOLS(new Material[]{Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_HOE, Material.IRON_SHOVEL, Material.IRON_SWORD}, Option.AND, rngSettings.SINGLE, 1),
-    DIAMOND_TOOLS(new Material[]{Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_HOE, Material.DIAMOND_SHOVEL, Material.DIAMOND_SWORD}, Option.AND, rngSettings.SINGLE, 3),
-    COAL(new Material[]{Material.COAL}, Option.OR, rngSettings.COBBLESTONE, 1),
-    COAL_BLOCK(new Material[]{Material.COAL_BLOCK}, Option.OR, rngSettings.ORE_BLOCK, 2),
-    FURNACE(new Material[]{Material.FURNACE}, Option.OR, rngSettings.SINGLE, 0),
-    CHARCOAL(new Material[]{Material.CHARCOAL}, Option.OR, rngSettings.INGOT, 1),
-    SMOKER(new Material[]{Material.SMOKER}, Option.OR, rngSettings.SINGLE, 0),
-    COPPER(new Material[]{Material.COPPER_INGOT}, Option.OR, rngSettings.INGOT, 1),
-    COPPER_BLOCK(new Material[]{Material.COPPER_BLOCK}, Option.OR, rngSettings.ORE_BLOCK, 2),
-    LIGHTNING_ROD(new Material[]{Material.LIGHTNING_ROD}, Option.OR, rngSettings.SINGLE, 1),
-    OXIDIZED_COPPER(new Material[]{Material.OXIDIZED_COPPER}, Option.OR, rngSettings.SINGLE, 2),
-    IRON_INGOT(new Material[]{Material.IRON_INGOT}, Option.OR, rngSettings.INGOT, 1),
-    IRON_NUGGET(new Material[]{Material.IRON_NUGGET}, Option.OR, rngSettings.MULTI_STACK, 1),
-    IRON_BLOCK(new Material[]{Material.IRON_BLOCK}, Option.OR, rngSettings.ORE_BLOCK, 2),
-    GOLD_INGOT(new Material[]{Material.GOLD_INGOT}, Option.OR, rngSettings.INGOT, 1),
-    GOLD_BLOCK(new Material[]{Material.GOLD_BLOCK}, Option.OR, rngSettings.ORE_BLOCK, 2),
-    LAPIS(new Material[]{Material.LAPIS_LAZULI}, Option.OR, rngSettings.INGOT, 1),
-    LAPIS_BLOCK(new Material[]{Material.LAPIS_BLOCK}, Option.OR, rngSettings.ORE_BLOCK, 2),
-    REDSTONE(new Material[]{Material.REDSTONE}, Option.OR, rngSettings.INGOT, 1),
-    REDSTONE_BLOCK(new Material[]{Material.REDSTONE_BLOCK}, Option.OR, rngSettings.ORE_BLOCK, 2),
-    COMPASS(new Material[]{Material.COMPASS}, Option.OR, rngSettings.SINGLE, 1),
-    CLOCK(new Material[]{Material.CLOCK}, Option.OR, rngSettings.SINGLE, 1),
-    AMETHYST_SHARD(new Material[]{Material.AMETHYST_SHARD}, Option.OR, rngSettings.SINGLE, 1),
-    CALCITE(new Material[]{Material.CALCITE}, Option.OR, rngSettings.DIAMOND, 1),
-    SPYGLASS(new Material[]{Material.SPYGLASS}, Option.OR, rngSettings.SINGLE, 1),
-    TINTED_GLASS(new Material[]{Material.TINTED_GLASS}, Option.OR, rngSettings.SINGLE, 1),
-    AMETHYST_BLOCK(new Material[]{Material.AMETHYST_BLOCK}, Option.OR, rngSettings.ORE_BLOCK, 1),
-    DIAMOND(new Material[]{Material.DIAMOND}, Option.OR, rngSettings.DIAMOND, 2),
-    DIAMOND_PICKAXE(new Material[]{Material.DIAMOND_PICKAXE}, Option.OR, rngSettings.SINGLE, 2),
+            Option.OR, RNGSettings.SINGLE, 0),
+    COBBLESTONE(new Material[]{Material.COBBLESTONE}, Option.OR, RNGSettings.COBBLESTONE, 0),
+    SPORE_BLOSSOM(new Material[]{Material.SPORE_BLOSSOM}, Option.OR, RNGSettings.SINGLE, 1),
+    AZALEA(new Material[]{Material.FLOWERING_AZALEA, Material.AZALEA}, Option.OR, RNGSettings.SINGLE, 1),
+    FLINT(new Material[]{Material.FLINT}, Option.OR, RNGSettings.DIAMOND, 1),
+    GLOW_LICHEN(new Material[]{Material.GLOW_LICHEN}, Option.OR, RNGSettings.GLOW_LICHEN, 1),
+    DEEPSLATE(new Material[]{Material.DEEPSLATE}, Option.OR, RNGSettings.INGOT, 1),
+    STONE_TOOLS(new Material[]{Material.STONE_PICKAXE, Material.STONE_AXE, Material.STONE_HOE, Material.STONE_SHOVEL, Material.STONE_SWORD}, Option.AND, RNGSettings.SINGLE, 0),
+    IRON_TOOLS(new Material[]{Material.IRON_PICKAXE, Material.IRON_AXE, Material.IRON_HOE, Material.IRON_SHOVEL, Material.IRON_SWORD}, Option.AND, RNGSettings.SINGLE, 1),
+    DIAMOND_TOOLS(new Material[]{Material.DIAMOND_PICKAXE, Material.DIAMOND_AXE, Material.DIAMOND_HOE, Material.DIAMOND_SHOVEL, Material.DIAMOND_SWORD}, Option.AND, RNGSettings.SINGLE, 3),
+    COAL(new Material[]{Material.COAL}, Option.OR, RNGSettings.COBBLESTONE, 1),
+    COAL_BLOCK(new Material[]{Material.COAL_BLOCK}, Option.OR, RNGSettings.ORE_BLOCK, 2),
+    FURNACE(new Material[]{Material.FURNACE}, Option.OR, RNGSettings.SINGLE, 0),
+    CHARCOAL(new Material[]{Material.CHARCOAL}, Option.OR, RNGSettings.INGOT, 1),
+    SMOKER(new Material[]{Material.SMOKER}, Option.OR, RNGSettings.SINGLE, 0),
+    COPPER(new Material[]{Material.COPPER_INGOT}, Option.OR, RNGSettings.INGOT, 1),
+    COPPER_BLOCK(new Material[]{Material.COPPER_BLOCK}, Option.OR, RNGSettings.ORE_BLOCK, 2),
+    LIGHTNING_ROD(new Material[]{Material.LIGHTNING_ROD}, Option.OR, RNGSettings.SINGLE, 1),
+    OXIDIZED_COPPER(new Material[]{Material.OXIDIZED_COPPER}, Option.OR, RNGSettings.SINGLE, 2),
+    IRON_INGOT(new Material[]{Material.IRON_INGOT}, Option.OR, RNGSettings.INGOT, 1),
+    IRON_NUGGET(new Material[]{Material.IRON_NUGGET}, Option.OR, RNGSettings.MULTI_STACK, 1),
+    IRON_BLOCK(new Material[]{Material.IRON_BLOCK}, Option.OR, RNGSettings.ORE_BLOCK, 2),
+    GOLD_INGOT(new Material[]{Material.GOLD_INGOT}, Option.OR, RNGSettings.INGOT, 1),
+    GOLD_BLOCK(new Material[]{Material.GOLD_BLOCK}, Option.OR, RNGSettings.ORE_BLOCK, 2),
+    LAPIS(new Material[]{Material.LAPIS_LAZULI}, Option.OR, RNGSettings.INGOT, 1),
+    LAPIS_BLOCK(new Material[]{Material.LAPIS_BLOCK}, Option.OR, RNGSettings.ORE_BLOCK, 2),
+    REDSTONE(new Material[]{Material.REDSTONE}, Option.OR, RNGSettings.INGOT, 1),
+    REDSTONE_BLOCK(new Material[]{Material.REDSTONE_BLOCK}, Option.OR, RNGSettings.ORE_BLOCK, 2),
+    COMPASS(new Material[]{Material.COMPASS}, Option.OR, RNGSettings.SINGLE, 1),
+    CLOCK(new Material[]{Material.CLOCK}, Option.OR, RNGSettings.SINGLE, 1),
+    AMETHYST_SHARD(new Material[]{Material.AMETHYST_SHARD}, Option.OR, RNGSettings.SINGLE, 1),
+    CALCITE(new Material[]{Material.CALCITE}, Option.OR, RNGSettings.DIAMOND, 1),
+    SPYGLASS(new Material[]{Material.SPYGLASS}, Option.OR, RNGSettings.SINGLE, 1),
+    TINTED_GLASS(new Material[]{Material.TINTED_GLASS}, Option.OR, RNGSettings.SINGLE, 1),
+    AMETHYST_BLOCK(new Material[]{Material.AMETHYST_BLOCK}, Option.OR, RNGSettings.ORE_BLOCK, 1),
+    DIAMOND(new Material[]{Material.DIAMOND}, Option.OR, RNGSettings.DIAMOND, 2),
+    DIAMOND_PICKAXE(new Material[]{Material.DIAMOND_PICKAXE}, Option.OR, RNGSettings.SINGLE, 2),
     ALL_ORE_BLOCKS(new Material[]{Material.COAL_BLOCK, Material.COPPER_BLOCK, Material.IRON_BLOCK, Material.GOLD_BLOCK, Material.REDSTONE_BLOCK, Material.LAPIS_BLOCK, Material.DIAMOND_BLOCK, Material.EMERALD_BLOCK},
-            Option.AND, rngSettings.SINGLE, 3),
-    DIAMOND_BLOCK(new Material[]{Material.DIAMOND_BLOCK}, Option.OR, rngSettings.DIAMOND_BLOCK, 3),
-    EMERALD(new Material[]{Material.EMERALD}, Option.OR, rngSettings.COBBLESTONE, 2),
-    LAVA_BUCKET(new Material[]{Material.LAVA_BUCKET}, Option.OR, rngSettings.SINGLE, 1),
-    OBSIDIAN(new Material[]{Material.OBSIDIAN}, Option.OR, rngSettings.ORE_BLOCK, 2),
-    ENCHANTING_TABLE(new Material[]{Material.ENCHANTING_TABLE}, Option.OR, rngSettings.SINGLE, 2),
+            Option.AND, RNGSettings.SINGLE, 3),
+    DIAMOND_BLOCK(new Material[]{Material.DIAMOND_BLOCK}, Option.OR, RNGSettings.DIAMOND_BLOCK, 3),
+    EMERALD(new Material[]{Material.EMERALD}, Option.OR, RNGSettings.COBBLESTONE, 2),
+    LAVA_BUCKET(new Material[]{Material.LAVA_BUCKET}, Option.OR, RNGSettings.SINGLE, 1),
+    OBSIDIAN(new Material[]{Material.OBSIDIAN}, Option.OR, RNGSettings.ORE_BLOCK, 2),
+    ENCHANTING_TABLE(new Material[]{Material.ENCHANTING_TABLE}, Option.OR, RNGSettings.SINGLE, 2),
     DOOR(new Material[]{
             Material.OAK_DOOR,
             Material.SPRUCE_DOOR,
@@ -110,7 +118,7 @@ public enum CollectGoal implements Goal {
             Material.WARPED_DOOR,
             Material.IRON_DOOR,
             Material.COPPER_DOOR},
-            Option.AND, rngSettings.SMALL_SUBSET, 2),
+            Option.AND, RNGSettings.SMALL_SUBSET, 2),
     SLAB(new Material[]{
             Material.OAK_SLAB,
             Material.SPRUCE_SLAB,
@@ -162,7 +170,7 @@ public enum CollectGoal implements Goal {
             Material.QUARTZ_SLAB,
             Material.SMOOTH_QUARTZ_SLAB,
             Material.CUT_COPPER_SLAB},
-            Option.AND, rngSettings.LARGE_SUBSET, 2),
+            Option.AND, RNGSettings.LARGE_SUBSET, 2),
     STAIRS(new Material[]{
             Material.OAK_STAIRS,
             Material.SPRUCE_STAIRS,
@@ -211,7 +219,7 @@ public enum CollectGoal implements Goal {
             Material.QUARTZ_STAIRS,
             Material.SMOOTH_QUARTZ_STAIRS,
             Material.CUT_COPPER_STAIRS},
-            Option.AND, rngSettings.LARGE_SUBSET, 2),
+            Option.AND, RNGSettings.LARGE_SUBSET, 2),
     BED(new Material[]{
             Material.BLACK_BED,
             Material.BLUE_BED,
@@ -229,7 +237,7 @@ public enum CollectGoal implements Goal {
             Material.RED_BED,
             Material.WHITE_BED,
             Material.YELLOW_BED},
-            Option.AND, rngSettings.SMALL_SUBSET, 1),
+            Option.AND, RNGSettings.SMALL_SUBSET, 1),
     WALL(new Material[]{
             Material.COBBLESTONE_WALL,
             Material.MOSSY_COBBLESTONE_WALL,
@@ -255,7 +263,7 @@ public enum CollectGoal implements Goal {
             Material.BLACKSTONE_WALL,
             Material.POLISHED_BLACKSTONE_WALL,
             Material.POLISHED_BLACKSTONE_BRICK_WALL},
-            Option.AND, rngSettings.LARGE_SUBSET, 2),
+            Option.AND, RNGSettings.LARGE_SUBSET, 2),
     FENCE(new Material[]{
             Material.OAK_FENCE,
             Material.SPRUCE_FENCE,
@@ -269,7 +277,7 @@ public enum CollectGoal implements Goal {
             Material.CRIMSON_FENCE,
             Material.WARPED_FENCE,
             Material.NETHER_BRICK_FENCE},
-            Option.AND, rngSettings.SMALL_SUBSET, 2),
+            Option.AND, RNGSettings.SMALL_SUBSET, 2),
     TRAPDOOR(new Material[]{
             Material.OAK_TRAPDOOR,
             Material.SPRUCE_TRAPDOOR,
@@ -284,10 +292,10 @@ public enum CollectGoal implements Goal {
             Material.WARPED_TRAPDOOR,
             Material.IRON_TRAPDOOR,
             Material.COPPER_TRAPDOOR,},
-            Option.AND, rngSettings.SMALL_SUBSET, 1),
-    CHEST(new Material[]{Material.CHEST}, Option.OR, rngSettings.SINGLE, 0),
-    BARREL(new Material[]{Material.BARREL}, Option.OR, rngSettings.SINGLE, 0),
-    LECTERN(new Material[]{Material.LECTERN}, Option.OR, rngSettings.SINGLE, 1),
+            Option.AND, RNGSettings.SMALL_SUBSET, 1),
+    CHEST(new Material[]{Material.CHEST}, Option.OR, RNGSettings.SINGLE, 0),
+    BARREL(new Material[]{Material.BARREL}, Option.OR, RNGSettings.SINGLE, 0),
+    LECTERN(new Material[]{Material.LECTERN}, Option.OR, RNGSettings.SINGLE, 1),
     SIGN(new Material[]{
             Material.OAK_SIGN,
             Material.SPRUCE_SIGN,
@@ -300,7 +308,7 @@ public enum CollectGoal implements Goal {
             Material.BAMBOO_SIGN,
             Material.CRIMSON_SIGN,
             Material.WARPED_SIGN},
-            Option.AND, rngSettings.SMALL_SUBSET, 1),
+            Option.AND, RNGSettings.SMALL_SUBSET, 1),
     HANGING_SIGN(new Material[]{
             Material.OAK_HANGING_SIGN,
             Material.SPRUCE_HANGING_SIGN,
@@ -313,21 +321,27 @@ public enum CollectGoal implements Goal {
             Material.BAMBOO_HANGING_SIGN,
             Material.CRIMSON_HANGING_SIGN,
             Material.WARPED_HANGING_SIGN},
-            Option.AND, rngSettings.SMALL_SUBSET, 1),
-    LOOM(new Material[]{Material.LOOM}, Option.OR, rngSettings.SINGLE, 1),
-    TORCH(new Material[]{Material.TORCH}, Option.OR, rngSettings.COBBLESTONE, 1),
-    JACK_O_LANTERN(new Material[]{Material.JACK_O_LANTERN}, Option.OR, rngSettings.SINGLE, 1),
-    GLOWSTONE_BLOCK(new Material[]{Material.GLOWSTONE}, Option.OR, rngSettings.COBBLESTONE, 2),
-    SHROOMLIGHT(new Material[]{Material.SHROOMLIGHT}, Option.OR, rngSettings.ORE_BLOCK, 2),
-    SOUL_FIRE_TORCH(new Material[]{Material.SOUL_TORCH}, Option.OR, rngSettings.COBBLESTONE, 2),
-    FROGLIGHT(new Material[]{Material.OCHRE_FROGLIGHT, Material.VERDANT_FROGLIGHT, Material.PEARLESCENT_FROGLIGHT}, Option.OR, rngSettings.PICK_ONE, 3);
+            Option.AND, RNGSettings.SMALL_SUBSET, 1),
+    LOOM(new Material[]{Material.LOOM}, Option.OR, RNGSettings.SINGLE, 1),
+    TORCH(new Material[]{Material.TORCH}, Option.OR, RNGSettings.COBBLESTONE, 1),
+    JACK_O_LANTERN(new Material[]{Material.JACK_O_LANTERN}, Option.OR, RNGSettings.SINGLE, 1),
+    GLOWSTONE_BLOCK(new Material[]{Material.GLOWSTONE}, Option.OR, RNGSettings.COBBLESTONE, 2),
+    SHROOMLIGHT(new Material[]{Material.SHROOMLIGHT}, Option.OR, RNGSettings.ORE_BLOCK, 2),
+    SOUL_FIRE_TORCH(new Material[]{Material.SOUL_TORCH}, Option.OR, RNGSettings.COBBLESTONE, 2),
+    FROGLIGHT(new Material[]{Material.OCHRE_FROGLIGHT, Material.VERDANT_FROGLIGHT, Material.PEARLESCENT_FROGLIGHT}, Option.OR, RNGSettings.PICK_ONE, 3);
 
 
-    public final ArrayList<Material> items;
-    public final Integer amount;
-    public final Option option;
-    public final Integer difficulty;
-    public final PlayerChecklist<Material> checklist;
+    private PlayerChecklist<Material> checklist;
+
+    private HashSet<Material> items;
+    private Integer itemCount;
+    private Option option;
+    private Integer difficulty;
+
+    private ItemStack displayItem;
+
+    private Material[] providedItems;
+    private RNGSettings rngSettings;
 
     /**
      *
@@ -336,46 +350,72 @@ public enum CollectGoal implements Goal {
      * @param rngSettings Settings enum described above
      * @param difficulty Difficulty rating of this goal
      */
-    CollectGoal(Material[] target, Option option, rngSettings rngSettings, Integer difficulty) {
+    CollectGoal(Material[] target, Option option, RNGSettings rngSettings, Integer difficulty) {
+        providedItems = target;
+        this.rngSettings = rngSettings;
+        this.option = option;
+        this.difficulty = difficulty;
+    }
+
+    @Override
+    public Goal generate() {
+        if(!this.canGenerate()) return null;
+
         Random rng = new Random();
         int[] settings = rngSettings.settings;
-        if(settings.length < 2) throw new IllegalArgumentException("Missing rng Settings");
-        if(settings.length > 2) {
-            int minItems = settings[2];
-            int maxItems = (settings.length > 3) ? settings[3] : target.length;
-            int numItems = rng.nextInt(minItems, maxItems);
-            ArrayList<Material> tmpItems = new ArrayList<Material>();
 
-            Set<Integer> chosenIndices = new HashSet<>();
+        if(settings.length > 2) {
+            HashSet<Material> itemSelectionPool = cutImpossibleItems();
+            int minItems = settings[2];
+            int maxItems = (settings.length > 3) ? (Math.min(settings[3], itemSelectionPool.size()))  : itemSelectionPool.size();
+            int numItems = rng.nextInt(minItems, maxItems);
+            HashSet<Material> tmpItems = new HashSet<>();
+
+            HashSet<Integer> chosenIndices = new HashSet<>();
             while(chosenIndices.size() < numItems) {
-                chosenIndices.add(rng.nextInt(0, target.length));
+                chosenIndices.add(rng.nextInt(0, itemSelectionPool.size()));
             }
             for (int index : chosenIndices) {
-                tmpItems.add(target[index]);
+                tmpItems.add(providedItems[index]);
             }
             this.items = tmpItems;
         }
-        else this.items = new ArrayList<Material>(Arrays.asList(target));
-        this.amount = rng.nextInt(settings[0], settings[1]);
-        this.option = option;
-        this.difficulty = difficulty;
-        this.checklist = new PlayerChecklist<Material>(this.items);
+        else this.items = new HashSet<>(Arrays.asList(providedItems));
+
+        this.itemCount = rng.nextInt(settings[0], settings[1]);
+        this.checklist = new PlayerChecklist<>(this.items);
+        displayItem = new ItemStack(items.toArray(new Material[0])[(new Random()).nextInt(0, items.size())]);
+        return this;
+    }
+
+    private HashSet<Material> cutImpossibleItems() {
+        HashSet<Material> newSet = new HashSet<>(Arrays.asList(providedItems));
+        for(Material item : providedItems) {
+            boolean isValid;
+            try{
+                isValid = Enum.valueOf(WorldRequirements.Element.class, item.name()).verify();
+            }catch(IllegalArgumentException e){
+                isValid = true;
+            }
+            if(!isValid) newSet.remove(item);
+        }
+        return newSet;
     }
 
 
     @Override
-    public void validate(Player p, Plugin plugin) {
+    public boolean check(Player p, Plugin plugin) {
         Inventory inv = p.getInventory();
 
-        boolean isComplete;
         for(Material m : items) {
-            if (inv.contains(m, amount)) {
+            if (inv.contains(m, itemCount)) {
                 if (option == Option.OR || checklist.checkItem(p, m)) {
                     plugin.getServer().getPluginManager().callEvent(new GoalObtainedEvent(p, this));
-                    return;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     @Override
@@ -396,33 +436,51 @@ public enum CollectGoal implements Goal {
                 return "Collect a full iron toolset";
             case DIAMOND_TOOLS:
                 return "Collect a full diamond toolset";
+            case FROGLIGHT:
+                return "Obtain any froglight";
         }
 
-        if(items.size() == 1) {
-            return "Collect" + amount + " " + items.get(0).name().toLowerCase();
+        ArrayList<Material> itemList = new ArrayList<>(items);
+        if(itemList.size() == 1) {
+            return "Collect" + itemCount + " " + itemList.get(0).name().toLowerCase();
         }
         else {
-            String rValue = "Collect " + amount;
-            for(int i = 0; i < items.size(); i++) {
-                if(i < items.size() - 1) {
-                    rValue += " " + this.option.name().toLowerCase();
+            StringBuilder rValue = new StringBuilder("Collect " + itemCount);
+            for(int i = 0; i < itemList.size(); i++) {
+                if(i < itemList.size() - 1) {
+                    rValue.append(" ").append(this.option.name().toLowerCase());
                 }
-                rValue += " " + items.get(1).name().toLowerCase();
-                if(i < items.size() - 1) {
-                    rValue += ",";
+                rValue.append(" ").append(itemList.get(1).name().toLowerCase());
+                if(i < itemList.size() - 1) {
+                    rValue.append(",");
                 }
             }
-            return rValue;
+            return rValue.toString();
         }
+    }
+
+    @Override
+    public int getDifficulty() {
+        return difficulty;
     }
 
     @Override
     public ItemStack displayItem() {
-        return new ItemStack(items.get((new Random().nextInt(0, items.size()))), amount);
+        return displayItem;
     }
 
     @Override
-    public boolean canGenerate(GameWorld world) {
+    public boolean canGenerate() {
+        int validItems = providedItems.length;
+        int minItems = 1;
+        if(rngSettings.settings.length > 2) minItems = rngSettings.settings[2];
+
+        for(Material m : providedItems) {
+            if(!WorldRequirements.Element.valueOf(m.name()).verify() && option == Option.AND) {
+                validItems--;
+                if(validItems < minItems) return false;
+            }
+        }
         return true;
     }
 }

@@ -22,7 +22,7 @@ public interface Goal {
      * @param p The player to check completion for
      * @param plugin A reference to the plugin (for event handling)
      */
-    void validate(Player p, Plugin plugin);
+    boolean check(Player p, Plugin plugin);
 
     /**
      * This method can logically generate a description, but may also be used to hardcode specific descriptions.
@@ -36,13 +36,15 @@ public interface Goal {
      */
     ItemStack displayItem();
 
+    public Goal generate();
+
+    public int getDifficulty();
 
     /**
      *
-     * @param world World the game is taking place in
      * @return Whether this goal can safely be included in a game in this world
      */
-    default boolean canGenerate(GameWorld world) {
+    default boolean canGenerate() {
         return true;
     }
 }

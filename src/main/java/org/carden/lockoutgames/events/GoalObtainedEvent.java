@@ -5,6 +5,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.carden.lockoutgames.goal.Goal;
+import org.jetbrains.annotations.NotNull;
 
 public class GoalObtainedEvent extends Event {
 
@@ -42,7 +43,7 @@ public class GoalObtainedEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
 }
