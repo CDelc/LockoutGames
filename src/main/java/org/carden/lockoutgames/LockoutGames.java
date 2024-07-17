@@ -4,8 +4,11 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.carden.lockoutgames.commands.Startgame;
 import org.carden.lockoutgames.events.EventListener;
 import org.carden.lockoutgames.game.GameSettings;
+
+import java.util.Objects;
 
 /**
  * Base plugin class
@@ -36,10 +39,17 @@ public final class LockoutGames extends JavaPlugin {
 
         game = new GameSettings(this);
 
+        try {
+            Objects.requireNonNull(this.getCommand("startgame")).setExecutor(new Startgame(this));
+        }catch(NullPointerException e) {
+            this.getLogger().severe("MISSING COMMAND " + e.getMessage());
+        }
+
     }
 
     @Override
     public void onDisable() {
+        game.getWorld().destroy();
     }
 
     private boolean setupMultiverseCore() {
