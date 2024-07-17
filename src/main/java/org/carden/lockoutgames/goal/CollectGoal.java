@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 import org.carden.lockoutgames.events.GoalObtainedEvent;
-import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.info.WorldRequirements;
 
 import java.util.*;
@@ -335,13 +334,13 @@ public enum CollectGoal implements Goal {
 
     private HashSet<Material> items;
     private Integer itemCount;
-    private Option option;
-    private Integer difficulty;
+    private final Option option;
+    private final Integer difficulty;
 
     private ItemStack displayItem;
 
-    private Material[] providedItems;
-    private RNGSettings rngSettings;
+    private final Material[] providedItems;
+    private final RNGSettings rngSettings;
 
     /**
      *

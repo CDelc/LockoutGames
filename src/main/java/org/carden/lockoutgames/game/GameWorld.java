@@ -33,8 +33,8 @@ public class GameWorld {
     boolean amplified;
     int worldSize;
 
-    Set<Biome> availableBiomes = new HashSet<Biome>();
-    Set<Structure> availableStructures = new HashSet<Structure>();
+    Set<Biome> availableBiomes = new HashSet<>();
+    Set<Structure> availableStructures = new HashSet<>();
 
     Map<World.Environment, World> cbWorlds;
 
@@ -72,7 +72,7 @@ public class GameWorld {
     }
 
     public World getWorld(World.Environment type) {
-        return cbWorlds.getOrDefault(World.Environment.NETHER, overworld.getCBWorld());
+        return cbWorlds.getOrDefault(type, overworld.getCBWorld());
     }
 
     private void generateWorld() {
@@ -155,13 +155,6 @@ public class GameWorld {
                 availableBiomes.add(world.getBiome(x, world.getHighestBlockYAt(x, z),z));
             }
         }
-
-//        world = getWorld(World.Environment.THE_END);
-//        for(int x = -radius + 100; x < radius - 100; x+=stepsize) {
-//            for(int z = -radius + 100; z < radius - 100; z+=stepsize) {
-//                availableBiomes.add(world.getBiome(x, world.getHighestBlockYAt(x, z),z));
-//            }
-//        }
 
         availableBiomes.add(Biome.SMALL_END_ISLANDS);
         availableBiomes.add(Biome.END_BARRENS);

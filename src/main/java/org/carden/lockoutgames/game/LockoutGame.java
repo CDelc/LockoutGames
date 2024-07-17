@@ -1,7 +1,6 @@
 package org.carden.lockoutgames.game;
 
 import org.carden.lockoutgames.goal.Goal;
-import org.carden.lockoutgames.goal.GoalSelector;
 
 import java.util.ArrayList;
 

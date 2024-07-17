@@ -4,7 +4,7 @@ public enum GoalType {
 
     COLLECT_GOAL(CollectGoal.class);
 
-    Class<? extends Goal> goalType;
+    private final Class<? extends Goal> goalType;
 
     GoalType(Class<? extends Goal> goalType) {
         this.goalType = goalType;

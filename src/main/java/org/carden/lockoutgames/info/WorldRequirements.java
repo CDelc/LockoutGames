@@ -1,13 +1,9 @@
 package org.carden.lockoutgames.info;
 
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.structure.Structure;
-import org.bukkit.generator.structure.StructureType;
 import org.carden.lockoutgames.game.GameWorld;
-import sun.jvm.hotspot.code.Stub;
 
-import java.io.StringReader;
 import java.util.function.Predicate;
 
 public class WorldRequirements {
@@ -857,7 +853,7 @@ public class WorldRequirements {
 
 
         private static GameWorld world;
-        Predicate<GameWorld> requirement;
+        private final Predicate<GameWorld> requirement;
 
         Element(Predicate<GameWorld> requirement) {
             this.requirement = requirement;

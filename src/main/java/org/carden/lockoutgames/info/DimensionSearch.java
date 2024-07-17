@@ -2,7 +2,6 @@ package org.carden.lockoutgames.info;
 
 import org.bukkit.World;
 import org.bukkit.generator.structure.Structure;
-import org.bukkit.generator.structure.StructureType;
 
 import java.util.ArrayList;
 
@@ -56,7 +55,7 @@ public enum DimensionSearch {
 
     DimensionSearch(World.Environment environment, Structure[] structures) {
         this.environment = environment;
-        this.structures = new ArrayList<Structure>(Arrays.asList(structures));
+        this.structures = new ArrayList<>(Arrays.asList(structures));
     }
 
     public World.Environment getEnvironment() {

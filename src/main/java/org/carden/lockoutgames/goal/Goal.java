@@ -3,7 +3,6 @@ package org.carden.lockoutgames.goal;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.carden.lockoutgames.game.GameWorld;
 
 public interface Goal {
 
@@ -36,9 +35,9 @@ public interface Goal {
      */
     ItemStack displayItem();
 
-    public Goal generate();
+    Goal generate();
 
-    public int getDifficulty();
+    int getDifficulty();
 
     /**
      *

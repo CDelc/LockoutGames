@@ -44,7 +44,7 @@ public final class LockoutGames extends JavaPlugin {
 
     private boolean setupMultiverseCore() {
         Plugin plugin = getServer().getPluginManager().getPlugin("Multiverse-Core");
-        if (plugin == null || !(plugin instanceof MultiverseCore)) {
+        if (!(plugin instanceof MultiverseCore)) {
             return false;
         }
         multiverseCore = (MultiverseCore) plugin;
@@ -53,7 +53,7 @@ public final class LockoutGames extends JavaPlugin {
 
     private boolean setupNetherPortals() {
         Plugin plugin = getServer().getPluginManager().getPlugin("Multiverse-NetherPortals");
-        if (plugin == null || !(plugin instanceof MultiverseNetherPortals)) {
+        if (!(plugin instanceof MultiverseNetherPortals)) {
             return false;
         }
         mvnetherPortals = (MultiverseNetherPortals) plugin;

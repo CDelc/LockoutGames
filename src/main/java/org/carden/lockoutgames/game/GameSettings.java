@@ -49,8 +49,8 @@ public class GameSettings {
     public GameSettings(LockoutGames plugin) {
         this.plugin = plugin;
         this.world = new GameWorld(plugin);
-        this.players = new HashSet<Player>();
-        this.spectators = new HashSet<Player>();
+        this.players = new HashSet<>();
+        this.spectators = new HashSet<>();
         this.goalSelector = new GoalSelector();
         this.lockout = null;
 
