@@ -24,6 +24,10 @@ public class GameSettings {
         return goalSelector;
     }
 
+    protected LockoutGames getPlugin() {
+        return plugin;
+    }
+
     public int getWorldSize() {
         return worldSize;
     }
@@ -64,8 +68,8 @@ public class GameSettings {
 
     public boolean start() {
         if(lockout != null) return false;
-        world.regenerate();
-        lockout = new LockoutGame(this);
+        world.generateWorld();
+        //lockout = new LockoutGame(this);
         return true;
     }
 }

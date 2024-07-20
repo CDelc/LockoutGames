@@ -29,7 +29,7 @@ public final class LockoutGames extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
         if(!setupNetherPortals()) {
-            getLogger().severe("Multiverse-NetherPortals not found! Please install the Multiverse-NetherPortals plugin to your server.\n" +
+            getLogger().severe("Multiverse-NetherPortals not found! Please install the Multiverse-core plugin to your server.\n" +
                     "Plugin disabled.");
             getServer().getPluginManager().disablePlugin(this);
         }
@@ -49,7 +49,6 @@ public final class LockoutGames extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        game.getWorld().destroy();
     }
 
     private boolean setupMultiverseCore() {
