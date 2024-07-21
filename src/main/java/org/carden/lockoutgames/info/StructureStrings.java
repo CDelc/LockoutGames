@@ -7,6 +7,10 @@ import java.util.Map;
 
 public class StructureStrings {
 
+    /**
+     * Tool mostly used for debugging to get a readable string for structures.
+     */
+
     private static final Map<Structure, String> STRUCTURE_TYPE_NAMES = new HashMap<>();
 
     static {

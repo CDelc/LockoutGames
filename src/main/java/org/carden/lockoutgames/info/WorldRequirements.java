@@ -8,7 +8,16 @@ import java.util.function.Predicate;
 
 public class WorldRequirements {
 
+    /**
+     * This tracks everything in the game that requires certain conditions about the gameplay area are met.
+     * NOTE: A function here returning false does not necessarily mean the element is unobtainable, these
+     * simply check the minimum requirements where the plugin can consistently guarantee that the element is obtainable.
+     */
     public enum Element {
+        /**
+         * Enums here should match the correspond enum's name in the Spigot API (i.e. Material.DRIPSTONE_BLOCK should match ELEMENT.DRIPSTONE_BLOCK
+         * A boolean function can be passed that checks whether a GameWorld has the required attributes for an element to be accessible
+         */
 
         DRIPSTONE_BLOCK(WorldRequirements::hasDripstone),
         PODZOL(WorldRequirements::hasPodzol),
@@ -859,15 +868,23 @@ public class WorldRequirements {
             this.requirement = requirement;
         }
 
+        /**
+         *
+         * @return True if this element can be accessed in this game world, false otherwise
+         */
         public boolean verify() {
             return requirement.test(world);
         }
 
+        /**
+         * @param w The GameWorld object elements are being checked against
+         */
         public static void setWorld(GameWorld w) {
             world = w;
         }
     }
 
+    //Returns true if the world can generate ferns
     public static boolean hasFern(GameWorld world) {
         return world.hasBiome(Biome.JUNGLE) ||
                 world.hasBiome(Biome.TAIGA) ||
@@ -876,6 +893,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.OLD_GROWTH_PINE_TAIGA);
     }
 
+    //Returns true if the world can generate crying obsidian consistently
     public static boolean hasCryingObsidian(GameWorld world) {
         return world.hasStructure(Structure.RUINED_PORTAL) ||
                 world.hasStructure(Structure.RUINED_PORTAL_DESERT) ||
@@ -887,20 +905,24 @@ public class WorldRequirements {
                 hasPiglin(world);
     }
 
+    //Returns true if a pillager outpost has generated in the world
     public static boolean hasPillagerOutpost(GameWorld world) {
         return world.hasStructure(Structure.PILLAGER_OUTPOST);
     }
 
+    //Returns true if Evokers can be spawned in the world
     public static boolean hasEvoker(GameWorld world) {
         return (world.hasStructure(Structure.PILLAGER_OUTPOST) && hasVillage(world)) ||
                 world.hasStructure(Structure.MANSION);
     }
 
+    //Returns true if shroomlights generate in the world
     public static boolean hasShroomlight(GameWorld world) {
         return world.hasBiome(Biome.CRIMSON_FOREST) ||
                 world.hasBiome(Biome.WARPED_FOREST);
     }
 
+    //Returns true if sweet berries generate in the world
     public static boolean hasSweetBerries(GameWorld world) {
         return world.hasBiome(Biome.TAIGA) ||
                 world.hasBiome(Biome.SNOWY_TAIGA) ||
@@ -908,28 +930,33 @@ public class WorldRequirements {
                 world.hasBiome(Biome.OLD_GROWTH_SPRUCE_TAIGA);
     }
 
+    //Returns true if goats spawn in the world
     public static boolean hasGoat(GameWorld world) {
         return world.hasBiome(Biome.FROZEN_PEAKS) ||
                 world.hasBiome(Biome.JAGGED_PEAKS) ||
                 world.hasBiome(Biome.SNOWY_SLOPES);
     }
 
+    //Returns true of ghasts spawn in the world
     public static boolean hasGhast(GameWorld world) {
         return world.hasBiome(Biome.NETHER_WASTES) ||
                 world.hasBiome(Biome.SOUL_SAND_VALLEY) ||
                 world.hasBiome(Biome.BASALT_DELTAS);
     }
 
+    //Returns true if end crystals can be crafted from materials in this world
     public static boolean hasEndCrystal(GameWorld world) {
         return hasGhast(world) && hasFortress(world);
     }
 
+    //Returns true if magma cubes spawn in this world
     public static boolean hasMagmaCube(GameWorld world) {
         return world.hasBiome(Biome.NETHER_WASTES) ||
                 world.hasBiome(Biome.BASALT_DELTAS) ||
                 world.hasStructure(Structure.FORTRESS);
     }
 
+    //Returns true if rabbits spawn in this world
     public static boolean hasRabbit(GameWorld world) {
         return world.hasBiome(Biome.DESERT) ||
                 world.hasBiome(Biome.SNOWY_PLAINS) ||
@@ -945,11 +972,13 @@ public class WorldRequirements {
                 world.hasBiome(Biome.CHERRY_GROVE);
     }
 
+    //Returns true if frogs spawn in this world
     public static boolean hasFrog(GameWorld world) {
         return world.hasBiome(Biome.SWAMP) ||
                 world.hasBiome(Biome.MANGROVE_SWAMP);
     }
 
+    //Returns true if temperate frogs can be raised in this world
     public static boolean hasTemperateFrog(GameWorld world) {
         return hasFrog(world) && (world.hasBiome(Biome.SWAMP) ||
                 world.hasBiome(Biome.BEACH) ||
@@ -981,6 +1010,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.STONY_PEAKS));
     }
 
+    //Returns true if warm frogs can be raised in this world
     public static boolean hasWarmFrog(GameWorld world) {
         return hasFrog(world) && (world.hasBiome(Biome.MANGROVE_SWAMP) ||
                 world.hasBiome(Biome.BADLANDS) ||
@@ -996,6 +1026,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.WOODED_BADLANDS));
     }
 
+    //Returns true if cold frogs can be raised in this world
     public static boolean hasColdFrog(GameWorld world) {
         return hasFrog(world) && (world.hasBiome(Biome.DEEP_FROZEN_OCEAN) ||
                 world.hasBiome(Biome.FROZEN_OCEAN) ||
@@ -1012,28 +1043,34 @@ public class WorldRequirements {
                 hasEndAccess(world));
     }
 
+    //Returns true if pearlescent froglights are accessible
     public static boolean hasPearlescentFroglight(GameWorld world) {
         return hasMagmaCube(world) && hasWarmFrog(world);
     }
 
+    //Returns true if ochre froglights are accessible
     public static boolean hasOchreFroglight(GameWorld world) {
         return hasMagmaCube(world) && hasTemperateFrog(world);
     }
 
+    //Returns true if verdant froglights are accessible
     public static boolean hasVerdantFroglight(GameWorld world) {
         return hasMagmaCube(world) && hasColdFrog(world);
     }
 
+    //Returns true if piglins spawn in this world
     public static boolean hasPiglin(GameWorld world) {
         return world.hasBiome(Biome.NETHER_WASTES) ||
                 world.hasBiome(Biome.CRIMSON_FOREST) ||
                 world.hasStructure(Structure.BASTION_REMNANT);
     }
 
+    //Returns true if a bastion has generated in this world
     public static boolean hasBastion(GameWorld world) {
         return world.hasStructure(Structure.BASTION_REMNANT);
     }
 
+    //Returns true if cod spawn in this world
     public static boolean hasCod(GameWorld world) {
         return world.hasBiome(Biome.OCEAN) ||
                 world.hasBiome(Biome.COLD_OCEAN) ||
@@ -1043,6 +1080,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.LUKEWARM_OCEAN);
     }
 
+    //Returns true if salmon spawn in this world
     public static boolean hasSalmon(GameWorld world) {
         return world.hasBiome(Biome.COLD_OCEAN) ||
                 world.hasBiome(Biome.DEEP_COLD_OCEAN) ||
@@ -1052,17 +1090,20 @@ public class WorldRequirements {
                 world.hasBiome(Biome.FROZEN_RIVER);
     }
 
+    //Returns true if tropical fish spawn in this world
     public static boolean hasTropicalFish(GameWorld world) {
         return world.hasBiome(Biome.WARM_OCEAN) ||
                 world.hasBiome(Biome.LUKEWARM_OCEAN) ||
                 world.hasBiome(Biome.DEEP_LUKEWARM_OCEAN);
     }
 
+    //Returns true if powdered snow generates in this world
     public static boolean hasPowderedSnow(GameWorld world) {
         return world.hasBiome(Biome.GROVE) ||
                 world.hasBiome(Biome.SNOWY_SLOPES);
     }
 
+    //Returns true if there is a village in this world
     public static boolean hasVillage(GameWorld world) {
         return world.hasStructure(Structure.VILLAGE_PLAINS) ||
                 world.hasStructure(Structure.VILLAGE_DESERT) ||
@@ -1071,38 +1112,46 @@ public class WorldRequirements {
                 world.hasStructure(Structure.VILLAGE_SAVANNA);
     }
 
+    //Returns true if apples are naturally accessible in this world
     public static boolean hasApple(GameWorld world) {
         return hasOak(world) || hasDarkOak(world);
     }
 
+    //Returns true if cobwebs are generating in this world
     public static boolean hasCobweb(GameWorld world) {
         return world.hasStructure(Structure.MINESHAFT) ||
                 world.hasStructure(Structure.STRONGHOLD) ||
                 world.hasStructure(Structure.MANSION);
     }
 
+    //Returns true if there is a dripstone cave in this world
     public static boolean hasDripstone(GameWorld world) {
         return world.hasBiome(Biome.DRIPSTONE_CAVES);
     }
 
+    //Returns true if there is a lush cave in this world
     public static boolean hasLushCave(GameWorld world) {
         return world.hasBiome(Biome.LUSH_CAVES);
     }
 
+    //Returns true of podzol is naturally generated in this world
     public static boolean hasPodzol(GameWorld world) {
         return world.hasBiome(Biome.OLD_GROWTH_PINE_TAIGA) ||
                 world.hasBiome(Biome.OLD_GROWTH_PINE_TAIGA) ||
                 world.hasBiome(Biome.BAMBOO_JUNGLE);
     }
 
+    //Returns true if there is a crimson forest in this world
     public static boolean hasCrimson(GameWorld world) {
         return world.hasBiome(Biome.CRIMSON_FOREST);
     }
 
+    //Returns true if there is a warped forest in this world
     public static boolean hasWarped(GameWorld world) {
         return world.hasBiome(Biome.WARPED_FOREST);
     }
 
+    //Returns true if oak trees generate in this world
     public static boolean hasOak(GameWorld world) {
         return world.hasBiome(Biome.BAMBOO_JUNGLE) ||
                 world.hasBiome(Biome.DARK_FOREST) ||
@@ -1117,6 +1166,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.MEADOW);
     }
 
+    //Returns true if spruce trees generate in this world
     public static boolean hasSpruce(GameWorld world) {
         return world.hasBiome(Biome.OLD_GROWTH_SPRUCE_TAIGA) ||
                 world.hasBiome(Biome.OLD_GROWTH_PINE_TAIGA) ||
@@ -1127,6 +1177,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.GROVE);
     }
 
+    //Returns true if birch trees generate in this world
     public static boolean hasBirch(GameWorld world) {
         return world.hasBiome(Biome.DARK_FOREST) ||
                 world.hasBiome(Biome.FOREST) ||
@@ -1135,48 +1186,58 @@ public class WorldRequirements {
                 world.hasBiome(Biome.MEADOW);
     }
 
+    //Returns true if jungle trees generate in this world
     public static boolean hasJungle(GameWorld world) {
         return world.hasBiome(Biome.BAMBOO_JUNGLE) ||
                 world.hasBiome(Biome.JUNGLE) ||
                 world.hasBiome(Biome.SPARSE_JUNGLE);
     }
 
+    //Returns true if acacia trees generate in this world
     public static boolean hasAcacia(GameWorld world) {
         return world.hasBiome(Biome.SAVANNA) ||
                 world.hasBiome(Biome.SAVANNA_PLATEAU);
     }
 
+    //Returns true if cherry trees generate in this world
     public static boolean hasCherry(GameWorld world) {
         return world.hasBiome(Biome.CHERRY_GROVE);
     }
 
+    //Returns true if dark oak trees generate in this world
     public static boolean hasDarkOak(GameWorld world) {
         return world.hasBiome(Biome.DARK_FOREST);
     }
 
+    //Returns true if mangrove trees generate in this world
     public static boolean hasMangrove(GameWorld world) {
         return world.hasBiome(Biome.MANGROVE_SWAMP);
     }
 
+    //Returns true if bamboo generates in this world
     public static boolean hasBamboo(GameWorld world) {
         return world.hasBiome(Biome.BAMBOO_JUNGLE);
     }
 
+    //Returns true if suspicious sand can be generated in this world
     public static boolean hasSuspiciousSand(GameWorld world) {
         return world.hasStructure(Structure.DESERT_PYRAMID) ||
                 world.hasStructure(Structure.OCEAN_RUIN_WARM);
     }
 
+    //Returns true if suspicious gravel can be generated in this world
     public static boolean hasSuspiciousGravel(GameWorld world) {
         return world.hasStructure(Structure.OCEAN_RUIN_COLD);
     }
 
+    //Returns true if red sand generates in this world
     public static boolean hasRedSand(GameWorld world) {
         return world.hasBiome(Biome.BADLANDS) ||
                 world.hasBiome(Biome.WOODED_BADLANDS) ||
                 world.hasBiome(Biome.ERODED_BADLANDS);
     }
 
+    //Returns true if emeralds can naturally generate in this world
     public static boolean hasNaturalEmerald(GameWorld world) {
         return world.hasBiome(Biome.MEADOW) ||
                 world.hasBiome(Biome.CHERRY_GROVE) ||
@@ -1190,10 +1251,12 @@ public class WorldRequirements {
                 world.hasBiome(Biome.WINDSWEPT_FOREST);
     }
 
+    //Returns true if a trial chamber has generated in this world
     public static boolean hasTrialChamber(GameWorld world) {
         return world.hasStructure(Structure.TRIAL_CHAMBERS);
     }
 
+    //Returns true if bees can be reliably found in this world
     public static boolean hasBees(GameWorld world) {
         return world.hasBiome(Biome.MEADOW) ||
                 world.hasBiome(Biome.PLAINS) ||
@@ -1203,10 +1266,12 @@ public class WorldRequirements {
                 world.hasBiome(Biome.CHERRY_GROVE);
     }
 
+    //Returns true if an ocean monument generated in this world
     public static boolean hasOceanMonument(GameWorld world) {
         return world.hasStructure(Structure.MONUMENT);
     }
 
+    //Returns true if dead bushes generated in this world
     public static boolean hasDeadBush(GameWorld world) {
         return world.hasBiome(Biome.DESERT) ||
                 world.hasBiome(Biome.BADLANDS) ||
@@ -1218,6 +1283,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.OLD_GROWTH_SPRUCE_TAIGA);
     }
 
+    //Returns true if seagrass can generate in this world
     public static boolean hasSeagrass(GameWorld world) {
         return world.hasBiome(Biome.OCEAN) ||
                 world.hasBiome(Biome.COLD_OCEAN) ||
@@ -1228,6 +1294,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.WARM_OCEAN);
     }
 
+    //Returns true if kelp can generate in this world
     public static boolean hasKelp(GameWorld world) {
         return world.hasBiome(Biome.OCEAN) ||
                 world.hasBiome(Biome.COLD_OCEAN) ||
@@ -1237,19 +1304,23 @@ public class WorldRequirements {
                 world.hasBiome(Biome.LUKEWARM_OCEAN);
     }
 
+    //Returns true if coral can generate in this world
     public static boolean hasCoral(GameWorld world) {
         return world.hasBiome(Biome.WARM_OCEAN);
     }
 
+    //Returns true if blue orchids can generate in this world
     public static boolean hasBlueOrchid(GameWorld world) {
         return world.hasBiome(Biome.SWAMP);
     }
 
+    //Returns true if allium can generate in this world
     public static boolean hasAllium(GameWorld world) {
         return world.hasBiome(Biome.FLOWER_FOREST) ||
                 world.hasBiome(Biome.MEADOW);
     }
 
+    //Returns true if azure bluet can generate in this world
     public static boolean hasAzureBluet(GameWorld world) {
         return world.hasBiome(Biome.FLOWER_FOREST) ||
                 world.hasBiome(Biome.MEADOW) ||
@@ -1257,6 +1328,7 @@ public class WorldRequirements {
                 world.hasBiome(Biome.SUNFLOWER_PLAINS);
     }
 
+    //Returns true of tulips can generate in this world
     public static boolean hasTulip(GameWorld world) {
         return world.hasBiome(Biome.FLOWER_FOREST) ||
                 world.hasBiome(Biome.PLAINS) ||

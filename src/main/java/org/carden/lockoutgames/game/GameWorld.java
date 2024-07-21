@@ -50,6 +50,10 @@ public class GameWorld {
 
     }
 
+    /**
+     *
+     * @param value Sets the world border size, to be used by GameSettings
+     */
     protected void setWorldSize(int value) {
         worldSize = value;
         World overworld = getWorld(World.Environment.NORMAL);
@@ -58,14 +62,30 @@ public class GameWorld {
         if(nether != null) nether.getWorldBorder().setSize(worldSize);
     }
 
+    /**
+     *
+     * @param t The structure to check
+     * @return true if the structure exists within the world boundaries (Structure scan is required)
+     */
     public boolean hasStructure(Structure t) {
         return availableStructures.contains(t);
     }
 
+    /**
+     *
+     * @param b The biome to check
+     * @return true if the biome exists within the world boundaries (Biome scan is required)
+     */
     public boolean hasBiome(Biome b) {
         return availableBiomes.contains(b);
     }
 
+    /**
+     *
+     * @param type The world dimension to check
+     * @return The Bukkit instance of the game world that correspond to the given environment
+     * (Default overworld) returns null if worlds have not been generated
+     */
     public World getWorld(World.Environment type) {
         try{
             switch(type) {
@@ -76,12 +96,18 @@ public class GameWorld {
                 case THE_END:
                     return worldManager.getMVWorld(WorldNames.END.name).getCBWorld();
             }
+            return worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld();
         }catch(NullPointerException e){
             return null;
         }
-        return worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld();
     }
 
+    /**
+     * Creates the nether and end portal connections between dimensions
+     * @param overworld Overworld world name
+     * @param netherworld Nether world name
+     * @param endworld End world name
+     */
     private void linkSMPWorlds(String overworld, String netherworld, String endworld) {
         MultiverseNetherPortals netherPortals = plugin.getMvnetherPortals();
         netherPortals.addWorldLink(overworld, netherworld, PortalType.NETHER);
@@ -92,6 +118,10 @@ public class GameWorld {
         netherPortals.addWorldLink(endworld, overworld, PortalType.ENDER);
     }
 
+    /**
+     * Generates a new set of worlds, creating them if they do not exist yet in the multiverse.
+     * Then scans the worlds for biomes and structures to update logic.
+     */
     public void generateWorld() {
         long seed = (new Random()).nextLong();
 
@@ -128,7 +158,12 @@ public class GameWorld {
         }.runTaskLater(plugin, 40);
     }
 
+    /**
+     * Updated the availableBiomes set to contain the biomes that exist within the world boundary.
+     * This scan is done asynchronously in order to not block the main server thread.
+     */
     private void scanBiomes() {
+        availableBiomes.clear();
         new BukkitRunnable() {
             private final ArrayList<Biome> allBiomes = new ArrayList<>(Arrays.asList(Biome.values()));
 
@@ -151,6 +186,7 @@ public class GameWorld {
             }
         }.runTaskAsynchronously(plugin);
 
+        //End dimension has no world border, so all biomes are included.
         availableBiomes.add(Biome.SMALL_END_ISLANDS);
         availableBiomes.add(Biome.END_BARRENS);
         availableBiomes.add(Biome.END_HIGHLANDS);
@@ -158,6 +194,11 @@ public class GameWorld {
         availableBiomes.add(Biome.THE_END);
     }
 
+    /**
+     * Updated the availableStructures set to contain the structures that exist within the world boundary.
+     * This scan is done asynchronously in order to not block the main server thread,
+     * and all structures are searched for in parallel
+     */
     private void scanStructures() {
 
         ArrayList<Structure> allStructures = new ArrayList<>(DimensionSearch.NORMAL.getStructures());
@@ -179,7 +220,7 @@ public class GameWorld {
                     world = getWorld(DimensionSearch.NETHER.getEnvironment());
                 }
                 Location origin = new Location(world, 0, 50, 0);
-                StructureSearchResult result = structureSearchWithTimeout(world, origin, s);;
+                StructureSearchResult result = structureSearchWithTimeout(world, origin, s, 20);;
                 if(result != null && Math.abs(result.getLocation().getX()) < (double) worldSize / 2 && Math.abs(result.getLocation().getZ()) < (double) worldSize / 2){
                     plugin.getServer().broadcastMessage(ChatColor.GREEN + StructureStrings.getStructureName(s) + " found");
                     availableStructures.add(s);
@@ -195,10 +236,20 @@ public class GameWorld {
             }
         }.runTaskTimerAsynchronously(plugin, 0, 5);
 
+        //End has no border, end city always included.
         availableStructures.add(Structure.END_CITY);
     }
 
-    private StructureSearchResult structureSearchWithTimeout(World world, Location origin, Structure s) {
+    /**
+     * Calls world.locateNearestStructure inside the world's radius but with a timeout
+     * Structure searches do not stop until the structure is found regardless of the radius so this is necessary for speed.
+     * @param world The world to search
+     * @param origin The center of the search
+     * @param s The structure to search for
+     * @param timeout The number of seconds to allow for the search before a timeout
+     * @return The corresponding StructureSearchResult if the structure is found, null if it is not found or times out.
+     */
+    private StructureSearchResult structureSearchWithTimeout(World world, Location origin, Structure s, int timeout) {
         CompletableFuture<StructureSearchResult> future = new CompletableFuture<>();
         BukkitTask search = new BukkitRunnable() {
             @Override
@@ -216,10 +267,13 @@ public class GameWorld {
                     search.cancel();
                 }
             }
-        }.runTaskLater(plugin, 400);
+        }.runTaskLater(plugin, 20L * timeout);
         return future.join();
     }
 
+    /**
+     * Enum to store constant world names.
+     */
     public enum WorldNames {
         OVERWORLD("game"),
         NETHER("game_nether"),

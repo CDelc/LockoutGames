@@ -4,12 +4,13 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.structure.Structure;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
 public enum DimensionSearch {
+    /**
+     * Enum that allows for a quick lookup of which structures and biomes appear in which dimensions
+     */
 
     NORMAL(World.Environment.NORMAL, new Structure[]{
             Structure.BURIED_TREASURE,
@@ -127,14 +128,26 @@ public enum DimensionSearch {
         this.biomes = new HashSet<>(Arrays.asList(biomes));
     }
 
+    /**
+     *
+     * @return The World.Environment associated with this enum
+     */
     public World.Environment getEnvironment() {
         return environment;
     }
 
+    /**
+     *
+     * @return A hashset of structures that appears in this envionment's dimension
+     */
     public HashSet<Structure> getStructures() {
         return structures;
     }
 
+    /**
+     *
+     * @return A hashset of biomes that appears in this envionment's dimension
+     */
     public HashSet<Biome> getBiomes() {
         return biomes;
     }
