@@ -10,7 +10,7 @@ import org.carden.lockoutgames.game.GameSettings;
 import org.carden.lockoutgames.goal.CollectGoal;
 import org.carden.lockoutgames.goal.Goal;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * General Event Listener, will be used to listen to both custom and spigot events
@@ -53,12 +53,14 @@ public class EventListener implements Listener {
     @EventHandler
     public void onCollectGoal(CollectGoalCheckEvent e) {
         if(gameSettings.getGame() == null) return;
-        ArrayList<Goal> goals = plugin.getGameSettings().getGame().getGoals();
-        goals.stream().filter(goal -> goal instanceof CollectGoal).forEach(goal -> goal.check(e.getPlayer(), plugin));
+        HashSet<Goal> goals = plugin.getGameSettings().getGame().getActiveGoals();
+        goals.stream().filter(goal -> goal instanceof CollectGoal).filter(goal -> goal.check(e.getPlayer())).forEach(goal -> {
+            LockoutGames.getPluginInstance().getServer().getPluginManager().callEvent(new GoalObtainedEvent(e.getPlayer(), goal));
+        });
     }
 
     @EventHandler
     public void onGoalComplete(GoalObtainedEvent e) {
-        plugin.getServer().broadcastMessage(e.getPlayer().getDisplayName() + " has completed: \"" + e.getGoal().getDescription() + "\"");
+        if(gameSettings.getGame() != null) gameSettings.getGame().awardGoal(e);
     }
 }

@@ -1,4 +1,7 @@
-package org.carden.lockoutgames.goal;
+package org.carden.lockoutgames.utils;
+
+import org.carden.lockoutgames.goal.Goal;
+import org.carden.lockoutgames.goal.GoalType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,14 +10,13 @@ import java.util.Random;
 
 public class GoalSelector {
 
+    static HashSet<Goal> allGoals;
 
-    HashSet<Goal> allGoals;
-
-    public GoalSelector() {
-        this.allGoals = getAllGoals();
+    static {
+        allGoals = GoalSelector.getAllGoals();
     }
 
-    public ArrayList<Goal> select(int numGoals) {
+    public static HashSet<Goal> select(int numGoals) {
         Random random = new Random();
         ArrayList<Goal> allValidGoals = new ArrayList<>();
         ArrayList<Goal> selectedGoals = new ArrayList<>();
@@ -29,10 +31,10 @@ public class GoalSelector {
             allValidGoals.remove(index);
         }
 
-        return selectedGoals;
+        return new HashSet<>(selectedGoals);
     }
 
-    public HashSet<Goal> getAllGoals() {
+    public static HashSet<Goal> getAllGoals() {
         HashSet<Goal> goals = new HashSet<>();
 
         for(GoalType goalType : GoalType.values()) {

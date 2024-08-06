@@ -17,11 +17,9 @@ public interface Goal {
 
     /**
      * Checks whether a player has completed a goal
-     * If so, triggers a GoalObtainedEvent
      * @param p The player to check completion for
-     * @param plugin A reference to the plugin (for event handling)
      */
-    boolean check(Player p, Plugin plugin);
+    boolean check(Player p);
 
     /**
      * This method can logically generate a description, but may also be used to hardcode specific descriptions.
@@ -38,6 +36,8 @@ public interface Goal {
     Goal generate();
 
     int getDifficulty();
+
+    String getID();
 
     /**
      *

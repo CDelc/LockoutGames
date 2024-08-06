@@ -122,10 +122,11 @@ public class GameWorld {
      * Generates a new set of worlds, creating them if they do not exist yet in the multiverse.
      * Then scans the worlds for biomes and structures to update logic.
      */
-    public void generateWorld() {
+    protected CompletableFuture<Boolean> generateWorld() {
         long seed = (new Random()).nextLong();
 
         this.waitingRoom = worldManager.getMVWorld(WorldNames.WORLD.name);
+        CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
 
         try{
             plugin.getServer().broadcastMessage("Moving players to waiting room...");
@@ -152,18 +153,21 @@ public class GameWorld {
                 getWorld(World.Environment.NETHER).getWorldBorder().setSize(worldSize);
                 linkSMPWorlds(WorldNames.OVERWORLD.name, WorldNames.NETHER.name, WorldNames.END.name);
 
-                scanBiomes();
-                scanStructures();
+                CompletableFuture<Boolean> biomesComplete = scanBiomes();
+                CompletableFuture<Boolean> structuresComplete = scanStructures();
+                CompletableFuture.allOf(biomesComplete, structuresComplete).thenRun(() -> completeCheck.complete(true));
             }
         }.runTaskLater(plugin, 40);
+        return completeCheck;
     }
 
     /**
      * Updated the availableBiomes set to contain the biomes that exist within the world boundary.
      * This scan is done asynchronously in order to not block the main server thread.
      */
-    private void scanBiomes() {
+    private CompletableFuture<Boolean> scanBiomes() {
         availableBiomes.clear();
+        CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
         new BukkitRunnable() {
             private final ArrayList<Biome> allBiomes = new ArrayList<>(Arrays.asList(Biome.values()));
 
@@ -183,6 +187,7 @@ public class GameWorld {
                         //plugin.getServer().broadcastMessage(ChatColor.RED + b.name() + " not found");
                     }
                 }
+                isComplete.complete(true);
             }
         }.runTaskAsynchronously(plugin);
 
@@ -192,6 +197,7 @@ public class GameWorld {
         availableBiomes.add(Biome.END_HIGHLANDS);
         availableBiomes.add(Biome.END_MIDLANDS);
         availableBiomes.add(Biome.THE_END);
+        return isComplete;
     }
 
     /**
@@ -199,11 +205,12 @@ public class GameWorld {
      * This scan is done asynchronously in order to not block the main server thread,
      * and all structures are searched for in parallel
      */
-    private void scanStructures() {
+    private CompletableFuture<Boolean> scanStructures() {
 
         ArrayList<Structure> allStructures = new ArrayList<>(DimensionSearch.NORMAL.getStructures());
         allStructures.addAll(DimensionSearch.NETHER.getStructures());
         Lock lock = new ReentrantLock();
+        CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
 
         new BukkitRunnable() {
 
@@ -230,7 +237,10 @@ public class GameWorld {
                 }
                 structureCount++;
                 if(index >= allStructures.size()) {
-                    if(structureCount >= allStructures.size()) plugin.getServer().broadcastMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "Structure Scan complete");
+                    if(structureCount >= allStructures.size()){
+                        plugin.getServer().broadcastMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "Structure Scan complete");
+                        isComplete.complete(true);
+                    }
                     cancel();
                 }
             }
@@ -238,6 +248,7 @@ public class GameWorld {
 
         //End has no border, end city always included.
         availableStructures.add(Structure.END_CITY);
+        return isComplete;
     }
 
     /**

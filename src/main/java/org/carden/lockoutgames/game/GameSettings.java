@@ -1,8 +1,11 @@
 package org.carden.lockoutgames.game;
 
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.carden.lockoutgames.LockoutGames;
-import org.carden.lockoutgames.goal.GoalSelector;
+import org.carden.lockoutgames.game.gamemodes.Lockout;
+import org.carden.lockoutgames.utils.GoalSelector;
+import org.carden.lockoutgames.utils.PlayerUtils;
 
 import java.util.HashSet;
 
@@ -13,7 +16,7 @@ public class GameSettings {
 
     LockoutGames plugin;
     GameWorld world;
-    LockoutGame lockout;
+    Lockout game;
 
     GoalSelector goalSelector;
 
@@ -32,14 +35,6 @@ public class GameSettings {
      */
     protected GoalSelector getGoalSelector() {
         return goalSelector;
-    }
-
-    /**
-     *
-     * @return The instance of this plugin
-     */
-    protected LockoutGames getPlugin() {
-        return plugin;
     }
 
     /**
@@ -79,19 +74,32 @@ public class GameSettings {
      *
      * @return The instance of the game, if one is running
      */
-    public LockoutGame getGame() {
-        return lockout;
+    public Game getGame() {
+        return game;
+    }
+
+    public HashSet<Player> getPlayers() {
+        return players;
+    }
+
+    public HashSet<Player> getSpectators() {
+        return spectators;
     }
 
 
-    public GameSettings(LockoutGames plugin) {
-        this.plugin = plugin;
+    public GameSettings() {
+        this.plugin = LockoutGames.getPluginInstance();
         this.world = new GameWorld(plugin);
         this.players = new HashSet<>();
         this.spectators = new HashSet<>();
-        this.goalSelector = new GoalSelector();
-        this.lockout = null;
+        this.game = null;
 
+        setDefaults();
+    }
+
+    private void setDefaults() {
+
+        players.addAll(plugin.getServer().getOnlinePlayers());
         setNumGoals(NUM_GOALS_DEFAULT);
         setWorldSize(WORLD_SIZE_DEFAULT);
     }
@@ -109,9 +117,15 @@ public class GameSettings {
      * @return False if a game is already running, true if the game begins successfully.
      */
     public boolean start() {
-        if(lockout != null) return false;
-        world.generateWorld();
-        //lockout = new LockoutGame(this);
+        if(game != null) return false;
+        GameSettings instance = this;
+        PlayerUtils.resetAllPlayers();
+        world.generateWorld().thenRun(new BukkitRunnable() {
+            @Override
+            public void run() {
+                game = new Lockout(instance);
+            }
+        });
         return true;
     }
 }

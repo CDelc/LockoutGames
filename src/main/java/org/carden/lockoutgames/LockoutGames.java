@@ -20,9 +20,12 @@ public final class LockoutGames extends JavaPlugin {
 
     private GameSettings game;
 
+    private static LockoutGames instance;
+
 
     @Override
     public void onEnable() {
+        instance = this;
         if(!setupMultiverseCore()) {
             getLogger().severe("Multiverse-Core not found! Please install the Multiverse-core plugin to your server.\n" +
                     "Plugin disabled.");
@@ -34,10 +37,10 @@ public final class LockoutGames extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
+        game = new GameSettings();
+
         EventListener listener = new EventListener(this);
         getServer().getPluginManager().registerEvents(listener, this);
-
-        game = new GameSettings(this);
 
         try {
             Objects.requireNonNull(this.getCommand("startgame")).setExecutor(new Startgame(this));
@@ -79,5 +82,13 @@ public final class LockoutGames extends JavaPlugin {
 
     public GameSettings getGameSettings() {
         return game;
+    }
+
+    public static LockoutGames getPluginInstance() {
+        return instance;
+    }
+
+    public static void broadcastMessage(String s) {
+        instance.getServer().broadcastMessage(s);
     }
 }

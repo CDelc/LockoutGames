@@ -5,10 +5,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
+import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.events.GoalObtainedEvent;
 import org.carden.lockoutgames.info.WorldRequirements;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
 
 enum RNGSettings {
     /**
@@ -356,6 +358,10 @@ public enum CollectGoal implements Goal {
         this.difficulty = difficulty;
     }
 
+    /**
+     *
+     * @return This goal, after randomizing the goal's values
+     */
     @Override
     public Goal generate() {
         if(!this.canGenerate()) return null;
@@ -403,13 +409,12 @@ public enum CollectGoal implements Goal {
 
 
     @Override
-    public boolean check(Player p, Plugin plugin) {
+    public boolean check(Player p) {
         Inventory inv = p.getInventory();
 
         for(Material m : items) {
             if (inv.contains(m, itemCount)) {
                 if (option == Option.OR || checklist.checkItem(p, m)) {
-                    plugin.getServer().getPluginManager().callEvent(new GoalObtainedEvent(p, this));
                     return true;
                 }
             }
@@ -441,7 +446,7 @@ public enum CollectGoal implements Goal {
 
         ArrayList<Material> itemList = new ArrayList<>(items);
         if(itemList.size() == 1) {
-            return "Collect" + itemCount + " " + itemList.get(0).name().toLowerCase();
+            return "Collect " + itemCount + " " + itemList.get(0).name().toLowerCase();
         }
         else {
             StringBuilder rValue = new StringBuilder("Collect " + itemCount);
@@ -449,7 +454,7 @@ public enum CollectGoal implements Goal {
                 if(i < itemList.size() - 1) {
                     rValue.append(" ").append(this.option.name().toLowerCase());
                 }
-                rValue.append(" ").append(itemList.get(1).name().toLowerCase());
+                rValue.append(" ").append(itemList.get(i).name().toLowerCase());
                 if(i < itemList.size() - 1) {
                     rValue.append(",");
                 }
@@ -464,23 +469,21 @@ public enum CollectGoal implements Goal {
     }
 
     @Override
+    public String getID() {
+        return this.name();
+    }
+
+    @Override
     public ItemStack displayItem() {
         return displayItem;
     }
 
     @Override
     public boolean canGenerate() {
-        int validItems = providedItems.length;
-        int minItems = 1;
+        int minItems = providedItems.length;
         if(rngSettings.settings.length > 2) minItems = rngSettings.settings[2];
 
-        for(Material m : providedItems) {
-            if(!WorldRequirements.Element.valueOf(m.name()).verify() && option == Option.AND) {
-                validItems--;
-                if(validItems < minItems) return false;
-            }
-        }
-        return true;
+        return cutImpossibleItems().size() >= minItems;
     }
 }
 
