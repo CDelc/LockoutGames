@@ -1,14 +1,15 @@
 package org.carden.lockoutgames.events;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.carden.lockoutgames.LockoutGames;
-import org.carden.lockoutgames.game.GameSettings;
-import org.carden.lockoutgames.goal.CollectGoal;
+import org.carden.lockoutgames.game.GameBuilder;
 import org.carden.lockoutgames.goal.Goal;
+import org.carden.lockoutgames.goal.GoalType;
 
 import java.util.HashSet;
 
@@ -19,48 +20,41 @@ public class EventListener implements Listener {
 
     private final LockoutGames plugin;
 
-    private final GameSettings gameSettings;
+    private final GameBuilder gameBuilder;
 
     public EventListener(LockoutGames plugin) {
         this.plugin = plugin;
-        gameSettings = plugin.getGameSettings();
+        gameBuilder = plugin.getGameBuilder();
     }
 
     @EventHandler
     public void onPlayerPickupItem(EntityPickupItemEvent e) {
-        if(gameSettings.getGame() == null) return;
-        if(e.getEntity() instanceof Player) {
-            plugin.getServer().getPluginManager().callEvent(new CollectGoalCheckEvent(
-                    (Player) e.getEntity(),
-                    e.getItem().getItemStack(),
-                    CollectGoalCheckEvent.ObtainMethod.ITEMPICKUP
-            ));
-        }
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent e) {
-        if(gameSettings.getGame() == null) return;
-        if(e.getWhoClicked() instanceof Player) {
-            plugin.getServer().getPluginManager().callEvent(new CollectGoalCheckEvent(
-                    (Player) e.getWhoClicked(),
-                    e.getCurrentItem(),
-                    CollectGoalCheckEvent.ObtainMethod.INVENTORYCLICK
-            ));
-        }
-    }
-
-    @EventHandler
-    public void onCollectGoal(CollectGoalCheckEvent e) {
-        if(gameSettings.getGame() == null) return;
-        HashSet<Goal> goals = plugin.getGameSettings().getGame().getActiveGoals();
-        goals.stream().filter(goal -> goal instanceof CollectGoal).filter(goal -> goal.check(e.getPlayer())).forEach(goal -> {
-            LockoutGames.getPluginInstance().getServer().getPluginManager().callEvent(new GoalObtainedEvent(e.getPlayer(), goal));
+        if(gameBuilder.getGame() == null || !(e.getEntity() instanceof Player)) return;
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            HashSet<Goal> goals = plugin.getGameBuilder().getGame().getActiveGoals();
+            goals.stream()
+                    .filter(goal -> goal.getGoalType() == GoalType.COLLECT_GOAL)
+                    .filter(goal -> goal.check((Player) e.getEntity()))
+                    .forEach(goal -> {
+                        LockoutGames.getPluginInstance().getServer().getPluginManager().callEvent(new GoalObtainedEvent((Player) e.getEntity(), goal));
+                    });
         });
     }
 
     @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        if(gameBuilder.getGame() == null || !(e.getWhoClicked() instanceof Player)) return;
+        HashSet<Goal> goals = plugin.getGameBuilder().getGame().getActiveGoals();
+        goals.stream()
+                .filter(goal -> goal.getGoalType() == GoalType.COLLECT_GOAL)
+                .filter(goal -> goal.check((Player) e.getWhoClicked()))
+                .forEach(goal -> {
+                    LockoutGames.getPluginInstance().getServer().getPluginManager().callEvent(new GoalObtainedEvent((Player) e.getWhoClicked(), goal));
+                });
+    }
+
+    @EventHandler
     public void onGoalComplete(GoalObtainedEvent e) {
-        if(gameSettings.getGame() != null) gameSettings.getGame().awardGoal(e);
+        if(gameBuilder.getGame() != null) gameBuilder.getGame().handleGoal(e);
     }
 }

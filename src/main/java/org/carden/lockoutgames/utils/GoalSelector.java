@@ -1,6 +1,7 @@
 package org.carden.lockoutgames.utils;
 
 import org.carden.lockoutgames.goal.Goal;
+import org.carden.lockoutgames.goal.GoalGenerator;
 import org.carden.lockoutgames.goal.GoalType;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Random;
 
 public class GoalSelector {
 
-    static HashSet<Goal> allGoals;
+    static HashSet<GoalGenerator> allGoals;
 
     static {
         allGoals = GoalSelector.getAllGoals();
@@ -18,9 +19,9 @@ public class GoalSelector {
 
     public static HashSet<Goal> select(int numGoals) {
         Random random = new Random();
-        ArrayList<Goal> allValidGoals = new ArrayList<>();
+        ArrayList<GoalGenerator> allValidGoals = new ArrayList<>();
         ArrayList<Goal> selectedGoals = new ArrayList<>();
-        allGoals.stream().filter(Goal::canGenerate).forEach(allValidGoals::add);
+        allGoals.stream().filter(GoalGenerator::canGenerate).forEach(allValidGoals::add);
 
         if(numGoals > allValidGoals.size()) {
             throw new IllegalArgumentException("Too many goals requested for this world");
@@ -34,8 +35,8 @@ public class GoalSelector {
         return new HashSet<>(selectedGoals);
     }
 
-    public static HashSet<Goal> getAllGoals() {
-        HashSet<Goal> goals = new HashSet<>();
+    public static HashSet<GoalGenerator> getAllGoals() {
+        HashSet<GoalGenerator> goals = new HashSet<>();
 
         for(GoalType goalType : GoalType.values()) {
             if(goalType.getGoalClass().isEnum()) {

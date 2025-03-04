@@ -1,7 +1,10 @@
 package org.carden.lockoutgames.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.carden.lockoutgames.LockoutGames;
 
@@ -21,6 +24,7 @@ public class PlayerUtils {
     }
 
     public static void resetAllPlayers() {
+        LockoutGames.broadcastMessage("Resetting Players");
         for(Player p : getOnlinePlayers()) {
             p.setHealth(20);
             p.setExp(0);
@@ -28,9 +32,4 @@ public class PlayerUtils {
             p.getInventory().clear();
         }
     }
-
-    public static void moveAllPlayers(World w) {
-        getPlayerStream().forEach(p -> p.teleport(w.getSpawnLocation()));
-    }
-
 }

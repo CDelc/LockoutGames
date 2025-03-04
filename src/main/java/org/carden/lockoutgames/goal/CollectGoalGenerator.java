@@ -1,13 +1,11 @@
 package org.carden.lockoutgames.goal;
 
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.Material;
+import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.player.GamePlayer;
 import org.carden.lockoutgames.info.WorldRequirements;
-import org.carden.lockoutgames.utils.PlayerChecklist;
-import org.carden.lockoutgames.utils.PlayerUtils;
 
 import java.util.*;
 
@@ -46,7 +44,7 @@ enum RNGSettings {
     }
 }
 
-public enum CollectGoal implements Goal {
+public enum CollectGoalGenerator implements GoalGenerator {
 
     /**
      * These are goals that involve obtaining an item or a set of items.
@@ -331,15 +329,8 @@ public enum CollectGoal implements Goal {
     FROGLIGHT(new Material[]{Material.OCHRE_FROGLIGHT, Material.VERDANT_FROGLIGHT, Material.PEARLESCENT_FROGLIGHT}, Option.OR, RNGSettings.PICK_ONE, 3);
 
 
-    private PlayerChecklist<Material> checklist;
-
-    private HashSet<Material> items;
-    private Integer itemCount;
     private final Option option;
     private final Integer difficulty;
-
-    private ItemStack displayItem;
-
     private final Material[] providedItems;
     private final RNGSettings rngSettings;
 
@@ -350,23 +341,20 @@ public enum CollectGoal implements Goal {
      * @param rngSettings Settings enum described above
      * @param difficulty Difficulty rating of this goal
      */
-    CollectGoal(Material[] target, Option option, RNGSettings rngSettings, Integer difficulty) {
+    CollectGoalGenerator(Material[] target, Option option, RNGSettings rngSettings, Integer difficulty) {
         providedItems = target;
         this.rngSettings = rngSettings;
         this.option = option;
         this.difficulty = difficulty;
     }
 
-    /**
-     *
-     * @return This goal, after randomizing the goal's values
-     */
     @Override
     public Goal generate() {
         if(!this.canGenerate()) return null;
 
         Random rng = new Random();
         int[] settings = rngSettings.settings;
+        HashSet<Material> items;
 
         if(settings.length > 2) {
             HashSet<Material> itemSelectionPool = cutImpossibleItems();
@@ -382,16 +370,29 @@ public enum CollectGoal implements Goal {
             for (int index : chosenIndices) {
                 tmpItems.add(providedItems[index]);
             }
-            this.items = tmpItems;
+            items = tmpItems;
         }
         else {
-            this.items = new HashSet<>(Arrays.asList(providedItems));
+            items = new HashSet<>(Arrays.asList(providedItems));
         }
 
-        this.itemCount = rng.nextInt(settings[0], settings[1]);
-        this.checklist = new PlayerChecklist<>(items);
-        displayItem = new ItemStack(items.toArray(new Material[0])[(new Random()).nextInt(0, items.size())]);
-        return this;
+        int itemCount = rng.nextInt(settings[0], settings[1]);
+        ItemStack displayItem = new ItemStack(items.toArray(new Material[0])[(new Random()).nextInt(0, items.size())]);
+        UUID goalID = UUID.randomUUID();
+
+        return new Goal(player -> {
+            Inventory inv = player.getInventory();
+            GamePlayer playerTracker = LockoutGames.getPluginInstance().getPlayerManager().getGamePlayerObject(player.getUniqueId());
+            playerTracker.addChecklist(goalID, items, Material.class);
+                for(Material m : items) {
+                    if (inv.contains(m, itemCount)) {
+                        if (option == Option.OR || playerTracker.progressChecklist(goalID, m, Material.class)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }, displayItem, createDescription(items, itemCount), GoalType.COLLECT_GOAL, goalID);
     }
 
     private HashSet<Material> cutImpossibleItems() {
@@ -408,36 +409,7 @@ public enum CollectGoal implements Goal {
         return newSet;
     }
 
-
-    @Override
-    public boolean check(Player p) {
-        Inventory inv = p.getInventory();
-
-        for(Material m : items) {
-            if (inv.contains(m, itemCount)) {
-                if (option == Option.OR || checklist.checkItem(p, m)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean check(Player p, Item pickedUp) {
-        Inventory inv = PlayerUtils.getVirtualInventory(p);
-        inv.addItem(pickedUp.getItemStack());
-        for(Material m : items) {
-            if (inv.contains(m, itemCount)) {
-                if (option == Option.OR || checklist.checkItem(p, m)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String getDescription() {
+    private String createDescription(HashSet<Material> items, Integer itemCount) {
         //Special Cases
         switch(this) {
             case HOE:
@@ -483,11 +455,6 @@ public enum CollectGoal implements Goal {
     @Override
     public String getID() {
         return this.name();
-    }
-
-    @Override
-    public ItemStack displayItem() {
-        return displayItem;
     }
 
     @Override

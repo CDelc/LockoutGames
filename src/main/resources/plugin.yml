@@ -6,6 +6,6 @@ prefix: Lockout
 authors: [Carden]
 description: Offers a variety of competitive survival games with various objectives
 commands:
-  startgame:
-    description: Start a game
-    usage: /startgame
+  gadmin:
+    description: Adjust game settings
+    usage: /gadmin [..args]

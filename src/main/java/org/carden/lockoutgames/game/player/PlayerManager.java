@@ -1,30 +1,44 @@
-package org.carden.lockoutgames.game;
+package org.carden.lockoutgames.game.player;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class PlayerManager {
 
-    HashSet<UUID> players;
-    HashSet<UUID> spectators;
+    HashMap<UUID, GamePlayer> players;
 
     public PlayerManager() {
-        spectators = new HashSet<UUID>();
-        players = new HashSet<UUID>(Bukkit.getOnlinePlayers().stream().map(Player::getUniqueId).toList());
+        players = new HashMap<UUID, GamePlayer>();
+        Bukkit.getOnlinePlayers().forEach(this::introducePlayer);
     }
 
-    public void handlePlayerJoin(PlayerJoinEvent e) {
-        UUID uuid = e.getPlayer().getUniqueId();
-        if(!players.contains(uuid) && !spectators.contains(uuid)) {
-            players.add(uuid);
+    private void introducePlayer(Player p) {
+        if(!players.containsKey(p.getUniqueId())) {
+            addNewPlayer(p);
         }
     }
 
-    public boolean playerIsSpectator(Player p) {
-        return spectators.contains(p.getUniqueId());
+    private void addNewPlayer(Player p) {
+        GamePlayer new_player = new GamePlayer(p);
+        players.put(p.getUniqueId(), new_player);
+    }
+
+    public void handlePlayerJoin(PlayerJoinEvent e) {
+        Player target = e.getPlayer();
+        UUID uuid = target.getUniqueId();
+        if(players.containsKey(uuid)) {
+            players.get(uuid).setPlayerObject(target);
+        }
+        else {
+            introducePlayer(target);
+        }
+    }
+
+    public GamePlayer getGamePlayerObject(UUID playerUUID) {
+        return players.get(playerUUID);
     }
 }

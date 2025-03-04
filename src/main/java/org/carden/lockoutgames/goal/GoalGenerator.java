@@ -1,9 +1,8 @@
 package org.carden.lockoutgames.goal;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
-public interface Goal {
+public interface GoalGenerator {
 
     /**
      * Generic interface for all types of goals
@@ -15,23 +14,9 @@ public interface Goal {
     }
 
     /**
-     * Checks whether a player has completed a goal
-     * @param p The player to check completion for
-     */
-    boolean check(Player p);
-
-    /**
-     * This method can logically generate a description, but may also be used to hardcode specific descriptions.
-     * @return The in-game description of the goal.
-     */
-    String getDescription();
-
-    /**
      *
-     * @return ItemStack that will appear in the goal gui
+     * @return A Goal object built from this constants parameters
      */
-    ItemStack displayItem();
-
     Goal generate();
 
     int getDifficulty();

@@ -3,10 +3,12 @@ package org.carden.lockoutgames;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginLogger;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.carden.lockoutgames.commands.Startgame;
+import org.carden.lockoutgames.commands.Gadmin;
 import org.carden.lockoutgames.events.EventListener;
-import org.carden.lockoutgames.game.GameSettings;
+import org.carden.lockoutgames.game.GameBuilder;
+import org.carden.lockoutgames.game.player.PlayerManager;
 
 import java.util.Objects;
 
@@ -18,7 +20,8 @@ public final class LockoutGames extends JavaPlugin {
     private MultiverseCore multiverseCore;
     private MultiverseNetherPortals mvnetherPortals;
 
-    private GameSettings game;
+    private GameBuilder gameBuilder;
+    private PlayerManager playerManager;
 
     private static LockoutGames instance;
 
@@ -37,13 +40,17 @@ public final class LockoutGames extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
         }
 
-        game = new GameSettings();
+        gameBuilder = new GameBuilder();
+        playerManager = new PlayerManager();
 
         EventListener listener = new EventListener(this);
+        EventListener playerTracker = new EventListener(this);
         getServer().getPluginManager().registerEvents(listener, this);
+        getServer().getPluginManager().registerEvents(playerTracker, this);
 
         try {
-            Objects.requireNonNull(this.getCommand("startgame")).setExecutor(new Startgame(this));
+            Objects.requireNonNull(this.getCommand("gadmin")).setExecutor(new Gadmin());
+            Objects.requireNonNull(this.getCommand("gadmin")).setTabCompleter(new Gadmin());
         }catch(NullPointerException e) {
             this.getLogger().severe("MISSING COMMAND " + e.getMessage());
         }
@@ -80,8 +87,12 @@ public final class LockoutGames extends JavaPlugin {
         return mvnetherPortals;
     }
 
-    public GameSettings getGameSettings() {
-        return game;
+    public GameBuilder getGameBuilder() {
+        return gameBuilder;
+    }
+
+    public PlayerManager getPlayerManager() {
+        return playerManager;
     }
 
     public static LockoutGames getPluginInstance() {

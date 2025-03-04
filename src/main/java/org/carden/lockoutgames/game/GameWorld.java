@@ -38,15 +38,13 @@ public class GameWorld {
 
     MultiverseWorld waitingRoom;
 
-    public GameWorld(LockoutGames plugin) {
+    public GameWorld() {
 
-        this.plugin = plugin;
+        this.plugin = LockoutGames.getPluginInstance();
         worldManager = plugin.getMultiverseCore().getMVWorldManager();
         consistentDimensionSeed = true;
         amplified = false;
         worldSize = 10000;
-
-        WorldRequirements.Element.setWorld(this);
 
     }
 
@@ -157,7 +155,7 @@ public class GameWorld {
                 CompletableFuture<Boolean> structuresComplete = scanStructures();
                 CompletableFuture.allOf(biomesComplete, structuresComplete).thenRun(() -> completeCheck.complete(true));
             }
-        }.runTaskLater(plugin, 40);
+        }.runTaskAsynchronously(plugin);
         return completeCheck;
     }
 
@@ -181,10 +179,10 @@ public class GameWorld {
                     Location origin = new Location(world, 0, 50, 0);
                     if (world.locateNearestBiome(origin, worldSize / 2 - 50, b) != null) {
                         availableBiomes.add(b);
-                        //plugin.getServer().broadcastMessage(ChatColor.GREEN + b.name() + " found");
+                        plugin.getServer().broadcastMessage(ChatColor.GREEN + b.name() + " found");
                     }
                     else {
-                        //plugin.getServer().broadcastMessage(ChatColor.RED + b.name() + " not found");
+                        plugin.getServer().broadcastMessage(ChatColor.RED + b.name() + " not found");
                     }
                 }
                 isComplete.complete(true);

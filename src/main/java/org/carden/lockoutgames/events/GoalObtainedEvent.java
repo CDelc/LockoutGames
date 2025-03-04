@@ -3,8 +3,8 @@ package org.carden.lockoutgames.events;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
 import org.carden.lockoutgames.goal.Goal;
+import org.carden.lockoutgames.goal.GoalGenerator;
 import org.jetbrains.annotations.NotNull;
 
 public class GoalObtainedEvent extends Event {

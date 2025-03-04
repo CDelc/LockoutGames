@@ -15,7 +15,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
   <build>
@@ -25,8 +26,9 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
+          <release>21</release>
+            <source>16</source>
+            <target>16</target>
         </configuration>
       </plugin>
       <plugin>
@@ -78,7 +80,7 @@
       <dependency>
           <groupId>org.spigotmc</groupId>
           <artifactId>spigot-api</artifactId>
-          <version>1.21-R0.1-SNAPSHOT</version>
+          <version>1.21.4-R0.1-SNAPSHOT</version>
           <scope>provided</scope>
       </dependency>
       <dependency>
