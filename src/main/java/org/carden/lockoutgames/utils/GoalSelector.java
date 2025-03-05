@@ -1,5 +1,6 @@
 package org.carden.lockoutgames.utils;
 
+import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.goal.GoalGenerator;
 import org.carden.lockoutgames.goal.GoalType;
@@ -26,6 +27,7 @@ public class GoalSelector {
         if(numGoals > allValidGoals.size()) {
             throw new IllegalArgumentException("Too many goals requested for this world");
         }
+
         for(int i = 0; i < numGoals; i++) {
             int index = random.nextInt(0, allValidGoals.size());
             selectedGoals.add(allValidGoals.get(index).generate());

@@ -17,12 +17,13 @@ public class Lockout extends Game {
     public Lockout(GameWorld world, SettingsImage settingsImage) {
         super(world, settingsImage);
         this.goals = GoalSelector.select(settingsImage.getNumGoals());
-        this.goals.forEach(goal -> LockoutGames.broadcastMessage(goal.getDescription()));
+        LockoutGames.broadcastMessage("awiohdpoa;iewhjf");
+        this.goals.stream().toList().forEach(goal -> LockoutGames.broadcastMessage(goal.getDescription()));
     }
 
     @Override
     public void handleGoal(GoalObtainedEvent e) {
-
+        LockoutGames.broadcastMessage(e.getPlayer() + " has completed " + e.getGoal().getDescription());
     }
 
     @Override

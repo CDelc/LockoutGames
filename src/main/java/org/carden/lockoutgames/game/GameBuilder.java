@@ -39,7 +39,7 @@ public class GameBuilder {
     int worldSize;
     int numGoals;
 
-    static final int WORLD_SIZE_DEFAULT = 4000;
+    static final int WORLD_SIZE_DEFAULT = 2000;
     static final int NUM_GOALS_DEFAULT = 25;
 
     public GameBuilder() {
@@ -112,6 +112,7 @@ public class GameBuilder {
         world.generateWorld().thenRun(new BukkitRunnable() {
             @Override
             public void run() {
+                LockoutGames.broadcastMessage("World Gen Complete");
                 game = new Lockout(world, new SettingsImage(instance));
             }
         });

@@ -12,7 +12,7 @@ public abstract class Game {
     SettingsImage settingsImage;
 
     public Game(GameWorld world, SettingsImage settingsImage) {
-        this.world = world;
+        setWorld(world);
         this.settingsImage = settingsImage;
         this.world.setWorldSize(settingsImage.getWorldSize());
     }
