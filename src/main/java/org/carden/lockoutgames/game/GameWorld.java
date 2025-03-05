@@ -132,6 +132,7 @@ public class GameWorld {
             worldManager.getMVWorld(WorldNames.NETHER.name).getCBWorld().getPlayers().forEach(p -> p.teleport(waitingRoom.getCBWorld().getSpawnLocation()));
             worldManager.getMVWorld(WorldNames.END.name).getCBWorld().getPlayers().forEach(p -> p.teleport(waitingRoom.getCBWorld().getSpawnLocation()));
         }catch(NullPointerException e){
+            LockoutGames.broadcastMessage(e.getMessage());
             worldManager.addWorld(WorldNames.OVERWORLD.name, World.Environment.NORMAL, String.valueOf(seed), amplified ? WorldType.AMPLIFIED : WorldType.NORMAL, true, null);
             worldManager.addWorld(WorldNames.NETHER.name, World.Environment.NETHER, String.valueOf(seed), WorldType.NORMAL, true, null);
             worldManager.addWorld(WorldNames.END.name, World.Environment.THE_END, String.valueOf(seed), WorldType.NORMAL, true, null);
@@ -140,12 +141,12 @@ public class GameWorld {
         new BukkitRunnable() {
             @Override
             public void run() {
-                plugin.getServer().broadcastMessage("Generating Overworld (May cause lag)...");
-                worldManager.regenWorld(WorldNames.OVERWORLD.name, true, true, null);
-                plugin.getServer().broadcastMessage("Generating Nether (May cause lag)...");
-                worldManager.regenWorld(WorldNames.NETHER.name, true, true, null);
-                plugin.getServer().broadcastMessage("Generating End (May cause lag)...");
-                worldManager.regenWorld(WorldNames.END.name, true, true, null);
+//                plugin.getServer().broadcastMessage("Generating Overworld (May cause lag)...");
+//                worldManager.regenWorld(WorldNames.OVERWORLD.name, true, true, null);
+//                plugin.getServer().broadcastMessage("Generating Nether (May cause lag)...");
+//                worldManager.regenWorld(WorldNames.NETHER.name, true, true, null);
+//                plugin.getServer().broadcastMessage("Generating End (May cause lag)...");
+//                worldManager.regenWorld(WorldNames.END.name, true, true, null);
 
                 getWorld(World.Environment.NORMAL).getWorldBorder().setSize(worldSize);
                 getWorld(World.Environment.NETHER).getWorldBorder().setSize(worldSize);
@@ -155,7 +156,7 @@ public class GameWorld {
                 CompletableFuture<Boolean> structuresComplete = scanStructures();
                 CompletableFuture.allOf(biomesComplete, structuresComplete).thenRun(() -> completeCheck.complete(true));
             }
-        }.runTaskAsynchronously(plugin);
+        }.runTaskLater(plugin, 40);
         return completeCheck;
     }
 
