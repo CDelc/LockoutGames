@@ -32,7 +32,7 @@ public class Goal {
     }
 
     public String getDescription() {
-        return this.getDescription();
+        return this.description;
     }
 
     public GoalType getGoalType() {

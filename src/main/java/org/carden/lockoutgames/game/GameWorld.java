@@ -44,8 +44,7 @@ public class GameWorld {
         worldManager = plugin.getMultiverseCore().getMVWorldManager();
         consistentDimensionSeed = true;
         amplified = false;
-        worldSize = 10000;
-
+        setWorldSize(1000);
     }
 
     /**
@@ -180,10 +179,10 @@ public class GameWorld {
                     Location origin = new Location(world, 0, 50, 0);
                     if (world.locateNearestBiome(origin, worldSize / 2 - 50, b) != null) {
                         availableBiomes.add(b);
-                        plugin.getServer().broadcastMessage(ChatColor.GREEN + b.name() + " found");
+//                        plugin.getServer().broadcastMessage(ChatColor.GREEN + b.name() + " found");
                     }
                     else {
-                        plugin.getServer().broadcastMessage(ChatColor.RED + b.name() + " not found");
+//                        plugin.getServer().broadcastMessage(ChatColor.RED + b.name() + " not found");
                     }
                 }
                 isComplete.complete(true);
