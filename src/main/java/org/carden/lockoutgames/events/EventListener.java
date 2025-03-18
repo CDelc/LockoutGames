@@ -44,13 +44,15 @@ public class EventListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         if(gameBuilder.getGame() == null || !(e.getWhoClicked() instanceof Player)) return;
-        HashSet<Goal> goals = plugin.getGameBuilder().getGame().getActiveGoals();
-        goals.stream()
-                .filter(goal -> goal.getGoalType() == GoalType.COLLECT_GOAL)
-                .filter(goal -> goal.check((Player) e.getWhoClicked()))
-                .forEach(goal -> {
-                    LockoutGames.getPluginInstance().getServer().getPluginManager().callEvent(new GoalObtainedEvent((Player) e.getWhoClicked(), goal));
-                });
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            HashSet<Goal> goals = plugin.getGameBuilder().getGame().getActiveGoals();
+            goals.stream()
+                    .filter(goal -> goal.getGoalType() == GoalType.COLLECT_GOAL)
+                    .filter(goal -> goal.check((Player) e.getWhoClicked()))
+                    .forEach(goal -> {
+                        LockoutGames.getPluginInstance().getServer().getPluginManager().callEvent(new GoalObtainedEvent((Player) e.getWhoClicked(), goal));
+                    });
+        });
     }
 
     @EventHandler

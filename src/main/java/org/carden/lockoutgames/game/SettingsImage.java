@@ -1,13 +1,23 @@
 package org.carden.lockoutgames.game;
 
+import org.bukkit.Difficulty;
+
 public class SettingsImage {
 
-    int worldSize;
-    int numGoals;
+    private final int worldSize;
+    private final int numGoals;
+    private final boolean regenOnStart;
+    private final boolean pvp;
+    private final Difficulty difficulty;
+    private final boolean hunger;
 
     public SettingsImage(GameBuilder b) {
         this.worldSize = b.getWorldSize();
         this.numGoals = b.getNumGoals();
+        this.regenOnStart = b.isRegenOnStart();
+        this.pvp = b.isPvp();
+        this.difficulty = b.getDifficulty();
+        this.hunger = b.isHunger();
     }
 
     public int getWorldSize() {
@@ -16,5 +26,21 @@ public class SettingsImage {
 
     public int getNumGoals() {
         return numGoals;
+    }
+
+    public boolean isRegenOnStart() {
+        return regenOnStart;
+    }
+
+    public boolean isPvP() {
+        return pvp;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public boolean isHunger() {
+        return hunger;
     }
 }
