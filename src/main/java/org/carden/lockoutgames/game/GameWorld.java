@@ -1,7 +1,9 @@
 package org.carden.lockoutgames.game;
 
+import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
+import com.onarandombox.MultiverseCore.enums.AllowedPortalType;
 import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -10,9 +12,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.StructureSearchResult;
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.player.PlayerManager;
 import org.carden.lockoutgames.info.DimensionSearch;
 import org.carden.lockoutgames.info.StructureStrings;
-import org.carden.lockoutgames.info.WorldRequirements;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -25,33 +27,33 @@ public class GameWorld {
      * This will calculate and store information about the contents of the world the game is taking place in
      */
 
+    static final int STRUCTURE_SEARCH_TIMEOUT_SECONDS = 20;
+    static final int BIOME_SEARCH_BORDER_MARGIN_BLOCKS = 50;
+    static final int LARGE_WORLD_THRESHOLD = 50000;
 
     LockoutGames plugin;
     MVWorldManager worldManager;
 
-    boolean consistentDimensionSeed;
-    boolean amplified;
     int worldSize;
 
-    Set<Biome> availableBiomes = new HashSet<>();
-    Set<Structure> availableStructures = new HashSet<>();
+    Set<Biome> availableBiomes;
+    Set<Structure> availableStructures;
 
     MultiverseWorld waitingRoom;
 
     public GameWorld() {
 
         this.plugin = LockoutGames.getPluginInstance();
+        this.availableBiomes = new HashSet<>();
+        this.availableStructures = new HashSet<>();
         worldManager = plugin.getMultiverseCore().getMVWorldManager();
-        consistentDimensionSeed = true;
-        amplified = false;
-        setWorldSize(1000);
     }
 
     /**
      *
      * @param value Sets the world border size, to be used by GameSettings
      */
-    protected void setWorldSize(int value) {
+    public void setWorldSize(int value) {
         worldSize = value;
         World overworld = getWorld(World.Environment.NORMAL);
         World nether = getWorld(World.Environment.NETHER);
@@ -119,44 +121,99 @@ public class GameWorld {
      * Generates a new set of worlds, creating them if they do not exist yet in the multiverse.
      * Then scans the worlds for biomes and structures to update logic.
      */
-    protected CompletableFuture<Boolean> generateWorld() {
-        long seed = (new Random()).nextLong();
+    public CompletableFuture<Void> regenerate() {
+        PlayerManager.movePlayerstoSafeWorld();
 
-        this.waitingRoom = worldManager.getMVWorld(WorldNames.WORLD.name);
-        CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
-
-        try{
-            plugin.getServer().broadcastMessage("Moving players to waiting room...");
-            worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld().getPlayers().forEach(p -> p.teleport(waitingRoom.getCBWorld().getSpawnLocation()));
-            worldManager.getMVWorld(WorldNames.NETHER.name).getCBWorld().getPlayers().forEach(p -> p.teleport(waitingRoom.getCBWorld().getSpawnLocation()));
-            worldManager.getMVWorld(WorldNames.END.name).getCBWorld().getPlayers().forEach(p -> p.teleport(waitingRoom.getCBWorld().getSpawnLocation()));
-        }catch(NullPointerException e){
-            LockoutGames.broadcastMessage(e.getMessage());
-            worldManager.addWorld(WorldNames.OVERWORLD.name, World.Environment.NORMAL, String.valueOf(seed), amplified ? WorldType.AMPLIFIED : WorldType.NORMAL, true, null);
-            worldManager.addWorld(WorldNames.NETHER.name, World.Environment.NETHER, String.valueOf(seed), WorldType.NORMAL, true, null);
-            worldManager.addWorld(WorldNames.END.name, World.Environment.THE_END, String.valueOf(seed), WorldType.NORMAL, true, null);
-        }
-
+        CompletableFuture<Boolean> overworld = new CompletableFuture<>();
+        CompletableFuture<Boolean> nether = new CompletableFuture<>();
+        CompletableFuture<Boolean> end = new CompletableFuture<>();
+        CompletableFuture<Void> isComplete = CompletableFuture.allOf(overworld, nether, end);
         new BukkitRunnable() {
             @Override
             public void run() {
-//                plugin.getServer().broadcastMessage("Generating Overworld (May cause lag)...");
-//                worldManager.regenWorld(WorldNames.OVERWORLD.name, true, true, null);
-//                plugin.getServer().broadcastMessage("Generating Nether (May cause lag)...");
-//                worldManager.regenWorld(WorldNames.NETHER.name, true, true, null);
-//                plugin.getServer().broadcastMessage("Generating End (May cause lag)...");
-//                worldManager.regenWorld(WorldNames.END.name, true, true, null);
-
-                getWorld(World.Environment.NORMAL).getWorldBorder().setSize(worldSize);
-                getWorld(World.Environment.NETHER).getWorldBorder().setSize(worldSize);
-                linkSMPWorlds(WorldNames.OVERWORLD.name, WorldNames.NETHER.name, WorldNames.END.name);
-
-                CompletableFuture<Boolean> biomesComplete = scanBiomes();
-                CompletableFuture<Boolean> structuresComplete = scanStructures();
-                CompletableFuture.allOf(biomesComplete, structuresComplete).thenRun(() -> completeCheck.complete(true));
+                plugin.getServer().broadcastMessage("Generating Overworld (May cause lag)...");
+                worldManager.regenWorld(WorldNames.OVERWORLD.name, true, true, null);
+                worldManager.loadWorld(WorldNames.OVERWORLD.name);
+                overworld.complete(true);
             }
-        }.runTaskLater(plugin, 40);
+        }.runTaskLater(plugin, 10);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getServer().broadcastMessage("Generating Nether (May cause lag)...");
+                worldManager.regenWorld(WorldNames.NETHER.name, true, true, null);
+                worldManager.loadWorld(WorldNames.NETHER.name);
+                nether.complete(true);
+            }
+        }.runTaskLater(plugin, 30);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getServer().broadcastMessage("Generating End (May cause lag)...");
+                worldManager.regenWorld(WorldNames.END.name, true, true, null);
+                worldManager.loadWorld(WorldNames.END.name);
+                end.complete(true);
+            }
+        }.runTaskLater(plugin, 50);
+
+        linkSMPWorlds(WorldNames.OVERWORLD.name, WorldNames.NETHER.name, WorldNames.END.name);
+        return isComplete;
+    }
+
+
+    public CompletableFuture<Boolean> checkLogic() {
+        CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
+        CompletableFuture<Boolean> biomesComplete = scanBiomes();
+        CompletableFuture<Boolean> structuresComplete = scanStructures();
+        CompletableFuture.allOf(biomesComplete, structuresComplete).thenRun(() -> completeCheck.complete(true));
         return completeCheck;
+    }
+
+    public CompletableFuture<Boolean> prepareNewWorld(SettingsImage settings) {
+        CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
+        String props = worldManager.getMVWorld(WorldNames.OVERWORLD.name).getAllPropertyNames();
+        setProps(settings);
+        LockoutGames.broadcastMessage(props);
+        if(settings.isRegenOnStart()) {
+            regenerate().thenRun(() -> isComplete.complete(true));
+        }
+        else {
+            isComplete.complete(true);
+        }
+        return isComplete;
+    }
+
+    private void setProps(SettingsImage settings) {
+        MultiverseWorld[] worlds = {
+                worldManager.getMVWorld(WorldNames.OVERWORLD.name),
+                worldManager.getMVWorld(WorldNames.NETHER.name),
+                worldManager.getMVWorld(WorldNames.END.name)
+        };
+
+        for(MultiverseWorld world : worlds) {
+            world.setAdjustSpawn(true);
+            world.setPVPMode(settings.isPvP());
+            world.setAllowAnimalSpawn(true);
+            world.setAllowMonsterSpawn(true);
+            world.setDifficulty(settings.getDifficulty());
+            world.allowPortalMaking(AllowedPortalType.ALL);
+            world.setBedRespawn(true);
+            world.setHunger(settings.isHunger());
+            world.setEnableWeather(true);
+        }
+    }
+
+    public void initializeMissingWorlds() {
+        if(!worldManager.isMVWorld(WorldNames.OVERWORLD.name)) {
+            worldManager.addWorld(WorldNames.OVERWORLD.name, World.Environment.NORMAL, null, WorldType.NORMAL, true, null);
+        }
+        if(!worldManager.isMVWorld(WorldNames.NETHER.name)) {
+            worldManager.addWorld(WorldNames.NETHER.name, World.Environment.NETHER, null, WorldType.NORMAL, true, null);
+        }
+        if(!worldManager.isMVWorld(WorldNames.END.name)) {
+            worldManager.addWorld(WorldNames.END.name, World.Environment.THE_END, null, WorldType.NORMAL, true, null);
+        }
+        linkSMPWorlds(WorldNames.OVERWORLD.name, WorldNames.NETHER.name, WorldNames.END.name);
     }
 
     /**
@@ -165,29 +222,55 @@ public class GameWorld {
      */
     private CompletableFuture<Boolean> scanBiomes() {
         availableBiomes.clear();
+        ArrayList<Biome> allBiomes = new ArrayList<>(DimensionSearch.NORMAL.getBiomes());
+        allBiomes.addAll(DimensionSearch.NETHER.getBiomes());
+        Lock lock = new ReentrantLock();
         CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
-        new BukkitRunnable() {
-            private final ArrayList<Biome> allBiomes = new ArrayList<>(Arrays.asList(Biome.values()));
 
+        if(this.worldSize >= LARGE_WORLD_THRESHOLD) {
+            availableBiomes.addAll(allBiomes);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    isComplete.complete(true);
+                }
+            }.runTaskLater(plugin, 10);
+            return isComplete;
+        }
+
+        new BukkitRunnable() {
+            private int index = 0;
+            private int biomeCount = 0;
             @Override
             public void run() {
-                for (Biome b : allBiomes) {
-                    World world = getWorld(World.Environment.NORMAL);
-                    if(DimensionSearch.NETHER.getBiomes().contains(b)) {
-                        world = getWorld(World.Environment.NETHER);
-                    }
-                    Location origin = new Location(world, 0, 50, 0);
-                    if (world.locateNearestBiome(origin, worldSize / 2 - 50, b) != null) {
-                        availableBiomes.add(b);
-//                        plugin.getServer().broadcastMessage(ChatColor.GREEN + b.name() + " found");
-                    }
-                    else {
-//                        plugin.getServer().broadcastMessage(ChatColor.RED + b.name() + " not found");
-                    }
+                lock.lock();
+                Biome b = allBiomes.get(index);
+                index++;
+                if(index >= allBiomes.size()) cancel();;
+                lock.unlock();
+                World world = getWorld(DimensionSearch.NORMAL.getEnvironment());
+                if(DimensionSearch.NETHER.getBiomes().contains(b)) {
+                    world = getWorld(World.Environment.NETHER);
                 }
-                isComplete.complete(true);
+                Location origin = new Location(world, 0, 0, 0);
+
+                if (world.locateNearestBiome(origin, worldSize / 2 - BIOME_SEARCH_BORDER_MARGIN_BLOCKS, b) != null) {
+                    availableBiomes.add(b);
+                    //plugin.getServer().broadcastMessage(ChatColor.GREEN + b.name() + " found");
+                }
+                else {
+                    plugin.getServer().broadcastMessage(ChatColor.RED + b.name() + " not found");
+                }
+                biomeCount++;
+                if(index >= allBiomes.size()) {
+                    if(biomeCount >= allBiomes.size()){
+                        plugin.getServer().broadcastMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Biome Scan complete");
+                        isComplete.complete(true);
+                    }
+                    cancel();
+                }
             }
-        }.runTaskAsynchronously(plugin);
+        }.runTaskTimerAsynchronously(plugin, 0, 1);
 
         //End dimension has no world border, so all biomes are included.
         availableBiomes.add(Biome.SMALL_END_ISLANDS);
@@ -204,11 +287,22 @@ public class GameWorld {
      * and all structures are searched for in parallel
      */
     private CompletableFuture<Boolean> scanStructures() {
-
+        availableStructures.clear();
         ArrayList<Structure> allStructures = new ArrayList<>(DimensionSearch.NORMAL.getStructures());
         allStructures.addAll(DimensionSearch.NETHER.getStructures());
         Lock lock = new ReentrantLock();
         CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
+
+        if(this.worldSize >= LARGE_WORLD_THRESHOLD) {
+            availableStructures.addAll(allStructures);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    isComplete.complete(true);
+                }
+            }.runTaskLater(plugin, 10);
+            return isComplete;
+        }
 
         new BukkitRunnable() {
 
@@ -219,15 +313,16 @@ public class GameWorld {
                 lock.lock();
                 Structure s = allStructures.get(index);
                 index++;
+                if(index >= allStructures.size()) cancel();;
                 lock.unlock();
                 World world = getWorld(DimensionSearch.NORMAL.getEnvironment());
                 if(DimensionSearch.NETHER.getStructures().contains(s)) {
-                    world = getWorld(DimensionSearch.NETHER.getEnvironment());
+                    world = getWorld(World.Environment.NETHER);
                 }
-                Location origin = new Location(world, 0, 50, 0);
-                StructureSearchResult result = structureSearchWithTimeout(world, origin, s, 20);;
+                Location origin = new Location(world, 0, 0, 0);
+                StructureSearchResult result = structureSearchWithTimeout(world, origin, s);;
                 if(result != null && Math.abs(result.getLocation().getX()) < (double) worldSize / 2 && Math.abs(result.getLocation().getZ()) < (double) worldSize / 2){
-                    plugin.getServer().broadcastMessage(ChatColor.GREEN + StructureStrings.getStructureName(s) + " found");
+                    //plugin.getServer().broadcastMessage(ChatColor.GREEN + StructureStrings.getStructureName(s) + " found");
                     availableStructures.add(s);
                 }
                 else {
@@ -242,7 +337,7 @@ public class GameWorld {
                     cancel();
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 0, 5);
+        }.runTaskTimerAsynchronously(plugin, 0, 1);
 
         //End has no border, end city always included.
         availableStructures.add(Structure.END_CITY);
@@ -255,10 +350,9 @@ public class GameWorld {
      * @param world The world to search
      * @param origin The center of the search
      * @param s The structure to search for
-     * @param timeout The number of seconds to allow for the search before a timeout
      * @return The corresponding StructureSearchResult if the structure is found, null if it is not found or times out.
      */
-    private StructureSearchResult structureSearchWithTimeout(World world, Location origin, Structure s, int timeout) {
+    private StructureSearchResult structureSearchWithTimeout(World world, Location origin, Structure s) {
         CompletableFuture<StructureSearchResult> future = new CompletableFuture<>();
         BukkitTask search = new BukkitRunnable() {
             @Override
@@ -276,7 +370,7 @@ public class GameWorld {
                     search.cancel();
                 }
             }
-        }.runTaskLater(plugin, 20L * timeout);
+        }.runTaskLater(plugin, 20L * STRUCTURE_SEARCH_TIMEOUT_SECONDS);
         return future.join();
     }
 
@@ -286,8 +380,7 @@ public class GameWorld {
     public enum WorldNames {
         OVERWORLD("game"),
         NETHER("game_nether"),
-        END("game_the_end"),
-        WORLD("world");
+        END("game_the_end");
 
         String name;
 

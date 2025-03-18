@@ -1,15 +1,18 @@
 package org.carden.lockoutgames;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
+import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginLogger;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.carden.lockoutgames.commands.Gadmin;
 import org.carden.lockoutgames.events.EventListener;
 import org.carden.lockoutgames.game.GameBuilder;
+import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.game.player.PlayerManager;
 
+import java.awt.*;
 import java.util.Objects;
 
 /**
@@ -21,10 +24,12 @@ public final class LockoutGames extends JavaPlugin {
     private MultiverseNetherPortals mvnetherPortals;
 
     private GameBuilder gameBuilder;
+    private GameWorld gameWorld;
     private PlayerManager playerManager;
 
     private static LockoutGames instance;
 
+    private static final String BROADCAST_PREFIX = ChatColor.WHITE + "[" + ChatColor.AQUA + "Lockout" + ChatColor.YELLOW + "Games" + ChatColor.WHITE + "]";
 
     @Override
     public void onEnable() {
@@ -42,6 +47,8 @@ public final class LockoutGames extends JavaPlugin {
 
         gameBuilder = new GameBuilder();
         playerManager = new PlayerManager();
+        gameWorld = new GameWorld();
+        gameWorld.initializeMissingWorlds();
 
         EventListener listener = new EventListener(this);
         EventListener playerTracker = new EventListener(this);
@@ -54,7 +61,6 @@ public final class LockoutGames extends JavaPlugin {
         }catch(NullPointerException e) {
             this.getLogger().severe("MISSING COMMAND " + e.getMessage());
         }
-
     }
 
     @Override
@@ -91,6 +97,10 @@ public final class LockoutGames extends JavaPlugin {
         return gameBuilder;
     }
 
+    public GameWorld getGameWorld() {
+        return gameWorld;
+    }
+
     public PlayerManager getPlayerManager() {
         return playerManager;
     }
@@ -100,6 +110,6 @@ public final class LockoutGames extends JavaPlugin {
     }
 
     public static void broadcastMessage(String s) {
-        instance.getServer().broadcastMessage(s);
+        instance.getServer().broadcastMessage(BROADCAST_PREFIX + " " + s);
     }
 }

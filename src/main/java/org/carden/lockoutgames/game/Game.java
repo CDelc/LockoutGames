@@ -1,29 +1,24 @@
 package org.carden.lockoutgames.game;
 
+import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.events.GoalObtainedEvent;
 import org.carden.lockoutgames.goal.Goal;
-import org.carden.lockoutgames.info.WorldRequirements;
 
 import java.util.HashSet;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class Game {
 
-    GameWorld world;
-    SettingsImage settingsImage;
+    protected CompletableFuture<Boolean> logicFuture;
 
-    public Game(GameWorld world, SettingsImage settingsImage) {
-        setWorld(world);
+    protected GameWorld world;
+    protected SettingsImage settingsImage;
+
+    public Game(SettingsImage settingsImage) {
+        world = LockoutGames.getPluginInstance().getGameWorld();
         this.settingsImage = settingsImage;
         this.world.setWorldSize(settingsImage.getWorldSize());
-    }
-
-    public GameWorld getWorld() {
-        return world;
-    }
-
-    public void setWorld(GameWorld world) {
-        this.world = world;
-        WorldRequirements.Element.setWorld(world);
+        this.logicFuture = world.checkLogic();
     }
 
     /**
