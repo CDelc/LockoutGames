@@ -1,13 +1,11 @@
 package org.carden.lockoutgames.game;
 
- import org.bukkit.Difficulty;
- import org.bukkit.entity.Player;
+import org.bukkit.Difficulty;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.gametypes.Lockout;
 
- import java.util.HashSet;
- import java.util.concurrent.CompletableFuture;
+import java.util.Random;
 
 public class GameBuilder {
     /**
@@ -33,17 +31,15 @@ public class GameBuilder {
     Lockout game;
     Gametype gametype;
 
-    HashSet<Player> players;
-    HashSet<Player> spectators;
-
     private int worldSize;
     private int numGoals;
     private boolean regenOnStart;
     private boolean pvp;
     private Difficulty difficulty;
-    private boolean hunger = true;
+    private boolean hunger;
+    private int playerSpreadRadius;
 
-    static final int WORLD_SIZE_DEFAULT = 4000;
+    static final int WORLD_SIZE_DEFAULT = 60000;
     static final int NUM_GOALS_DEFAULT = 25;
     static final boolean WORLD_REGEN_DEFAULT = false;
     static final boolean PVP_DEFAULT = false;
@@ -52,8 +48,6 @@ public class GameBuilder {
 
     public GameBuilder() {
         this.plugin = LockoutGames.getPluginInstance();
-        this.players = new HashSet<>();
-        this.spectators = new HashSet<>();
         this.game = null;
 
         setDefaults();
@@ -61,7 +55,6 @@ public class GameBuilder {
 
     public void setDefaults() {
 
-        players.addAll(plugin.getServer().getOnlinePlayers());
         setNumGoals(NUM_GOALS_DEFAULT);
         setWorldSize(WORLD_SIZE_DEFAULT);
         gametype = Gametype.LOCKOUT;
@@ -69,6 +62,7 @@ public class GameBuilder {
         pvp = PVP_DEFAULT;
         this.difficulty = DIFFICULTY_DEFAULT;
         this.hunger = HUNGER_DEFAULT;
+        this.playerSpreadRadius = worldSize;
     }
 
     /**
@@ -138,6 +132,14 @@ public class GameBuilder {
         this.hunger = hunger;
     }
 
+    public int getPlayerSpreadRadius() {
+        return playerSpreadRadius;
+    }
+
+    public void setPlayerSpreadRadius(int playerSpreadRadius) {
+        this.playerSpreadRadius = playerSpreadRadius;
+    }
+
     /**
      *
      * @return The instance of the game, if one is running
@@ -146,19 +148,23 @@ public class GameBuilder {
         return game;
     }
 
+    public boolean gameIsRunning() {
+        return game != null;
+    }
+
     /**
      * Begins a new game.
      * @return False if a game is already running, true if the game begins successfully.
      */
     public boolean start() {
-        if (game != null) return false;
+        if (gameIsRunning()) return false;
         GameBuilder instance = this;
         SettingsImage image = new SettingsImage(instance);
         GameWorld world = LockoutGames.getPluginInstance().getGameWorld();
         world.prepareNewWorld(image).thenRun(new BukkitRunnable() {
             @Override
             public void run() {
-                game = new Lockout(image);
+                game = new Lockout(image, new Random());
             }
         });
         return true;

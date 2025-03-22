@@ -16,6 +16,7 @@ import org.carden.lockoutgames.game.player.PlayerManager;
 import org.carden.lockoutgames.info.DimensionSearch;
 import org.carden.lockoutgames.info.StructureStrings;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.Lock;
@@ -34,10 +35,10 @@ public class GameWorld {
     LockoutGames plugin;
     MVWorldManager worldManager;
 
-    int worldSize;
+    private int worldSize;
 
-    Set<Biome> availableBiomes;
-    Set<Structure> availableStructures;
+    private final Set<Biome> availableBiomes;
+    private final Set<Structure> availableStructures;
 
     MultiverseWorld waitingRoom;
 
@@ -47,6 +48,7 @@ public class GameWorld {
         this.availableBiomes = new HashSet<>();
         this.availableStructures = new HashSet<>();
         worldManager = plugin.getMultiverseCore().getMVWorldManager();
+        setProps(null);
     }
 
     /**
@@ -87,15 +89,12 @@ public class GameWorld {
      */
     public World getWorld(World.Environment type) {
         try{
-            switch(type) {
-                case NORMAL:
-                    return worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld();
-                case NETHER:
-                    return worldManager.getMVWorld(WorldNames.NETHER.name).getCBWorld();
-                case THE_END:
-                    return worldManager.getMVWorld(WorldNames.END.name).getCBWorld();
-            }
-            return worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld();
+            return switch (type) {
+                case NORMAL -> worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld();
+                case NETHER -> worldManager.getMVWorld(WorldNames.NETHER.name).getCBWorld();
+                case THE_END -> worldManager.getMVWorld(WorldNames.END.name).getCBWorld();
+                default -> worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld();
+            };
         }catch(NullPointerException e){
             return null;
         }
@@ -171,9 +170,7 @@ public class GameWorld {
 
     public CompletableFuture<Boolean> prepareNewWorld(SettingsImage settings) {
         CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
-        String props = worldManager.getMVWorld(WorldNames.OVERWORLD.name).getAllPropertyNames();
         setProps(settings);
-        LockoutGames.broadcastMessage(props);
         if(settings.isRegenOnStart()) {
             regenerate().thenRun(() -> isComplete.complete(true));
         }
@@ -183,7 +180,12 @@ public class GameWorld {
         return isComplete;
     }
 
-    private void setProps(SettingsImage settings) {
+    public void setWorldSettings(SettingsImage settings) {
+        setProps(settings);
+        getWorld(World.Environment.NORMAL).setTime(1000);
+    }
+
+    private void setProps(@Nullable SettingsImage settings) {
         MultiverseWorld[] worlds = {
                 worldManager.getMVWorld(WorldNames.OVERWORLD.name),
                 worldManager.getMVWorld(WorldNames.NETHER.name),
@@ -192,14 +194,15 @@ public class GameWorld {
 
         for(MultiverseWorld world : worlds) {
             world.setAdjustSpawn(true);
-            world.setPVPMode(settings.isPvP());
+            world.setPVPMode(settings != null && settings.isPvP());
             world.setAllowAnimalSpawn(true);
             world.setAllowMonsterSpawn(true);
-            world.setDifficulty(settings.getDifficulty());
+            world.setDifficulty(settings != null ? settings.getDifficulty() : Difficulty.EASY);
             world.allowPortalMaking(AllowedPortalType.ALL);
             world.setBedRespawn(true);
-            world.setHunger(settings.isHunger());
+            world.setHunger(settings == null || settings.isHunger());
             world.setEnableWeather(true);
+            world.setSpawnLocation(world.getCBWorld().getSpawnLocation());
         }
     }
 

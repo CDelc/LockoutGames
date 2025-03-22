@@ -1,11 +1,13 @@
 package org.carden.lockoutgames.events;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.GameBuilder;
 import org.carden.lockoutgames.goal.Goal;
@@ -58,5 +60,11 @@ public class EventListener implements Listener {
     @EventHandler
     public void onGoalComplete(GoalObtainedEvent e) {
         if(gameBuilder.getGame() != null) gameBuilder.getGame().handleGoal(e);
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent e) {
+        Location spawnPointOverride = LockoutGames.getPluginInstance().getPlayerManager().getGamePlayerObject(e.getPlayer().getUniqueId()).getDefaultSpawnPoint();
+        if(e.getPlayer().getRespawnLocation() == null) e.setRespawnLocation(spawnPointOverride);
     }
 }

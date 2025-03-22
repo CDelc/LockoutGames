@@ -9,6 +9,9 @@ commands:
   gadmin:
     description: Adjust game settings
     usage: /gadmin [..args]
+  game:
+    descriptions: Game options
+    usage: /game [..args]
 depend:
   - Multiverse-Core
   - Multiverse-NetherPortals

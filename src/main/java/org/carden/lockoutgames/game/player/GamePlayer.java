@@ -1,6 +1,10 @@
 package org.carden.lockoutgames.game.player;
 
+import org.bukkit.*;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
+import org.carden.lockoutgames.LockoutGames;
 
 import java.util.*;
 
@@ -13,6 +17,7 @@ public class GamePlayer {
     private java.util.UUID UUID;
     private Player playerObject;
     private Map<UUID, Checklist<?>> checklists;
+    Location defaultSpawnPoint;
 
     public GamePlayer(Player p) {
         playerObject = p;
@@ -30,6 +35,36 @@ public class GamePlayer {
         return isSpectator;
     }
 
+    public boolean setSpectator(boolean spectator) {
+        if(LockoutGames.getPluginInstance().getGameBuilder().gameIsRunning() && !spectator) {
+            return false;
+        }
+        isSpectator = spectator;
+        updateGamemode();
+        return true;
+    }
+
+    public void resetPlayerStats() {
+        updateGamemode();
+        playerObject.setExp(0);
+        playerObject.setHealth(20);
+        playerObject.setFoodLevel(20);
+        playerObject.getInventory().clear();
+        playerObject.setLevel(0);
+        resetAdvancements();
+    }
+
+    private void resetAdvancements() {
+        for (Iterator<Advancement> it = Bukkit.advancementIterator(); it.hasNext(); ) {
+            Advancement advancement = it.next();
+            AdvancementProgress progress = playerObject.getAdvancementProgress(advancement);
+
+            for (String criterion : progress.getAwardedCriteria()) {
+                progress.revokeCriteria(criterion);
+            }
+        }
+    }
+
     /**
      * @return This player's UUID
      */
@@ -42,6 +77,26 @@ public class GamePlayer {
      */
     public Player getPlayer() {
         return playerObject;
+    }
+
+    public void updateGamemode() {
+        if(!isSpectator) {
+            playerObject.setGameMode(GameMode.SURVIVAL);
+        } else {
+            playerObject.setGameMode(GameMode.SPECTATOR);
+        }
+    }
+
+    public Location getDefaultSpawnPoint() {
+        if(defaultSpawnPoint != null) {
+            return defaultSpawnPoint;
+        } else {
+            return LockoutGames.getPluginInstance().getGameWorld().getWorld(World.Environment.NORMAL).getSpawnLocation();
+        }
+    }
+
+    public void setDefaultSpawnPoint(Location defaultSpawnPoint) {
+        this.defaultSpawnPoint = defaultSpawnPoint;
     }
 
     /**

@@ -8,16 +8,17 @@ import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.utils.GoalSelector;
 
 import java.util.HashSet;
+import java.util.Random;
 
 public class Lockout extends Game {
 
     HashSet<Goal> goals;
 
-    public Lockout(SettingsImage settingsImage) {
-        super(settingsImage);
+    public Lockout(SettingsImage settingsImage, Random rng) {
+        super(settingsImage, rng);
         logicFuture.thenRun(() -> {
             this.goals = GoalSelector.select(settingsImage.getNumGoals());
-            this.goals.stream().toList().forEach(goal -> LockoutGames.broadcastMessage(goal.getDescription()));
+            //this.goals.stream().toList().forEach(goal -> LockoutGames.broadcastMessage(goal.getDescription()));
         });
     }
 
