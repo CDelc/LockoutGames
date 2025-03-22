@@ -10,6 +10,7 @@ public class SettingsImage {
     private final boolean pvp;
     private final Difficulty difficulty;
     private final boolean hunger;
+    private final int playerSpreadRadius;
 
     public SettingsImage(GameBuilder b) {
         this.worldSize = b.getWorldSize();
@@ -18,6 +19,7 @@ public class SettingsImage {
         this.pvp = b.isPvp();
         this.difficulty = b.getDifficulty();
         this.hunger = b.isHunger();
+        this.playerSpreadRadius = b.getPlayerSpreadRadius();
     }
 
     public int getWorldSize() {
@@ -42,5 +44,9 @@ public class SettingsImage {
 
     public boolean isHunger() {
         return hunger;
+    }
+
+    public int getPlayerSpreadRadius() {
+        return playerSpreadRadius;
     }
 }

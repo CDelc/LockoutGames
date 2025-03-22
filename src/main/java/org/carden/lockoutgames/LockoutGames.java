@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.carden.lockoutgames.commands.Gadmin;
+import org.carden.lockoutgames.commands.Game;
 import org.carden.lockoutgames.events.EventListener;
 import org.carden.lockoutgames.game.GameBuilder;
 import org.carden.lockoutgames.game.GameWorld;
@@ -58,6 +59,8 @@ public final class LockoutGames extends JavaPlugin {
         try {
             Objects.requireNonNull(this.getCommand("gadmin")).setExecutor(new Gadmin());
             Objects.requireNonNull(this.getCommand("gadmin")).setTabCompleter(new Gadmin());
+            Objects.requireNonNull(this.getCommand("game")).setExecutor(new Game());
+            Objects.requireNonNull(this.getCommand("game")).setTabCompleter(new Game());
         }catch(NullPointerException e) {
             this.getLogger().severe("MISSING COMMAND " + e.getMessage());
         }
