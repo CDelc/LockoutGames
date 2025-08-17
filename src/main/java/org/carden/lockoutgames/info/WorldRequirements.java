@@ -1,5 +1,6 @@
 package org.carden.lockoutgames.info;
 
+import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.structure.Structure;
 import org.carden.lockoutgames.LockoutGames;
@@ -859,7 +860,15 @@ public class WorldRequirements {
         CAVE_VINES_PLANT(WorldRequirements::hasLushCave),
         BIG_DRIPLEAF_STEM(WorldRequirements::hasLushCave),
         POTTED_AZALEA_BUSH(WorldRequirements::hasLushCave),
-        POTTED_FLOWERING_AZALEA_BUSH(WorldRequirements::hasLushCave);
+        POTTED_FLOWERING_AZALEA_BUSH(WorldRequirements::hasLushCave),
+        COPPER_BULB(WorldRequirements::hasCopperBulb),
+        WEATHERED_COPPER_BULB(WorldRequirements::hasCopperBulb),
+        EXPOSED_COPPER_BULB(WorldRequirements::hasCopperBulb),
+        OXIDIZED_COPPER_BULB(WorldRequirements::hasCopperBulb),
+        WAXED_COPPER_BULB(WorldRequirements::hasWaxCopperBulb),
+        WAXED_WEATHERED_COPPER_BULB(WorldRequirements::hasWaxCopperBulb),
+        WAXED_EXPOSED_COPPER_BULB(WorldRequirements::hasWaxCopperBulb),
+        WAXED_OXIDIZED_COPPER_BULB(WorldRequirements::hasWaxCopperBulb);
 
 
         private final GameWorld world;
@@ -886,6 +895,14 @@ public class WorldRequirements {
                 world.hasBiome(Biome.SNOWY_TAIGA) ||
                 world.hasBiome(Biome.OLD_GROWTH_SPRUCE_TAIGA) ||
                 world.hasBiome(Biome.OLD_GROWTH_PINE_TAIGA);
+    }
+
+    public static boolean hasCopperBulb(GameWorld world) {
+        return world.hasStructure(Structure.TRIAL_CHAMBERS) || world.hasStructure(Structure.FORTRESS);
+    }
+
+    public static boolean hasWaxCopperBulb(GameWorld world) {
+        return hasCopperBulb(world) && hasFortress(world);
     }
 
     //Returns true if the world can generate crying obsidian consistently

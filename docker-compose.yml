@@ -5,6 +5,6 @@ services:
     ports:
       - "25565:25565"
     environment:
-      MEMORY: "2G"
+      MEMORY: "8G"
     volumes:
       - ./test_server:/server

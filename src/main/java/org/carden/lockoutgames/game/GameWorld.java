@@ -1,6 +1,5 @@
 package org.carden.lockoutgames.game;
 
-import com.onarandombox.MultiverseCore.MVWorld;
 import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseCore.api.MultiverseWorld;
 import com.onarandombox.MultiverseCore.enums.AllowedPortalType;
@@ -12,7 +11,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.StructureSearchResult;
 import org.carden.lockoutgames.LockoutGames;
-import org.carden.lockoutgames.game.player.PlayerManager;
 import org.carden.lockoutgames.info.DimensionSearch;
 import org.carden.lockoutgames.info.StructureStrings;
 
@@ -36,17 +34,17 @@ public class GameWorld {
     MVWorldManager worldManager;
 
     private int worldSize;
+    private final String world_name;
 
     private final Set<Biome> availableBiomes;
     private final Set<Structure> availableStructures;
-
-    MultiverseWorld waitingRoom;
 
     public GameWorld() {
 
         this.plugin = LockoutGames.getPluginInstance();
         this.availableBiomes = new HashSet<>();
         this.availableStructures = new HashSet<>();
+        this.world_name = "world";
         worldManager = plugin.getMultiverseCore().getMVWorldManager();
         setProps(null);
     }
@@ -90,10 +88,10 @@ public class GameWorld {
     public World getWorld(World.Environment type) {
         try{
             return switch (type) {
-                case NORMAL -> worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld();
-                case NETHER -> worldManager.getMVWorld(WorldNames.NETHER.name).getCBWorld();
-                case THE_END -> worldManager.getMVWorld(WorldNames.END.name).getCBWorld();
-                default -> worldManager.getMVWorld(WorldNames.OVERWORLD.name).getCBWorld();
+                case NORMAL -> worldManager.getMVWorld(world_name).getCBWorld();
+                case NETHER -> worldManager.getMVWorld(world_name + "_nether").getCBWorld();
+                case THE_END -> worldManager.getMVWorld(world_name + "_the_end").getCBWorld();
+                default -> worldManager.getMVWorld("world").getCBWorld();
             };
         }catch(NullPointerException e){
             return null;
@@ -116,50 +114,6 @@ public class GameWorld {
         netherPortals.addWorldLink(endworld, overworld, PortalType.ENDER);
     }
 
-    /**
-     * Generates a new set of worlds, creating them if they do not exist yet in the multiverse.
-     * Then scans the worlds for biomes and structures to update logic.
-     */
-    public CompletableFuture<Void> regenerate() {
-        PlayerManager.movePlayerstoSafeWorld();
-
-        CompletableFuture<Boolean> overworld = new CompletableFuture<>();
-        CompletableFuture<Boolean> nether = new CompletableFuture<>();
-        CompletableFuture<Boolean> end = new CompletableFuture<>();
-        CompletableFuture<Void> isComplete = CompletableFuture.allOf(overworld, nether, end);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                plugin.getServer().broadcastMessage("Generating Overworld (May cause lag)...");
-                worldManager.regenWorld(WorldNames.OVERWORLD.name, true, true, null);
-                worldManager.loadWorld(WorldNames.OVERWORLD.name);
-                overworld.complete(true);
-            }
-        }.runTaskLater(plugin, 10);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                plugin.getServer().broadcastMessage("Generating Nether (May cause lag)...");
-                worldManager.regenWorld(WorldNames.NETHER.name, true, true, null);
-                worldManager.loadWorld(WorldNames.NETHER.name);
-                nether.complete(true);
-            }
-        }.runTaskLater(plugin, 30);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                plugin.getServer().broadcastMessage("Generating End (May cause lag)...");
-                worldManager.regenWorld(WorldNames.END.name, true, true, null);
-                worldManager.loadWorld(WorldNames.END.name);
-                end.complete(true);
-            }
-        }.runTaskLater(plugin, 50);
-
-        linkSMPWorlds(WorldNames.OVERWORLD.name, WorldNames.NETHER.name, WorldNames.END.name);
-        return isComplete;
-    }
-
-
     public CompletableFuture<Boolean> checkLogic() {
         CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
         CompletableFuture<Boolean> biomesComplete = scanBiomes();
@@ -171,12 +125,6 @@ public class GameWorld {
     public CompletableFuture<Boolean> prepareNewWorld(SettingsImage settings) {
         CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
         setProps(settings);
-        if(settings.isRegenOnStart()) {
-            regenerate().thenRun(() -> isComplete.complete(true));
-        }
-        else {
-            isComplete.complete(true);
-        }
         return isComplete;
     }
 
@@ -187,9 +135,9 @@ public class GameWorld {
 
     private void setProps(@Nullable SettingsImage settings) {
         MultiverseWorld[] worlds = {
-                worldManager.getMVWorld(WorldNames.OVERWORLD.name),
-                worldManager.getMVWorld(WorldNames.NETHER.name),
-                worldManager.getMVWorld(WorldNames.END.name)
+                worldManager.getMVWorld(world_name),
+                worldManager.getMVWorld(world_name + "_nether"),
+                worldManager.getMVWorld(world_name + "_the_end")
         };
 
         for(MultiverseWorld world : worlds) {
@@ -204,19 +152,6 @@ public class GameWorld {
             world.setEnableWeather(true);
             world.setSpawnLocation(world.getCBWorld().getSpawnLocation());
         }
-    }
-
-    public void initializeMissingWorlds() {
-        if(!worldManager.isMVWorld(WorldNames.OVERWORLD.name)) {
-            worldManager.addWorld(WorldNames.OVERWORLD.name, World.Environment.NORMAL, null, WorldType.NORMAL, true, null);
-        }
-        if(!worldManager.isMVWorld(WorldNames.NETHER.name)) {
-            worldManager.addWorld(WorldNames.NETHER.name, World.Environment.NETHER, null, WorldType.NORMAL, true, null);
-        }
-        if(!worldManager.isMVWorld(WorldNames.END.name)) {
-            worldManager.addWorld(WorldNames.END.name, World.Environment.THE_END, null, WorldType.NORMAL, true, null);
-        }
-        linkSMPWorlds(WorldNames.OVERWORLD.name, WorldNames.NETHER.name, WorldNames.END.name);
     }
 
     /**
@@ -375,21 +310,5 @@ public class GameWorld {
             }
         }.runTaskLater(plugin, 20L * STRUCTURE_SEARCH_TIMEOUT_SECONDS);
         return future.join();
-    }
-
-    /**
-     * Enum to store constant world names.
-     */
-    public enum WorldNames {
-        OVERWORLD("game"),
-        NETHER("game_nether"),
-        END("game_the_end");
-
-        String name;
-
-        WorldNames(String name) {
-            this.name = name;
-        }
-
     }
 }

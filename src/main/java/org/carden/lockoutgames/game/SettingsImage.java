@@ -6,7 +6,6 @@ public class SettingsImage {
 
     private final int worldSize;
     private final int numGoals;
-    private final boolean regenOnStart;
     private final boolean pvp;
     private final Difficulty difficulty;
     private final boolean hunger;
@@ -15,7 +14,6 @@ public class SettingsImage {
     public SettingsImage(GameBuilder b) {
         this.worldSize = b.getWorldSize();
         this.numGoals = b.getNumGoals();
-        this.regenOnStart = b.isRegenOnStart();
         this.pvp = b.isPvp();
         this.difficulty = b.getDifficulty();
         this.hunger = b.isHunger();
@@ -28,10 +26,6 @@ public class SettingsImage {
 
     public int getNumGoals() {
         return numGoals;
-    }
-
-    public boolean isRegenOnStart() {
-        return regenOnStart;
     }
 
     public boolean isPvP() {
