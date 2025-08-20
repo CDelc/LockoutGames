@@ -2,7 +2,6 @@ package org.carden.lockoutgames.game.gametypes;
 
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.events.GoalObtainedEvent;
-import org.carden.lockoutgames.game.Game;
 import org.carden.lockoutgames.game.SettingsImage;
 import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.utils.GoalSelector;
@@ -18,7 +17,6 @@ public class Lockout extends Game {
         super(settingsImage, rng);
         logicFuture.thenRun(() -> {
             this.goals = GoalSelector.select(settingsImage.getNumGoals());
-            //this.goals.stream().toList().forEach(goal -> LockoutGames.broadcastMessage(goal.getDescription()));
         });
     }
 

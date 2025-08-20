@@ -1,9 +1,11 @@
-package org.carden.lockoutgames.game;
+package org.carden.lockoutgames.game.gametypes;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.events.GoalObtainedEvent;
+import org.carden.lockoutgames.game.GameWorld;
+import org.carden.lockoutgames.game.SettingsImage;
 import org.carden.lockoutgames.game.player.GamePlayer;
 import org.carden.lockoutgames.game.player.PlayerManager;
 import org.carden.lockoutgames.goal.Goal;
@@ -60,13 +62,12 @@ public abstract class Game {
             int x = (grid_x * worldRadius) / gridRadius;
             int z = (grid_z * worldRadius) / gridRadius;
             Location destination = new Location(overworld, x, overworld.getHighestBlockYAt(x, z) + 1, z);
-            LockoutGames.broadcastMessage(destination.clone().subtract(0, 1, 0).getBlock().getType().isSolid() + "");
             int timeout = 0;
             while(!destination.clone().subtract(0, 1, 0).getBlock().getType().isSolid()) {
                 if(timeout > 10000) break;
                 timeout++;
                 grid_x = placementRandomizer.nextInt(-gridRadius, gridRadius);
-                grid_z = placementRandomizer.nextInt(-gridRadius, gridRadius);
+                grid_z = placementRandomizer.nextInt(-gridRadius, gridRadius); 
                 x = (grid_x * worldRadius) / gridRadius;
                 z = (grid_z * worldRadius) / gridRadius;
                 destination = new Location(overworld, x, overworld.getHighestBlockYAt(x, z) + 1, z);

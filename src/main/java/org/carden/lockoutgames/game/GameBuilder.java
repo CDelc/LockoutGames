@@ -3,6 +3,7 @@ package org.carden.lockoutgames.game;
 import org.bukkit.Difficulty;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.gametypes.Game;
 import org.carden.lockoutgames.game.gametypes.Lockout;
 
 import java.util.Random;
@@ -33,7 +34,6 @@ public class GameBuilder {
 
     private int worldSize;
     private int numGoals;
-    private boolean regenOnStart;
     private boolean pvp;
     private Difficulty difficulty;
     private boolean hunger;
@@ -41,7 +41,6 @@ public class GameBuilder {
 
     static final int WORLD_SIZE_DEFAULT = 60000;
     static final int NUM_GOALS_DEFAULT = 25;
-    static final boolean WORLD_REGEN_DEFAULT = false;
     static final boolean PVP_DEFAULT = false;
     static final Difficulty DIFFICULTY_DEFAULT = Difficulty.EASY;
     static final boolean HUNGER_DEFAULT = true;
@@ -58,7 +57,6 @@ public class GameBuilder {
         setNumGoals(NUM_GOALS_DEFAULT);
         setWorldSize(WORLD_SIZE_DEFAULT);
         gametype = Gametype.LOCKOUT;
-        regenOnStart = WORLD_REGEN_DEFAULT;
         pvp = PVP_DEFAULT;
         this.difficulty = DIFFICULTY_DEFAULT;
         this.hunger = HUNGER_DEFAULT;
@@ -103,14 +101,6 @@ public class GameBuilder {
 
     public void setPvp(boolean pvp) {
         this.pvp = pvp;
-    }
-
-    public boolean isRegenOnStart() {
-        return regenOnStart;
-    }
-
-    public void setRegenOnStart(boolean regenOnStart) {
-        this.regenOnStart = regenOnStart;
     }
 
     public Difficulty getDifficulty() {

@@ -1,7 +1,6 @@
 package org.carden.lockoutgames;
 
 import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseCore.api.MVWorldManager;
 import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
@@ -13,7 +12,6 @@ import org.carden.lockoutgames.game.GameBuilder;
 import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.game.player.PlayerManager;
 
-import java.awt.*;
 import java.util.Objects;
 
 /**
@@ -49,7 +47,6 @@ public final class LockoutGames extends JavaPlugin {
         gameBuilder = new GameBuilder();
         playerManager = new PlayerManager();
         gameWorld = new GameWorld();
-        gameWorld.initializeMissingWorlds();
 
         EventListener listener = new EventListener(this);
         EventListener playerTracker = new EventListener(this);
