@@ -8,7 +8,6 @@ import org.carden.lockoutgames.LockoutGames;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class PlayerManager {
@@ -42,10 +41,6 @@ public class PlayerManager {
                 players.remove(uuid);
             }
         });
-    }
-
-    public static void movePlayerstoSafeWorld() {
-        Bukkit.getOnlinePlayers().forEach(player -> player.teleport(Objects.requireNonNull(Bukkit.getServer().getWorld("world")).getSpawnLocation()));
     }
 
     public void handlePlayerJoin(PlayerJoinEvent e) {

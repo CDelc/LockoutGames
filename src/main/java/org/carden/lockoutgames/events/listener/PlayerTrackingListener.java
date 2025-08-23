@@ -1,4 +1,4 @@
-package org.carden.lockoutgames.events;
+package org.carden.lockoutgames.events.listener;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -1,4 +1,4 @@
-package org.carden.lockoutgames.events;
+package org.carden.lockoutgames.events.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.events.GoalObtainedEvent;
 import org.carden.lockoutgames.game.GameBuilder;
 import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.goal.GoalType;
@@ -55,11 +56,6 @@ public class EventListener implements Listener {
                         LockoutGames.getPluginInstance().getServer().getPluginManager().callEvent(new GoalObtainedEvent((Player) e.getWhoClicked(), goal));
                     });
         });
-    }
-
-    @EventHandler
-    public void onGoalComplete(GoalObtainedEvent e) {
-        if(gameBuilder.getGame() != null) gameBuilder.getGame().handleGoal(e);
     }
 
     @EventHandler
