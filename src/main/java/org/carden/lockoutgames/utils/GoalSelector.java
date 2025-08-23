@@ -1,6 +1,5 @@
 package org.carden.lockoutgames.utils;
 
-import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.goal.GoalGenerator;
 import org.carden.lockoutgames.goal.GoalType;

@@ -7,10 +7,13 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.carden.lockoutgames.commands.Gadmin;
 import org.carden.lockoutgames.commands.Game;
-import org.carden.lockoutgames.events.EventListener;
+import org.carden.lockoutgames.events.listener.EventListener;
+import org.carden.lockoutgames.events.listener.GameEventListener;
+import org.carden.lockoutgames.events.listener.PlayerTrackingListener;
 import org.carden.lockoutgames.game.GameBuilder;
 import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.game.player.PlayerManager;
+import org.carden.lockoutgames.utils.APILoader;
 
 import java.util.Objects;
 
@@ -49,9 +52,11 @@ public final class LockoutGames extends JavaPlugin {
         gameWorld = new GameWorld();
 
         EventListener listener = new EventListener(this);
-        EventListener playerTracker = new EventListener(this);
+        PlayerTrackingListener playerTracker = new PlayerTrackingListener();
+        GameEventListener gameListener = new GameEventListener();
         getServer().getPluginManager().registerEvents(listener, this);
         getServer().getPluginManager().registerEvents(playerTracker, this);
+        getServer().getPluginManager().registerEvents(gameListener, this);
 
         try {
             Objects.requireNonNull(this.getCommand("gadmin")).setExecutor(new Gadmin());
@@ -61,6 +66,8 @@ public final class LockoutGames extends JavaPlugin {
         }catch(NullPointerException e) {
             this.getLogger().severe("MISSING COMMAND " + e.getMessage());
         }
+
+        APILoader.loadAll();
     }
 
     @Override

@@ -5,10 +5,12 @@ import org.bukkit.World;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.events.GoalObtainedEvent;
 import org.carden.lockoutgames.game.GameWorld;
-import org.carden.lockoutgames.game.SettingsImage;
+import org.carden.lockoutgames.game.setting.Setting;
+import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.game.player.GamePlayer;
 import org.carden.lockoutgames.game.player.PlayerManager;
 import org.carden.lockoutgames.goal.Goal;
+import org.carden.lockoutgames.info.SettingIDS;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -27,14 +29,14 @@ public abstract class Game {
     Random rng;
 
     public Game(SettingsImage settingsImage, Random rng) {
-        LockoutGames.getPluginInstance().getPlayerManager().cleanOfflinePlayers();
-        LockoutGames.getPluginInstance().getPlayerManager().updatePlayerGamemodes();
-        world = LockoutGames.getPluginInstance().getGameWorld();
+        this.world = LockoutGames.getPluginInstance().getGameWorld();
         this.settingsImage = settingsImage;
-        this.world.setWorldSize(settingsImage.getWorldSize());
+        this.world.setWorldSize(settingsImage.getSetting(SettingIDS.WORLD_SIZE));
         this.logicFuture = world.checkLogic();
         this.playerManager = LockoutGames.getPluginInstance().getPlayerManager();
         this.world.setWorldSettings(settingsImage);
+        playerManager.cleanOfflinePlayers();
+        playerManager.updatePlayerGamemodes();
         setPlayersInitialPosition();
         playerManager.getParticipants().forEach(GamePlayer::resetPlayerStats);
     }
@@ -55,7 +57,7 @@ public abstract class Game {
         Random placementRandomizer = new Random();
         playerManager.getParticipants().forEach(gamePlayer -> {
             World overworld = world.getWorld(World.Environment.NORMAL);
-            int worldRadius = settingsImage.getWorldSize() / 2;
+            int worldRadius = Setting.getSettingValue(SettingIDS.WORLD_SIZE) / 2;
             int gridRadius = SPREAD_GRID_RESOLUTION_SIZE / 2;
             int grid_x = placementRandomizer.nextInt(-gridRadius, gridRadius);
             int grid_z = placementRandomizer.nextInt(-gridRadius, gridRadius);
@@ -71,11 +73,13 @@ public abstract class Game {
                 x = (grid_x * worldRadius) / gridRadius;
                 z = (grid_z * worldRadius) / gridRadius;
                 destination = new Location(overworld, x, overworld.getHighestBlockYAt(x, z) + 1, z);
-                LockoutGames.broadcastMessage(destination.clone().subtract(0, 1, 0).getBlock().getType().isSolid() + " " + timeout);
             }
             gamePlayer.setDefaultSpawnPoint(destination);
             gamePlayer.getPlayer().teleport(destination);
         });
     }
 
+    public SettingsImage getSettings() {
+        return settingsImage;
+    }
 }

@@ -11,8 +11,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.StructureSearchResult;
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.info.DimensionSearch;
-import org.carden.lockoutgames.info.StructureStrings;
+import org.carden.lockoutgames.info.SettingIDS;
+import org.carden.lockoutgames.info.SettingsConstants;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -27,7 +29,7 @@ public class GameWorld {
      */
 
     static final int STRUCTURE_SEARCH_TIMEOUT_SECONDS = 20;
-    static final int BIOME_SEARCH_BORDER_MARGIN_BLOCKS = 50;
+    static final int BIOME_SEARCH_BORDER_MARGIN_BLOCKS = 30;
     static final int LARGE_WORLD_THRESHOLD = 50000;
 
     LockoutGames plugin;
@@ -142,13 +144,13 @@ public class GameWorld {
 
         for(MultiverseWorld world : worlds) {
             world.setAdjustSpawn(true);
-            world.setPVPMode(settings != null && settings.isPvP());
+            world.setPVPMode(settings != null && settings.getSetting(SettingIDS.PVP));
             world.setAllowAnimalSpawn(true);
             world.setAllowMonsterSpawn(true);
-            world.setDifficulty(settings != null ? settings.getDifficulty() : Difficulty.EASY);
+            world.setDifficulty(settings != null ? settings.getSetting(SettingIDS.DIFFICULTY) : SettingsConstants.DIFFICULTY_DEFAULT);
             world.allowPortalMaking(AllowedPortalType.ALL);
             world.setBedRespawn(true);
-            world.setHunger(settings == null || settings.isHunger());
+            world.setHunger(settings == null || settings.getSetting(SettingIDS.HUNGER));
             world.setEnableWeather(true);
             world.setSpawnLocation(world.getCBWorld().getSpawnLocation());
         }
@@ -194,10 +196,6 @@ public class GameWorld {
 
                 if (world.locateNearestBiome(origin, worldSize / 2 - BIOME_SEARCH_BORDER_MARGIN_BLOCKS, b) != null) {
                     availableBiomes.add(b);
-                    //plugin.getServer().broadcastMessage(ChatColor.GREEN + b.name() + " found");
-                }
-                else {
-                    plugin.getServer().broadcastMessage(ChatColor.RED + b.name() + " not found");
                 }
                 biomeCount++;
                 if(index >= allBiomes.size()) {
@@ -260,11 +258,7 @@ public class GameWorld {
                 Location origin = new Location(world, 0, 0, 0);
                 StructureSearchResult result = structureSearchWithTimeout(world, origin, s);;
                 if(result != null && Math.abs(result.getLocation().getX()) < (double) worldSize / 2 && Math.abs(result.getLocation().getZ()) < (double) worldSize / 2){
-                    //plugin.getServer().broadcastMessage(ChatColor.GREEN + StructureStrings.getStructureName(s) + " found");
                     availableStructures.add(s);
-                }
-                else {
-                    plugin.getServer().broadcastMessage(ChatColor.RED + StructureStrings.getStructureName(s) + " not found");
                 }
                 structureCount++;
                 if(index >= allStructures.size()) {

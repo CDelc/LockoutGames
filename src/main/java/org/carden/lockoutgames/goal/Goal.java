@@ -8,7 +8,6 @@ import java.util.function.Function;
 
 public class Goal {
 
-
     private final Function<Player, Boolean> checkFunction;
     private final ItemStack displayItem;
     private final String description;

@@ -1,18 +1,18 @@
-package org.carden.lockoutgames.game;
+package org.carden.lockoutgames.game.setting;
 
-import org.carden.lockoutgames.game.setting.Setting;
-
+import java.util.Collections;
 import java.util.Map;
 
 public class SettingsImage {
 
-    private static final Map<Integer, Setting<?>> settings_map;
+    private final Map<Integer, Setting<?>> settings_map;
 
-    public SettingsImage() {
-
+    protected SettingsImage(Map<Integer, Setting<?>> settings_map) {
+        this.settings_map = Collections.unmodifiableMap(settings_map);
     }
 
-    public static Object getSetting(Integer settingID) {
-        return settings_map.get(settingID).getCurrentValue();
+    @SuppressWarnings("unchecked")
+    public <T> T getSetting(SettingID<T> settingID) {
+        return (T) settings_map.get(settingID.getID()).getCurrentValue();
     }
 }

@@ -1,6 +1,5 @@
 package org.carden.lockoutgames.info;
 
-import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.structure.Structure;
 import org.carden.lockoutgames.LockoutGames;
