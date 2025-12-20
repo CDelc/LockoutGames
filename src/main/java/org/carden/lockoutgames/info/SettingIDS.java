@@ -9,12 +9,12 @@ import java.util.Map;
 
 public class SettingIDS {
     public static final SettingID<Integer> WORLD_SIZE = new SettingID<>(0);
-    public static final SettingID<Integer> NUM_GOALS = new SettingID<>(1);;
-    public static final SettingID<Boolean> PVP = new SettingID<>(2);;
-    public static final SettingID<Difficulty> DIFFICULTY = new SettingID<>(3);;
-    public static final SettingID<Boolean> HUNGER = new SettingID<>(4);;
-    public static final SettingID<Integer> PLAYER_SPREAD_RADIUS = new SettingID<>(5);;
-    public static final SettingID<Integer> PLAYER_SPREAD = new SettingID<>(6);;
+    public static final SettingID<Integer> NUM_GOALS = new SettingID<>(1);
+    public static final SettingID<Boolean> PVP = new SettingID<>(2);
+    public static final SettingID<Difficulty> DIFFICULTY = new SettingID<>(3);
+    public static final SettingID<Boolean> HUNGER = new SettingID<>(4);
+    public static final SettingID<Integer> PLAYER_SPREAD_RADIUS = new SettingID<>(5);
+    public static final SettingID<Integer> PLAYER_SPREAD = new SettingID<>(6);
 
     private static final String WORLD_SIZE_ARG = "worldSize";
     private static final String NUM_GOALS_ARG = "numGoals";
@@ -24,18 +24,14 @@ public class SettingIDS {
     private static final String PLAYER_SPREAD_RADIUS_ARG = "playerSpreadRadius";
     private static final String PLAYER_SPREAD_ARG = "playerSpread";
 
-    public static Map<String, SettingID<?>> COMMAND_MAPPINGS;
-
-    static {
-        COMMAND_MAPPINGS = new HashMap<>();
-        COMMAND_MAPPINGS.put(WORLD_SIZE_ARG.toLowerCase(), WORLD_SIZE);
-        COMMAND_MAPPINGS.put(NUM_GOALS_ARG.toLowerCase(), NUM_GOALS);
-        COMMAND_MAPPINGS.put(PVP_ARG.toLowerCase(), PVP);
-        COMMAND_MAPPINGS.put(DIFFICULTY_ARG.toLowerCase(), DIFFICULTY);
-        COMMAND_MAPPINGS.put(HUNGER_ARG.toLowerCase(), HUNGER);
-        COMMAND_MAPPINGS.put(PLAYER_SPREAD_RADIUS_ARG.toLowerCase(), PLAYER_SPREAD_RADIUS);
-        COMMAND_MAPPINGS.put(PLAYER_SPREAD_ARG.toLowerCase(), PLAYER_SPREAD);
-
-        COMMAND_MAPPINGS = Collections.unmodifiableMap(COMMAND_MAPPINGS);
-    }
+    public static final Map<String, SettingID<?>> COMMAND_MAPPINGS =
+        Map.ofEntries(
+            Map.entry(WORLD_SIZE_ARG.toLowerCase(), WORLD_SIZE),
+            Map.entry(NUM_GOALS_ARG.toLowerCase(), NUM_GOALS),
+            Map.entry(PVP_ARG.toLowerCase(), PVP),
+            Map.entry(DIFFICULTY_ARG.toLowerCase(), DIFFICULTY),
+            Map.entry(HUNGER_ARG.toLowerCase(), HUNGER),
+            Map.entry(PLAYER_SPREAD_RADIUS_ARG.toLowerCase(), PLAYER_SPREAD_RADIUS),
+            Map.entry(PLAYER_SPREAD_ARG.toLowerCase(), PLAYER_SPREAD)
+    );
 }

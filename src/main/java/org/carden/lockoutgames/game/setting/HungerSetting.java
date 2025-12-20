@@ -6,7 +6,7 @@ import org.carden.lockoutgames.info.SettingsConstants;
 public class HungerSetting extends BooleanSetting {
 
     static {
-        settings_map.put(SettingIDS.HUNGER.getID(), new HungerSetting());
+        settings_map.put(SettingIDS.HUNGER.ID(), new HungerSetting());
     }
 
     public HungerSetting() {

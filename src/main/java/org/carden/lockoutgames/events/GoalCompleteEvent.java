@@ -1,23 +1,22 @@
 package org.carden.lockoutgames.events;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.carden.lockoutgames.game.player.GamePlayer;
 import org.carden.lockoutgames.goal.Goal;
-import org.carden.lockoutgames.goal.GoalGenerator;
 import org.jetbrains.annotations.NotNull;
 
-public class GoalObtainedEvent extends Event {
+public class GoalCompleteEvent extends Event {
 
     /**
      * Event that triggers whenever a player completes a goal
      */
 
     private static final HandlerList HANDLERS = new HandlerList();
-    private final Player player;
+    private final GamePlayer player;
     private final Goal goal;
 
-    public GoalObtainedEvent(Player player, Goal goal) {
+    public GoalCompleteEvent(GamePlayer player, Goal goal) {
         this.player = player;
         this.goal = goal;
     }
@@ -26,7 +25,7 @@ public class GoalObtainedEvent extends Event {
      *
      * @return The player that completed the goal
      */
-    public Player getPlayer() {
+    public GamePlayer getPlayer() {
         return player;
     }
 

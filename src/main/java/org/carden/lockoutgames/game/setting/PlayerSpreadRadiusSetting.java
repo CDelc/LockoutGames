@@ -5,7 +5,7 @@ import org.carden.lockoutgames.info.SettingsConstants;
 
 public class PlayerSpreadRadiusSetting extends NumericalSetting {
 
-    static {settings_map.put(SettingIDS.PLAYER_SPREAD_RADIUS.getID(), new PlayerSpreadRadiusSetting());}
+    static {settings_map.put(SettingIDS.PLAYER_SPREAD_RADIUS.ID(), new PlayerSpreadRadiusSetting());}
 
     protected PlayerSpreadRadiusSetting() {
         super(

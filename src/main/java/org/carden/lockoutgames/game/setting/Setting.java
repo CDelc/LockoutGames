@@ -19,7 +19,7 @@ public abstract class Setting<T>{
      * 3. Add a static block to that class that adds it to the settings_map
      * 4. Ensure your class is using the default constructor
      * 5. Define the chat argument name for your setting in SettingIDS
-     * 6. Add your setting to COMMAND_ARGS map in the static block in SettingIDS
+     * 6. Add your setting to COMMAND_MAPPINGS map in SettingIDS
      */
 
     protected String name;
@@ -95,7 +95,7 @@ public abstract class Setting<T>{
      */
     @SuppressWarnings("unchecked")
     public static <T> T getSettingValue(SettingID<T> settingID) {
-        return (T) settings_map.get(settingID.getID()).getCurrentValue();
+        return (T) settings_map.get(settingID.ID()).getCurrentValue();
     }
 
     /**
@@ -107,7 +107,7 @@ public abstract class Setting<T>{
     public static <T> T getSettingValue(String settingArg) {
         settingArg = settingArg.toLowerCase();
         if(!isValidSetting(settingArg)) return null;
-        return (T) settings_map.get(SettingIDS.COMMAND_MAPPINGS.get(settingArg).getID()).getCurrentValue();
+        return (T) settings_map.get(SettingIDS.COMMAND_MAPPINGS.get(settingArg).ID()).getCurrentValue();
     }
 
     /**
@@ -118,7 +118,7 @@ public abstract class Setting<T>{
      */
     @SuppressWarnings("unchecked")
     public static <T> boolean setSetting(SettingID<T> settingID, Object value) {
-        Setting<?> tmpSetting = settings_map.get(settingID.getID());
+        Setting<?> tmpSetting = settings_map.get(settingID.ID());
         if(!tmpSetting.getExpectedType().isInstance(value)) {
             if(value instanceof String) {
                 return tmpSetting.setSettingFromString((String) value);
@@ -156,7 +156,7 @@ public abstract class Setting<T>{
      */
     @SuppressWarnings("unchecked")
     public static <T> Setting<T> getSettingObjectCopy(SettingID<T> settingID) {
-        Setting<T> rValue = (Setting<T>) getSettingMapCopy().get(settingID.getID());
+        Setting<T> rValue = (Setting<T>) getSettingMapCopy().get(settingID.ID());
         if(rValue == null) throw new IllegalArgumentException("Copy attempted with invalid setting");
         return rValue;
     }
@@ -169,7 +169,7 @@ public abstract class Setting<T>{
     @SuppressWarnings("unchecked")
     public static <T> Setting<T> getSettingObjectCopy(String settingArg) {
         settingArg = settingArg.toLowerCase();
-        Setting<T> rValue = (Setting<T>) getSettingMapCopy().get(SettingIDS.COMMAND_MAPPINGS.get(settingArg).getID());
+        Setting<T> rValue = (Setting<T>) getSettingMapCopy().get(SettingIDS.COMMAND_MAPPINGS.get(settingArg).ID());
         if(rValue == null) throw new IllegalArgumentException("Copy attempted with invalid setting");
         return rValue;
     }
@@ -240,7 +240,7 @@ public abstract class Setting<T>{
      */
     public static boolean isValidSetting(String settingArg) {
         return SettingIDS.COMMAND_MAPPINGS.containsKey(settingArg.toLowerCase())
-                && settings_map.containsKey(SettingIDS.COMMAND_MAPPINGS.get(settingArg.toLowerCase()).getID());
+                && settings_map.containsKey(SettingIDS.COMMAND_MAPPINGS.get(settingArg.toLowerCase()).ID());
     }
 
     private static Map<Integer, Setting<?>> getSettingMapCopy() {

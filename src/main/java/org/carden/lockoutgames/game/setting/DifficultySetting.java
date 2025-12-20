@@ -6,7 +6,7 @@ import org.carden.lockoutgames.info.SettingsConstants;
 
 public class DifficultySetting extends MultiChoiceSetting<Difficulty> {
 
-    static {settings_map.put(SettingIDS.DIFFICULTY.getID(), new DifficultySetting());}
+    static {settings_map.put(SettingIDS.DIFFICULTY.ID(), new DifficultySetting());}
 
     public DifficultySetting() {
         super(SettingsConstants.DIFFICULTY_HEADER, SettingsConstants.DIFFICULTY_HELP, SettingsConstants.DIFFICULTY_DEFAULT);

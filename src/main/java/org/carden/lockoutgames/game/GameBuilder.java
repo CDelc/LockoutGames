@@ -8,6 +8,7 @@ import org.carden.lockoutgames.game.setting.Setting;
 import org.carden.lockoutgames.game.setting.SettingsImage;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 public class GameBuilder {
@@ -31,44 +32,48 @@ public class GameBuilder {
     }
 
     LockoutGames plugin;
-    Lockout game;
-    Gametype gametype;
-
+    Game game;
 
     Map<Integer, Setting<?>> settings;
 
-    public GameBuilder() {
+    private static final GameBuilder gameBuilder = new GameBuilder();
+
+    private GameBuilder() {
         this.plugin = LockoutGames.getPluginInstance();
         this.game = null;
+    }
+
+    public static GameBuilder getGameBuilder() {
+        return gameBuilder;
     }
 
     /**
      *
      * @return The instance of the game, if one is running
      */
-    public Game getGame() {
-        return game;
+    public Optional<Game> getGame() {
+        return Optional.ofNullable(game);
     }
 
-    public boolean gameIsRunning() {
-        return game != null;
-    }
 
     /**
      * Begins a new game.
      * @return False if a game is already running, true if the game begins successfully.
      */
     public boolean start() {
-        if (gameIsRunning()) return false;
-        GameBuilder instance = this;
-        SettingsImage image = Setting.saveSettings();
+        if (getGame().isPresent()) return false;
+        SettingsImage settingsImage = Setting.saveSettings();
         GameWorld world = LockoutGames.getPluginInstance().getGameWorld();
-        world.prepareNewWorld(image).thenRun(new BukkitRunnable() {
+        world.setupWorld(settingsImage).thenRun(new BukkitRunnable() {
             @Override
             public void run() {
-                game = new Lockout(image, new Random());
+                game = new Lockout(settingsImage);
             }
         });
         return true;
+    }
+
+    public void end() {
+        game = null;
     }
 }

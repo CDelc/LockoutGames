@@ -98,7 +98,8 @@ public enum DimensionSearch {
             Biome.FROZEN_PEAKS,
             Biome.JAGGED_PEAKS,
             Biome.STONY_PEAKS,
-            Biome.CHERRY_GROVE
+            Biome.CHERRY_GROVE,
+            Biome.PALE_GARDEN
     }), NETHER(World.Environment.NETHER, new Structure[]
             {Structure.FORTRESS,
             Structure.NETHER_FOSSIL,

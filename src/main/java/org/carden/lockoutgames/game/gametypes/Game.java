@@ -2,60 +2,64 @@ package org.carden.lockoutgames.game.gametypes;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.event.Event;
 import org.carden.lockoutgames.LockoutGames;
-import org.carden.lockoutgames.events.GoalObtainedEvent;
+import org.carden.lockoutgames.events.GoalCompleteEvent;
 import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.game.setting.Setting;
 import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.game.player.GamePlayer;
 import org.carden.lockoutgames.game.player.PlayerManager;
-import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.info.SettingIDS;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 
 public abstract class Game {
-
-    protected CompletableFuture<Boolean> logicFuture;
 
     protected GameWorld world;
     protected SettingsImage settingsImage;
     protected PlayerManager playerManager;
+    protected List<GamePlayer> playerList;
 
     private final int SPREAD_GRID_RESOLUTION_SIZE = 100;
 
-    Random rng;
-
-    public Game(SettingsImage settingsImage, Random rng) {
-        this.world = LockoutGames.getPluginInstance().getGameWorld();
+    public Game(SettingsImage settingsImage) {
+        this.world = GameWorld.getGameWorld();
         this.settingsImage = settingsImage;
-        this.world.setWorldSize(settingsImage.getSetting(SettingIDS.WORLD_SIZE));
-        this.logicFuture = world.checkLogic();
-        this.playerManager = LockoutGames.getPluginInstance().getPlayerManager();
-        this.world.setWorldSettings(settingsImage);
-        playerManager.cleanOfflinePlayers();
-        playerManager.updatePlayerGamemodes();
-        setPlayersInitialPosition();
-        playerManager.getParticipants().forEach(GamePlayer::resetPlayerStats);
+        this.playerManager = PlayerManager.getPlayerManager();
+        setupGame();
     }
 
     /**
      * Process this GoalObtainedEvent in the context of the game
      * @param e The event associated with the collected goal
      */
-    abstract public void handleGoal(GoalObtainedEvent e);
+    abstract public void handleGoalEvent(GoalCompleteEvent e);
 
-    /**
-     * @return A set of Goals that can be awarded to players
-     */
-    abstract public HashSet<Goal> getActiveGoals();
+    abstract public void checkGoals(Event e);
 
+    protected void setupGame() {
+
+        long seed = (new Random()).nextLong();
+        LockoutGames.getRng().setSeed(seed);
+
+        for(GamePlayer gamePlayer : playerManager.getAllPlayers()) {
+            if(gamePlayer.isOnline() && !gamePlayer.isSpectator()) {
+                playerList.add(gamePlayer);
+            } else {
+                gamePlayer.setSpectator(true);
+            }
+            gamePlayer.updateGamemode();
+            gamePlayer.resetPlayerStats();
+        }
+
+        setPlayersInitialPosition();
+    }
 
     public void setPlayersInitialPosition() {
         Random placementRandomizer = new Random();
-        playerManager.getParticipants().forEach(gamePlayer -> {
+        playerList.forEach(gamePlayer -> {
             World overworld = world.getWorld(World.Environment.NORMAL);
             int worldRadius = Setting.getSettingValue(SettingIDS.WORLD_SIZE) / 2;
             int gridRadius = SPREAD_GRID_RESOLUTION_SIZE / 2;
@@ -75,7 +79,7 @@ public abstract class Game {
                 destination = new Location(overworld, x, overworld.getHighestBlockYAt(x, z) + 1, z);
             }
             gamePlayer.setDefaultSpawnPoint(destination);
-            gamePlayer.getPlayer().teleport(destination);
+            gamePlayer.getCBPlayer().teleport(destination);
         });
     }
 

@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.StructureSearchResult;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.setting.SettingsImage;
+import org.carden.lockoutgames.game.setting.WorldSizeSetting;
 import org.carden.lockoutgames.info.DimensionSearch;
 import org.carden.lockoutgames.info.SettingIDS;
 import org.carden.lockoutgames.info.SettingsConstants;
@@ -41,7 +42,9 @@ public class GameWorld {
     private final Set<Biome> availableBiomes;
     private final Set<Structure> availableStructures;
 
-    public GameWorld() {
+    private static final GameWorld gameWorld = new GameWorld();
+
+    private GameWorld() {
 
         this.plugin = LockoutGames.getPluginInstance();
         this.availableBiomes = new HashSet<>();
@@ -51,9 +54,13 @@ public class GameWorld {
         setProps(null);
     }
 
+    public static GameWorld getGameWorld() {
+        return gameWorld;
+    }
+
     /**
      *
-     * @param value Sets the world border size, to be used by GameSettings
+     * @param value Sets the world border size
      */
     public void setWorldSize(int value) {
         worldSize = value;
@@ -61,6 +68,10 @@ public class GameWorld {
         World nether = getWorld(World.Environment.NETHER);
         if(overworld != null) overworld.getWorldBorder().setSize(worldSize);
         if(nether != null) nether.getWorldBorder().setSize(worldSize);
+    }
+
+    public boolean isLargeWorld() {
+        return this.worldSize >= LARGE_WORLD_THRESHOLD;
     }
 
     /**
@@ -116,7 +127,7 @@ public class GameWorld {
         netherPortals.addWorldLink(endworld, overworld, PortalType.ENDER);
     }
 
-    public CompletableFuture<Boolean> checkLogic() {
+    public CompletableFuture<Boolean> updateLogic() {
         CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
         CompletableFuture<Boolean> biomesComplete = scanBiomes();
         CompletableFuture<Boolean> structuresComplete = scanStructures();
@@ -124,14 +135,16 @@ public class GameWorld {
         return completeCheck;
     }
 
-    public CompletableFuture<Boolean> prepareNewWorld(SettingsImage settings) {
-        CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
-        setProps(settings);
+    public CompletableFuture<Boolean> setupWorld(SettingsImage settings) {
+        if(settings!= null) this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
+        CompletableFuture<Boolean> isComplete = updateLogic();
+        applySettings(settings);
         return isComplete;
     }
 
-    public void setWorldSettings(SettingsImage settings) {
+    public void applySettings(SettingsImage settings) {
         setProps(settings);
+        this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
         getWorld(World.Environment.NORMAL).setTime(1000);
     }
 

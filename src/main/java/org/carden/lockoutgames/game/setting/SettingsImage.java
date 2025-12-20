@@ -13,6 +13,6 @@ public class SettingsImage {
 
     @SuppressWarnings("unchecked")
     public <T> T getSetting(SettingID<T> settingID) {
-        return (T) settings_map.get(settingID.getID()).getCurrentValue();
+        return (T) settings_map.get(settingID.ID()).getCurrentValue();
     }
 }

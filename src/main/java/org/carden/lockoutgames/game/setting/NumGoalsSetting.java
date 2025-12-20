@@ -1,12 +1,11 @@
 package org.carden.lockoutgames.game.setting;
 
 import org.carden.lockoutgames.info.SettingIDS;
-import org.carden.lockoutgames.utils.GoalSelector;
 import org.carden.lockoutgames.info.SettingsConstants;
 
 public class NumGoalsSetting extends NumericalSetting{
 
-    static {settings_map.put(SettingIDS.NUM_GOALS.getID(), new NumGoalsSetting());}
+    static {settings_map.put(SettingIDS.NUM_GOALS.ID(), new NumGoalsSetting());}
 
     public NumGoalsSetting() {
         super(

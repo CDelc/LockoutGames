@@ -3,19 +3,15 @@ package org.carden.lockoutgames;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.carden.lockoutgames.commands.Gadmin;
-import org.carden.lockoutgames.commands.Game;
-import org.carden.lockoutgames.events.listener.EventListener;
-import org.carden.lockoutgames.events.listener.GameEventListener;
-import org.carden.lockoutgames.events.listener.PlayerTrackingListener;
 import org.carden.lockoutgames.game.GameBuilder;
 import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.game.player.PlayerManager;
-import org.carden.lockoutgames.utils.APILoader;
+import org.carden.lockoutgames.utils.Loader;
 
-import java.util.Objects;
+import java.util.Random;
 
 /**
  * Base plugin class
@@ -29,6 +25,7 @@ public final class LockoutGames extends JavaPlugin {
     private GameWorld gameWorld;
     private PlayerManager playerManager;
 
+    private static Random rng;
     private static LockoutGames instance;
 
     private static final String BROADCAST_PREFIX = ChatColor.WHITE + "[" + ChatColor.AQUA + "Lockout" + ChatColor.YELLOW + "Games" + ChatColor.WHITE + "]";
@@ -36,6 +33,20 @@ public final class LockoutGames extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        setupMultiverseDependencies();
+        gameBuilder = GameBuilder.getGameBuilder();
+        playerManager = PlayerManager.getPlayerManager();
+        gameWorld = GameWorld.getGameWorld();
+
+        Loader.loadAll(this);
+    }
+
+    @Override
+    public void onDisable() {
+    }
+
+
+    private void setupMultiverseDependencies() {
         if(!setupMultiverseCore()) {
             getLogger().severe("Multiverse-Core not found! Please install the Multiverse-core plugin to your server.\n" +
                     "Plugin disabled.");
@@ -46,32 +57,6 @@ public final class LockoutGames extends JavaPlugin {
                     "Plugin disabled.");
             getServer().getPluginManager().disablePlugin(this);
         }
-
-        gameBuilder = new GameBuilder();
-        playerManager = new PlayerManager();
-        gameWorld = new GameWorld();
-
-        EventListener listener = new EventListener(this);
-        PlayerTrackingListener playerTracker = new PlayerTrackingListener();
-        GameEventListener gameListener = new GameEventListener();
-        getServer().getPluginManager().registerEvents(listener, this);
-        getServer().getPluginManager().registerEvents(playerTracker, this);
-        getServer().getPluginManager().registerEvents(gameListener, this);
-
-        try {
-            Objects.requireNonNull(this.getCommand("gadmin")).setExecutor(new Gadmin());
-            Objects.requireNonNull(this.getCommand("gadmin")).setTabCompleter(new Gadmin());
-            Objects.requireNonNull(this.getCommand("game")).setExecutor(new Game());
-            Objects.requireNonNull(this.getCommand("game")).setTabCompleter(new Game());
-        }catch(NullPointerException e) {
-            this.getLogger().severe("MISSING COMMAND " + e.getMessage());
-        }
-
-        APILoader.loadAll();
-    }
-
-    @Override
-    public void onDisable() {
     }
 
     private boolean setupMultiverseCore() {
@@ -114,6 +99,10 @@ public final class LockoutGames extends JavaPlugin {
 
     public static LockoutGames getPluginInstance() {
         return instance;
+    }
+
+    public static Random getRng() {
+        return rng;
     }
 
     public static void broadcastMessage(String s) {

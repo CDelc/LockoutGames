@@ -5,7 +5,7 @@ import org.carden.lockoutgames.info.SettingsConstants;
 
 public class WorldSizeSetting extends NumericalSetting {
 
-    static {settings_map.put(SettingIDS.WORLD_SIZE.getID(), new WorldSizeSetting());}
+    static {settings_map.put(SettingIDS.WORLD_SIZE.ID(), new WorldSizeSetting());}
 
     public WorldSizeSetting() {
         super(
@@ -16,6 +16,4 @@ public class WorldSizeSetting extends NumericalSetting {
                 SettingsConstants.WORLD_SIZE_MAXIMUM
         );
     }
-
-
 }
