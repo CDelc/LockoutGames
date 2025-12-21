@@ -13,7 +13,7 @@ public class NumGoalsSetting extends NumericalSetting{
                 SettingsConstants.NUM_GOALS_HELP,
                 SettingsConstants.NUM_GOALS_DEFAULT,
                 SettingsConstants.NUM_GOALS_MINIMUM,
-                GoalSelector.getAllGoals().size()
+                SettingsConstants.NUM_GOALS_MAXIMUM
         );
     }
 }

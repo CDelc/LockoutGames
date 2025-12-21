@@ -14,6 +14,7 @@ public class SettingsConstants {
     public static String NUM_GOALS_HELP = "The number of total goals in the game";
     public static Integer NUM_GOALS_DEFAULT = 25;
     public static Integer NUM_GOALS_MINIMUM = 1;
+    public static Integer NUM_GOALS_MAXIMUM = 50;
 
     public static String PVP_HEADER = "Enable PvP";
     public static String PVP_HELP = "PvP is enabled or disabled";

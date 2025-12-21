@@ -34,7 +34,7 @@ public class GamePlayer {
     }
 
     public boolean setSpectator(boolean spectator) {
-        if(LockoutGames.getPluginInstance().getGameBuilder().gameIsRunning() && !spectator) {
+        if(LockoutGames.getGame().isPresent() && !spectator) {
             return false;
         }
         isSpectator = spectator;

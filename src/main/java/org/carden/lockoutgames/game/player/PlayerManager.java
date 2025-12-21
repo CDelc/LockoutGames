@@ -29,7 +29,7 @@ public class PlayerManager {
         GamePlayer new_player = new GamePlayer(p);
         if(players.containsKey(p.getUniqueId())) return;
         players.put(p.getUniqueId(), new_player);
-        new_player.setSpectator(LockoutGames.getPluginInstance().getGameBuilder().gameIsRunning());
+        new_player.setSpectator(LockoutGames.getGame().isPresent());
     }
 
     public void handlePlayerJoin(PlayerJoinEvent e) {

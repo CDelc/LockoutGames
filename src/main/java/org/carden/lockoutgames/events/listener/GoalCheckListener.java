@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.carden.lockoutgames.game.GameBuilder;
+import org.carden.lockoutgames.LockoutGames;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,9 +44,8 @@ public class GoalCheckListener implements Listener {
 
     private void sendGoalCheck(Class<? extends Event> eventClass, Event e) {
         if(!eventsToListenFor.contains(eventClass)) return;
-        GameBuilder gameBuilder = GameBuilder.getGameBuilder();
-        if(gameBuilder.getGame().isPresent()) {
-            gameBuilder.getGame().get().checkGoals(e);
+        if(LockoutGames.getGame().isPresent()) {
+            LockoutGames.getGame().get().checkGoals(e);
         }
     }
 }

@@ -3,14 +3,17 @@ package org.carden.lockoutgames;
 import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.carden.lockoutgames.game.GameBuilder;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.carden.lockoutgames.game.GameWorld;
+import org.carden.lockoutgames.game.gametypes.Lockout;
 import org.carden.lockoutgames.game.player.PlayerManager;
+import org.carden.lockoutgames.game.setting.Setting;
+import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.utils.Loader;
 
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -21,8 +24,8 @@ public final class LockoutGames extends JavaPlugin {
     private MultiverseCore multiverseCore;
     private MultiverseNetherPortals mvnetherPortals;
 
-    private GameBuilder gameBuilder;
-    private GameWorld gameWorld;
+    private static GameWorld gameWorld;
+    private static org.carden.lockoutgames.game.gametypes.Game game;
     private PlayerManager playerManager;
 
     private static Random rng;
@@ -34,9 +37,9 @@ public final class LockoutGames extends JavaPlugin {
     public void onEnable() {
         instance = this;
         setupMultiverseDependencies();
-        gameBuilder = GameBuilder.getGameBuilder();
         playerManager = PlayerManager.getPlayerManager();
         gameWorld = GameWorld.getGameWorld();
+        game = null;
 
         Loader.loadAll(this);
     }
@@ -45,6 +48,49 @@ public final class LockoutGames extends JavaPlugin {
     public void onDisable() {
     }
 
+    /**
+     * Begins a new game.
+     * @return False if a game is already running, true if the game begins successfully.
+     */
+    public static boolean startGame() {
+        if (getGame().isPresent()) return false;
+        SettingsImage settingsImage = Setting.saveSettings();
+        gameWorld.setupWorld(settingsImage).thenRun(new BukkitRunnable() {
+            @Override
+            public void run() {
+                game = new Lockout(settingsImage);
+            }
+        });
+        return true;
+    }
+
+    public static void endGame() {
+        game = null;
+    }
+
+    public static LockoutGames getPluginInstance() {
+        return instance;
+    }
+
+    public static Random getRng() {
+        return rng;
+    }
+
+    public static Optional<org.carden.lockoutgames.game.gametypes.Game> getGame() {
+        return Optional.ofNullable(game);
+    }
+
+    public static GameWorld getGameWorld() {
+        return gameWorld;
+    }
+
+    public PlayerManager getPlayerManager() {
+        return playerManager;
+    }
+
+    public static void broadcastMessage(String s) {
+        instance.getServer().broadcastMessage(BROADCAST_PREFIX + " " + s);
+    }
 
     private void setupMultiverseDependencies() {
         if(!setupMultiverseCore()) {
@@ -83,29 +129,5 @@ public final class LockoutGames extends JavaPlugin {
 
     public MultiverseNetherPortals getMvnetherPortals() {
         return mvnetherPortals;
-    }
-
-    public GameBuilder getGameBuilder() {
-        return gameBuilder;
-    }
-
-    public GameWorld getGameWorld() {
-        return gameWorld;
-    }
-
-    public PlayerManager getPlayerManager() {
-        return playerManager;
-    }
-
-    public static LockoutGames getPluginInstance() {
-        return instance;
-    }
-
-    public static Random getRng() {
-        return rng;
-    }
-
-    public static void broadcastMessage(String s) {
-        instance.getServer().broadcastMessage(BROADCAST_PREFIX + " " + s);
     }
 }

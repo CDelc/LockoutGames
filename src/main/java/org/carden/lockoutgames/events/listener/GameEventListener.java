@@ -5,7 +5,6 @@ import org.bukkit.event.*;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.events.GoalCompleteEvent;
 import org.carden.lockoutgames.events.SettingChangeEvent;
-import org.carden.lockoutgames.game.GameBuilder;
 import org.carden.lockoutgames.game.setting.Setting;
 
 public class GameEventListener implements Listener {
@@ -18,16 +17,14 @@ public class GameEventListener implements Listener {
         return gameEventListener;
     }
 
-    private final static GameBuilder gameBuilder = LockoutGames.getPluginInstance().getGameBuilder();
-
     @EventHandler
     public void onGoalComplete(GoalCompleteEvent e) {
-        if(gameBuilder.getGame().isPresent()) gameBuilder.getGame().get().handleGoalEvent(e);
+        if(LockoutGames.getGame().isPresent()) LockoutGames.getGame().get().handleGoalEvent(e);
     }
 
     @EventHandler
     public void onSettingChange(SettingChangeEvent<?> settingChangeEvent) {
-        if(gameBuilder.getGame().isPresent()) return;
+        if(LockoutGames.getGame().isPresent()) return;
         LockoutGames.broadcastMessage(
                 ChatColor.BLUE + Setting.getSettingObjectCopy(settingChangeEvent.getSettingID()).getName() +
                         ChatColor.WHITE + " changed " +

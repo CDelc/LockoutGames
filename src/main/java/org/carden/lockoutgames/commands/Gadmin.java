@@ -40,7 +40,7 @@ public class Gadmin implements CommandExecutor, TabCompleter {
     }
 
     private void gadminStart(@NotNull CommandSender commandSender, @NotNull String[] args) {
-        LockoutGames.getPluginInstance().getGameBuilder().start();
+        LockoutGames.startGame();
     }
 
     private void gadminSettings(@NotNull CommandSender commandSender, @NotNull String[] args) {
