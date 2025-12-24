@@ -1,0 +1,79 @@
+package org.carden.lockoutgames.goal.factory;
+
+import org.carden.lockoutgames.goal.Goal;
+import org.carden.lockoutgames.goal.GoalDifficulty;
+import org.carden.lockoutgames.goal.GoalType;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public abstract class BaseGoalFactory implements GoalFactory {
+    protected GoalDifficulty minDifficulty = GoalDifficulty.VERY_EASY;
+    protected GoalDifficulty maxDifficulty = GoalDifficulty.VERY_HARD;
+    protected Collection<GoalType> usedGoalTypes = Set.of();
+    protected Collection<String> usedUniquenessStrings = Set.of();
+    protected boolean canGenerateMultiple = false;
+    private boolean generatedGoal = false;
+    protected final Set<GoalType> myGoalTypes = new HashSet<>();
+
+    @Override
+    public Goal makeGoal() {
+        if (this.canGenerateGoal()) {
+            Goal goal = this.makeGoalHook();
+            this.generatedGoal = true;
+            return goal;
+        }
+        else {
+            throw new IllegalStateException("canGenerateGoal is false");
+        }
+    }
+
+    protected abstract Goal makeGoalHook();
+
+    @Override
+    public GoalFactory setMinDifficulty(GoalDifficulty minDifficulty) {
+        this.minDifficulty = minDifficulty;
+        return this;
+    }
+
+    @Override
+    public GoalFactory setMaxDifficulty(GoalDifficulty maxDifficulty) {
+        this.maxDifficulty = maxDifficulty;
+        return this;
+    }
+
+    @Override
+    public GoalFactory setUsedGoalTypes(Collection<GoalType> goalTypes) {
+        this.usedGoalTypes = goalTypes;
+        return this;
+    }
+
+    @Override
+    public GoalFactory setUsedUniquenessStrings(Collection<String> uniquenessStrings) {
+        this.usedUniquenessStrings = uniquenessStrings;
+        return this;
+    }
+
+    @Override
+    public boolean canGenerateGoal() {
+        if (this.generatedGoal && this.canGenerateMultiple) {
+            return this.canGenerateGoalHook();
+        }
+        if (!this.generatedGoal && !invalidGoalType()) {
+            return this.canGenerateGoalHook();
+        }
+        return false;
+    }
+
+    private boolean invalidGoalType() {
+        return this.usedGoalTypes.stream().anyMatch((gt) -> this.myGoalTypes.contains(gt));
+    }
+
+    protected void addGoalTypes(GoalType... goalTypes) {
+        this.myGoalTypes.addAll(List.of(goalTypes));
+    }
+
+    protected abstract boolean canGenerateGoalHook();
+}
