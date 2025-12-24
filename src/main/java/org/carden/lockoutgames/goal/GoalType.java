@@ -4,5 +4,6 @@ public enum GoalType {
     OBTAIN_LUSH,
     CAVE_BLOCK,
     ECHO_SHARD,
-    OBTAIN_TOOLS
+    OBTAIN_TOOLS,
+    TAME_MOB
 }

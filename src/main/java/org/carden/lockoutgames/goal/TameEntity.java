@@ -25,6 +25,7 @@ public final class TameEntity extends SingleEventGoal<EntityTameEvent> {
 
     public TameEntity() {
         super(EntityTameEvent.class);
+        this.goalTypes.add(GoalType.TAME_MOB);
         this.canGenerateMultiple = false;
         setupGoal();
     }
