@@ -19,7 +19,7 @@ public abstract class BaseGoalFactory implements GoalFactory {
     protected final Set<GoalType> myGoalTypes = new HashSet<>();
 
     @Override
-    public Goal makeGoal() {
+    public final Goal makeGoal() {
         if (this.canGenerateGoal()) {
             Goal goal = this.makeGoalHook();
             this.generatedGoal = true;

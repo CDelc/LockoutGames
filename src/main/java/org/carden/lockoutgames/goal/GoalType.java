@@ -5,5 +5,6 @@ public enum GoalType {
     CAVE_BLOCK,
     ECHO_SHARD,
     OBTAIN_TOOLS,
-    TAME_MOB
+    TAME_MOB,
+    VISIT_BIOME
 }
