@@ -37,4 +37,12 @@ public class SettingsConstants {
     public static String PLAYER_SPREAD_HEADER = "Spread Players at Start of Game";
     public static String PLAYER_SPREAD_HELP = "Whether players are have initial spawn points distributed across the world";
     public static Boolean PLAYER_SPREAD_DEFAULT = true;
+
+    public static String LOGIC_SPREAD_HEADER = "Logic Scan Radius";
+    public static String LOGIC_SPREAD_HELP = "The radius from the origin that will be scanned to validate goals";
+    public static Integer LOGIC_SPREAD_DEFAULT = 4000;
+    public static Integer LOGIC_SPREAD_MINIMUM = 500;
+    public static Integer LOGIC_SPREAD_MAXIMUM = 30000000;
+    public static Integer LOGIC_SPREAD_SCAN_THRESHOLD = 15000;
+
 }

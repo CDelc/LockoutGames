@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.Debug;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,6 +47,9 @@ public class GoalCheckListener implements Listener {
         if(!eventsToListenFor.contains(eventClass)) return;
         if(LockoutGames.getGame().isPresent()) {
             LockoutGames.getGame().get().checkGoals(e);
+        }
+        if(Debug.isActive()) {
+            Debug.checkGoals();
         }
     }
 }

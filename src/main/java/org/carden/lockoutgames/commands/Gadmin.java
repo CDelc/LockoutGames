@@ -7,11 +7,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.Debug;
 import org.carden.lockoutgames.game.setting.Setting;
 import org.carden.lockoutgames.info.SettingIDS;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,21 +23,15 @@ public class Gadmin implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (args.length > 0 && args[0].equalsIgnoreCase("start")) gadminStart(commandSender, args);
         else if (args.length > 0 && args[0].equalsIgnoreCase("settings")) gadminSettings(commandSender, args);
+        else if (args.length > 0 && args[0].equalsIgnoreCase("debug")) gadminDebug(commandSender, args);
         return true;
     }
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        if(args.length == 1) return Arrays.asList("start", "settings");
+        if(args.length == 1) return Arrays.asList("start", "settings", "debug");
         else if(args.length >= 2 && args[0].equalsIgnoreCase("settings")) return settingsTabComplete(sender, args);
-        else return List.of();
-    }
-
-    private List<String> settingsTabComplete(@NotNull CommandSender commandSender, @NotNull String[] args) {
-        if(args.length == 2) return SettingIDS.COMMAND_MAPPINGS.keySet().stream().toList();
-        else if(args.length == 3 && Setting.isValidSetting(args[1])) {
-            return Setting.getSettingObjectCopy(args[1]).getValidArgs();
-        }
+        else if(args.length >= 2 && args[0].equalsIgnoreCase("debug")) return debugTabComplete(sender, args);
         else return List.of();
     }
 
@@ -87,5 +83,26 @@ public class Gadmin implements CommandExecutor, TabCompleter {
         } else {
             commandSender.sendMessage(Setting.settingsString());
         }
+    }
+
+    private List<String> settingsTabComplete(@NotNull CommandSender commandSender, @NotNull String[] args) {
+        if(args.length == 2) return SettingIDS.COMMAND_MAPPINGS.keySet().stream().toList();
+        else if(args.length == 3 && Setting.isValidSetting(args[1])) {
+            return Setting.getSettingObjectCopy(args[1]).getValidArgs();
+        }
+        else return List.of();
+    }
+
+    private void gadminDebug(@NotNull CommandSender commandSender, @NotNull String[] args) {
+        if(args.length <= 1) {
+            commandSender.sendMessage(Debug.getHelpString());
+        }
+    }
+
+    private List<String> debugTabComplete(@NotNull CommandSender commandSender, @NotNull String[] args) {
+        if(args.length == 2) {
+            return Debug.getValidArgs();
+        }
+        return new ArrayList<String>();
     }
 }

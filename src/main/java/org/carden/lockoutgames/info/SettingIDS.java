@@ -15,6 +15,7 @@ public class SettingIDS {
     public static final SettingID<Boolean> HUNGER = new SettingID<>(4);
     public static final SettingID<Integer> PLAYER_SPREAD_RADIUS = new SettingID<>(5);
     public static final SettingID<Integer> PLAYER_SPREAD = new SettingID<>(6);
+    public static final SettingID<Integer> LOGIC_RADIUS = new SettingID<>(7);
 
     private static final String WORLD_SIZE_ARG = "worldSize";
     private static final String NUM_GOALS_ARG = "numGoals";
@@ -23,6 +24,7 @@ public class SettingIDS {
     private static final String HUNGER_ARG = "hunger";
     private static final String PLAYER_SPREAD_RADIUS_ARG = "playerSpreadRadius";
     private static final String PLAYER_SPREAD_ARG = "playerSpread";
+    private static final String LOGIC_RADIUS_ARG = "logicRadius";
 
     public static final Map<String, SettingID<?>> COMMAND_MAPPINGS =
         Map.ofEntries(
@@ -32,6 +34,7 @@ public class SettingIDS {
             Map.entry(DIFFICULTY_ARG.toLowerCase(), DIFFICULTY),
             Map.entry(HUNGER_ARG.toLowerCase(), HUNGER),
             Map.entry(PLAYER_SPREAD_RADIUS_ARG.toLowerCase(), PLAYER_SPREAD_RADIUS),
-            Map.entry(PLAYER_SPREAD_ARG.toLowerCase(), PLAYER_SPREAD)
+            Map.entry(PLAYER_SPREAD_ARG.toLowerCase(), PLAYER_SPREAD),
+            Map.entry(LOGIC_RADIUS_ARG.toLowerCase(), LOGIC_RADIUS)
     );
 }

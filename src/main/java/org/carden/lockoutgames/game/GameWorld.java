@@ -12,10 +12,10 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.StructureSearchResult;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.setting.SettingsImage;
-import org.carden.lockoutgames.game.setting.WorldSizeSetting;
 import org.carden.lockoutgames.info.DimensionSearch;
 import org.carden.lockoutgames.info.SettingIDS;
 import org.carden.lockoutgames.info.SettingsConstants;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -31,12 +31,12 @@ public class GameWorld {
 
     static final int STRUCTURE_SEARCH_TIMEOUT_SECONDS = 20;
     static final int BIOME_SEARCH_BORDER_MARGIN_BLOCKS = 30;
-    static final int LARGE_WORLD_THRESHOLD = 50000;
 
     LockoutGames plugin;
     MVWorldManager worldManager;
 
     private int worldSize;
+    private boolean isLargeWorld = false;
     private final String world_name;
 
     private final Set<Biome> availableBiomes;
@@ -68,10 +68,6 @@ public class GameWorld {
         World nether = getWorld(World.Environment.NETHER);
         if(overworld != null) overworld.getWorldBorder().setSize(worldSize);
         if(nether != null) nether.getWorldBorder().setSize(worldSize);
-    }
-
-    public boolean isLargeWorld() {
-        return this.worldSize >= LARGE_WORLD_THRESHOLD;
     }
 
     /**
@@ -127,22 +123,23 @@ public class GameWorld {
         netherPortals.addWorldLink(endworld, overworld, PortalType.ENDER);
     }
 
-    public CompletableFuture<Boolean> updateLogic() {
+    public CompletableFuture<Boolean> updateLogic(int searchRadius) {
         CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
-        CompletableFuture<Boolean> biomesComplete = scanBiomes();
-        CompletableFuture<Boolean> structuresComplete = scanStructures();
+        CompletableFuture<Boolean> biomesComplete = scanBiomes(searchRadius);
+        CompletableFuture<Boolean> structuresComplete = scanStructures(searchRadius);
+        this.isLargeWorld = searchRadius >= SettingsConstants.LOGIC_SPREAD_SCAN_THRESHOLD;
         CompletableFuture.allOf(biomesComplete, structuresComplete).thenRun(() -> completeCheck.complete(true));
         return completeCheck;
     }
 
-    public CompletableFuture<Boolean> setupWorld(SettingsImage settings) {
-        if(settings!= null) this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
-        CompletableFuture<Boolean> isComplete = updateLogic();
+    public CompletableFuture<Boolean> setupWorld(@NotNull SettingsImage settings) {
+        this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
+        CompletableFuture<Boolean> isComplete = updateLogic(settings.getSetting(SettingIDS.LOGIC_RADIUS));
         applySettings(settings);
         return isComplete;
     }
 
-    public void applySettings(SettingsImage settings) {
+    public void applySettings(@NotNull SettingsImage settings) {
         setProps(settings);
         this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
         getWorld(World.Environment.NORMAL).setTime(1000);
@@ -173,14 +170,14 @@ public class GameWorld {
      * Updated the availableBiomes set to contain the biomes that exist within the world boundary.
      * This scan is done asynchronously in order to not block the main server thread.
      */
-    private CompletableFuture<Boolean> scanBiomes() {
+    private CompletableFuture<Boolean> scanBiomes(int searchRadius) {
         availableBiomes.clear();
         ArrayList<Biome> allBiomes = new ArrayList<>(DimensionSearch.NORMAL.getBiomes());
         allBiomes.addAll(DimensionSearch.NETHER.getBiomes());
         Lock lock = new ReentrantLock();
         CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
 
-        if(this.worldSize >= LARGE_WORLD_THRESHOLD) {
+        if(searchRadius >= SettingsConstants.LOGIC_SPREAD_SCAN_THRESHOLD) {
             availableBiomes.addAll(allBiomes);
             new BukkitRunnable() {
                 @Override
@@ -207,7 +204,7 @@ public class GameWorld {
                 }
                 Location origin = new Location(world, 0, 0, 0);
 
-                if (world.locateNearestBiome(origin, worldSize / 2 - BIOME_SEARCH_BORDER_MARGIN_BLOCKS, b) != null) {
+                if (world.locateNearestBiome(origin, searchRadius - BIOME_SEARCH_BORDER_MARGIN_BLOCKS, b) != null) {
                     availableBiomes.add(b);
                 }
                 biomeCount++;
@@ -235,14 +232,14 @@ public class GameWorld {
      * This scan is done asynchronously in order to not block the main server thread,
      * and all structures are searched for in parallel
      */
-    private CompletableFuture<Boolean> scanStructures() {
+    private CompletableFuture<Boolean> scanStructures(int searchRadius) {
         availableStructures.clear();
         ArrayList<Structure> allStructures = new ArrayList<>(DimensionSearch.NORMAL.getStructures());
         allStructures.addAll(DimensionSearch.NETHER.getStructures());
         Lock lock = new ReentrantLock();
         CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
 
-        if(this.worldSize >= LARGE_WORLD_THRESHOLD) {
+        if(searchRadius >= SettingsConstants.LOGIC_SPREAD_SCAN_THRESHOLD) {
             availableStructures.addAll(allStructures);
             new BukkitRunnable() {
                 @Override
@@ -269,8 +266,8 @@ public class GameWorld {
                     world = getWorld(World.Environment.NETHER);
                 }
                 Location origin = new Location(world, 0, 0, 0);
-                StructureSearchResult result = structureSearchWithTimeout(world, origin, s);;
-                if(result != null && Math.abs(result.getLocation().getX()) < (double) worldSize / 2 && Math.abs(result.getLocation().getZ()) < (double) worldSize / 2){
+                StructureSearchResult result = structureSearchWithTimeout(world, origin, s, searchRadius);;
+                if(result != null && Math.abs(result.getLocation().getX()) < (double) searchRadius && Math.abs(result.getLocation().getZ()) < (double) searchRadius){
                     availableStructures.add(s);
                 }
                 structureCount++;
@@ -297,12 +294,12 @@ public class GameWorld {
      * @param s The structure to search for
      * @return The corresponding StructureSearchResult if the structure is found, null if it is not found or times out.
      */
-    private StructureSearchResult structureSearchWithTimeout(World world, Location origin, Structure s) {
+    private StructureSearchResult structureSearchWithTimeout(World world, Location origin, Structure s, int searchRadius) {
         CompletableFuture<StructureSearchResult> future = new CompletableFuture<>();
         BukkitTask search = new BukkitRunnable() {
             @Override
             public void run() {
-                StructureSearchResult result = world.locateNearestStructure(origin, s, worldSize / 2, false);
+                StructureSearchResult result = world.locateNearestStructure(origin, s, searchRadius, false);
                 future.complete(result);
             }
         }.runTaskAsynchronously(plugin);
@@ -317,5 +314,9 @@ public class GameWorld {
             }
         }.runTaskLater(plugin, 20L * STRUCTURE_SEARCH_TIMEOUT_SECONDS);
         return future.join();
+    }
+
+    public boolean isLargeWorld() {
+        return this.isLargeWorld;
     }
 }
