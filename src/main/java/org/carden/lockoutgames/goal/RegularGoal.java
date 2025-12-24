@@ -39,7 +39,7 @@ public abstract class RegularGoal extends Goal {
      */
     @Override
     protected void fireGoalCompleteEvent(GamePlayer p) {
-        if(!p.isSpectator()) {
+        if(!p.isSpectator() && !this.completedPlayers.contains(p)) {
             this.completedPlayers.add(p);
             LockoutGames.getPluginInstance().getServer().getPluginManager().callEvent(new GoalCompleteEvent(p, this));
         }
