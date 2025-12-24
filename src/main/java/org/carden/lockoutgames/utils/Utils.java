@@ -1,6 +1,12 @@
 package org.carden.lockoutgames.utils;
 
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.player.PlayerEvent;
 import org.carden.lockoutgames.LockoutGames;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,4 +69,31 @@ public class Utils {
         return builder.toString();
     }
 
+    /**
+     * Get the player on a PlayerEvent. Returns null if it is not a PlayerEvent.
+     * @param e event
+     * @return player or null
+     */
+    public static @Nullable Player playerEventPlayer(Event e) {
+        if (e instanceof PlayerEvent) {
+            return ((PlayerEvent) e).getPlayer();
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the player on an EntityEvent. Returns null is it is not an EntityEvent or the entity is not a player.
+     * @param e event
+     * @return player or null
+     */
+    public static @Nullable Player entityEventPlayer(Event e) {
+        if (e instanceof EntityEvent && ((EntityEvent) e).getEntityType() == EntityType.PLAYER) {
+            return (Player)((EntityEvent) e).getEntity();
+        }
+        else {
+            return null;
+        }
+    }
 }
