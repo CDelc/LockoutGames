@@ -75,5 +75,9 @@ public abstract class BaseGoalFactory implements GoalFactory {
         this.myGoalTypes.addAll(List.of(goalTypes));
     }
 
+    protected final boolean isValidDifficulty(GoalDifficulty difficulty) {
+        return difficulty.isInRange(this.minDifficulty, this.maxDifficulty);
+    }
+
     protected abstract boolean canGenerateGoalHook();
 }

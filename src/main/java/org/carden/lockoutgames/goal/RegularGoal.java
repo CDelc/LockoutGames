@@ -16,6 +16,14 @@ public abstract class RegularGoal extends Goal {
 
     private ArrayList<GamePlayer> completedPlayers;
 
+    protected RegularGoal(Set<Class<? extends Event>> checkEvents, GoalDifficulty difficulty, String description, Set<GoalType> goalTypes, Set<String> uniquenessStrings) {
+        super(checkEvents, difficulty, description, goalTypes, uniquenessStrings);
+    }
+
+    protected RegularGoal(Set<Class<? extends Event>> checkEvents, GoalDifficulty difficulty, String description) {
+        super(checkEvents, difficulty, description);
+    }
+
     protected RegularGoal(Set<Class<? extends Event>> checkEvents) {
         super(checkEvents);
     }

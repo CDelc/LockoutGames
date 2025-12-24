@@ -7,6 +7,7 @@ import org.carden.lockoutgames.events.GoalCompleteEvent;
 import org.carden.lockoutgames.events.listener.GoalCheckListener;
 import org.carden.lockoutgames.game.player.GamePlayer;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,13 +22,23 @@ public abstract class Goal {
     protected GoalDifficulty goalDifficulty = GoalConstants.DEFAULT_DIFFICULTY;
     protected boolean canGenerateMultiple = false;
 
-    protected Goal(Set<Class<? extends Event>> checkEvents) {
+    protected Goal(Set<Class<? extends Event>> checkEvents, GoalDifficulty difficulty, String description, Set<GoalType> goalTypes, Set<String> uniquenessStrings) {
         this.checkEvents = checkEvents;
         for(Class<? extends Event> eventClass : checkEvents) {
             GoalCheckListener.getInstance().enableEventListener(eventClass);
         }
-        this.uniquenessStrings = new HashSet<>();
-        this.goalTypes = new HashSet<>();
+        this.uniquenessStrings = uniquenessStrings;
+        this.goalTypes = goalTypes;
+        this.goalDifficulty = difficulty;
+        this.description = description;
+    }
+
+    protected Goal(Set<Class<? extends Event>> checkEvents, GoalDifficulty difficulty, String description) {
+        this(checkEvents, difficulty, description, new HashSet<>(), new HashSet<>());
+    }
+
+    protected Goal(Set<Class<? extends Event>> checkEvents) {
+        this(checkEvents, GoalConstants.DEFAULT_DIFFICULTY, "", new HashSet<>(), new HashSet<>());
     }
 
     /**
@@ -58,6 +69,10 @@ public abstract class Goal {
      */
     protected boolean forceDifficulty(GoalDifficulty goalDifficulty) {
         return goalDifficulty.isEqualTo(this.goalDifficulty);
+    }
+
+    void setGoalDifficulty(GoalDifficulty goalDifficulty) {
+        this.goalDifficulty = goalDifficulty;
     }
 
     public final boolean regenerateWithDifficulty(GoalDifficulty goalDifficulty) {
