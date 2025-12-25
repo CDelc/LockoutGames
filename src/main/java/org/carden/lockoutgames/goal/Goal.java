@@ -84,7 +84,7 @@ public abstract class Goal implements IMutableGoal {
     /**
      * @return The difficulty of this goal in accordance with the constants in GoalConstants.GoalDifficulties
      */
-    public final GoalDifficulty getGoalDifficulty() {
+    public GoalDifficulty getGoalDifficulty() {
         return goalDifficulty;
     }
 
