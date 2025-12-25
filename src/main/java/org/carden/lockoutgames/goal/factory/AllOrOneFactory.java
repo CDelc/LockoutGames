@@ -3,6 +3,8 @@ package org.carden.lockoutgames.goal.factory;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
+import org.carden.lockoutgames.goal.IGoal;
+import org.carden.lockoutgames.goal.IMutableGoal;
 
 import java.util.List;
 import java.util.Random;
@@ -21,7 +23,7 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
     }
 
     @Override
-    protected final Goal makeGoalHook() {
+    protected final IMutableGoal makeGoalHook() {
         if (this.generateAll()) {
             return this.makeAll(this.possibleValues);
         }
@@ -32,9 +34,9 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
         }
     }
 
-    protected abstract Goal makeOne(E value);
+    protected abstract IMutableGoal makeOne(E value);
 
-    protected abstract Goal makeAll(Set<E> values);
+    protected abstract IMutableGoal makeAll(Set<E> values);
 
     protected void setAllProbablility(float probability) {
         this.allProbablility = Math.clamp(probability, 0, 1);

@@ -15,11 +15,8 @@ import java.util.stream.Collectors;
 import static org.carden.lockoutgames.utils.Utils.playerEventPlayer;
 
 public class VisitBiomes extends ChecklistGoal<Biome> {
-    public static final Set<GoalType> BASE_GOAL_TYPES = Set.of(GoalType.VISIT_BIOME);
-
-    public VisitBiomes(Collection<Biome> requiredBiomes, GoalDifficulty difficulty, String description) {
+    public VisitBiomes(Collection<Biome> requiredBiomes) {
         super(Set.of(PlayerMoveEvent.class));
-        this.goalTypes.addAll(BASE_GOAL_TYPES);
         this.requiredItems = List.copyOf(requiredBiomes);
         this.setupGoal(requiredBiomes);
     }

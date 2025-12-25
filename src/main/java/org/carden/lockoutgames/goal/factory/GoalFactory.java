@@ -3,6 +3,7 @@ package org.carden.lockoutgames.goal.factory;
 import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.GoalType;
+import org.carden.lockoutgames.goal.IGoal;
 
 import java.util.Collection;
 
@@ -12,7 +13,7 @@ public interface GoalFactory {
      * @return the goal
      * @throws IllegalStateException if canGenerateGoal is false
      */
-    Goal makeGoal();
+    IGoal makeGoal();
 
     /**
      * Create a goal with a minimum difficulty (inclusive).

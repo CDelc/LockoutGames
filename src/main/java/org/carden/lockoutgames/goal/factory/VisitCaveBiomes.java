@@ -1,10 +1,7 @@
 package org.carden.lockoutgames.goal.factory;
 
 import org.bukkit.block.Biome;
-import org.carden.lockoutgames.goal.Goal;
-import org.carden.lockoutgames.goal.GoalDifficulty;
-import org.carden.lockoutgames.goal.GoalType;
-import org.carden.lockoutgames.goal.VisitBiomes;
+import org.carden.lockoutgames.goal.*;
 
 import java.util.Set;
 
@@ -15,24 +12,23 @@ public class VisitCaveBiomes extends AllOrOneFactory<Biome> {
 
     public VisitCaveBiomes() {
         super(CAVE_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
+        this.addGoalTypes(GoalType.VISIT_BIOME);
         this.setAllProbablility(0.4f);
-        for (GoalType gt : VisitBiomes.BASE_GOAL_TYPES) {
-            this.addGoalTypes(gt);
-        }
     }
 
     @Override
-    protected Goal makeOne(Biome value) {
-        return new VisitBiomes(Set.of(value), DIFFICULTY_ONE_BIOME, String.format("Visit the %s biome", value));
+    protected IMutableGoal makeOne(Biome value) {
+        Goal g = new VisitBiomes(Set.of(value));
+        g.setGoalDifficulty(DIFFICULTY_ONE_BIOME);
+        g.setDescription(String.format("Visit the %s biome", value));
+        return g;
     }
 
     @Override
-    protected Goal makeAll(Set<Biome> values) {
-        return new VisitBiomes(values, DIFFICULTY_ALL_BIOMES, "Visit every cave biome");
-    }
-
-    @Override
-    protected boolean canGenerateGoalHook() {
-        return false;
+    protected IMutableGoal makeAll(Set<Biome> values) {
+        Goal g = new VisitBiomes(values);
+        g.setGoalDifficulty(DIFFICULTY_ALL_BIOMES);
+        g.setDescription("Visit every cave biome");
+        return g;
     }
 }

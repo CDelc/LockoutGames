@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class Goal {
+public abstract class Goal implements IMutableGoal {
 
     protected final Set<Class<? extends Event>> checkEvents;
 
@@ -71,17 +71,6 @@ public abstract class Goal {
         return goalDifficulty.isEqualTo(this.goalDifficulty);
     }
 
-    void setGoalDifficulty(GoalDifficulty goalDifficulty) {
-        this.goalDifficulty = goalDifficulty;
-    }
-
-    public final boolean regenerateWithDifficulty(GoalDifficulty goalDifficulty) {
-        if(!this.forceDifficulty(goalDifficulty)) {
-            this.failedToGenerate = true;
-            return false;
-        } else return true;
-    }
-
     /**
      * Fires a GoalCompleteEvent for this goal with the given GamePlayer. Will not fire if the GamePlayer is a spectator
      * @param p
@@ -93,40 +82,49 @@ public abstract class Goal {
     }
 
     /**
-     * @return true if the goal should not be used in a game
-     */
-    public boolean failedToGenerate() {
-        return failedToGenerate;
-    }
-
-    /**
      * @return The difficulty of this goal in accordance with the constants in GoalConstants.GoalDifficulties
      */
-    public GoalDifficulty getGoalDifficulty() {
+    public final GoalDifficulty getGoalDifficulty() {
         return goalDifficulty;
+    }
+
+    public final void setGoalDifficulty(GoalDifficulty difficulty) {
+        this.goalDifficulty = difficulty;
     }
 
     /**
      * @return The description for this goal that should be displayed in game
      */
-    public String getDescription() {
+    public final String getDescription() {
         return description;
+    }
+
+    public final void setDescription(String description) {
+        this.description = description;
     }
 
     /**
      * @return Used by the goal selector to ensure this goal is unique.
      * Mainly for resolving conflicts this goal may have with itself if multiple versions may be generated.
      */
-    public Set<String> getUniquenessStrings() {
+    public final Set<String> getUniquenessStrings() {
         return uniquenessStrings;
+    }
+
+    public final void addUniquenessStrings(Set<String> strings) {
+        this.uniquenessStrings.addAll(strings);
     }
 
     /**
      * @return Used by the goal generated to ensure this goal is not used if another goal with the same conflict code has already been used in the game.
      * The goal should not conflict with itself
      */
-    public Set<GoalType> getGoalTypes() {
+    public final Set<GoalType> getGoalTypes() {
         return goalTypes;
+    }
+
+    public final void addGoalTypes(Set<GoalType> goalTypes) {
+        this.goalTypes.addAll(goalTypes);
     }
 
     /**
@@ -142,18 +140,4 @@ public abstract class Goal {
     public Set<Class<? extends Event>> getCheckEvents() {
         return checkEvents;
     }
-
-    /**
-     * List of every goal class that can be picked for a game
-     */
-    public enum GoalClass {
-        OBTAIN_LUSH_SINGLE(ObtainLushSingle.class),
-        OBTAIN_LUSH_MULTIPLE(ObtainLushMultiple.class);
-
-        public final Class<? extends Goal> classObject;
-        GoalClass(Class<? extends Goal> goalClass) {
-            this.classObject = goalClass;
-        }
-    }
-
 }

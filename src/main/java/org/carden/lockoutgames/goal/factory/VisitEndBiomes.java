@@ -5,14 +5,14 @@ import org.carden.lockoutgames.goal.*;
 
 import java.util.Set;
 
-public class VisitNetherBiomes extends AllOrOneFactory<Biome> {
-    private static final Set<Biome> NETHER_BIOMES = Set.of(Biome.NETHER_WASTES, Biome.WARPED_FOREST, Biome.CRIMSON_FOREST, Biome.SOUL_SAND_VALLEY);
-    private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.EASY;
-    private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.MEDIUM;
+public class VisitEndBiomes extends AllOrOneFactory<Biome> {
+    private static final Set<Biome> END_BIOMES = Set.of(Biome.THE_END, Biome.END_BARRENS, Biome.END_MIDLANDS, Biome.END_HIGHLANDS);
+    private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.HARD;
+    private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.HARD;
 
-    public VisitNetherBiomes() {
-        super(NETHER_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
-        this.setAllProbablility(0.4f);
+    public VisitEndBiomes() {
+        super(END_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
+        this.setAllProbablility(0.6f);
         this.addGoalTypes(GoalType.VISIT_BIOME);
     }
 
@@ -28,7 +28,7 @@ public class VisitNetherBiomes extends AllOrOneFactory<Biome> {
     protected IMutableGoal makeAll(Set<Biome> values) {
         Goal g = new VisitBiomes(values);
         g.setGoalDifficulty(DIFFICULTY_ALL_BIOMES);
-        g.setDescription("Visit every nether biome");
+        g.setDescription("Visit every end biome");
         return g;
     }
 }

@@ -1,8 +1,6 @@
 package org.carden.lockoutgames.goal.factory;
 
-import org.carden.lockoutgames.goal.Goal;
-import org.carden.lockoutgames.goal.GoalDifficulty;
-import org.carden.lockoutgames.goal.GoalType;
+import org.carden.lockoutgames.goal.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,9 +17,10 @@ public abstract class BaseGoalFactory implements GoalFactory {
     protected final Set<GoalType> myGoalTypes = new HashSet<>();
 
     @Override
-    public final Goal makeGoal() {
+    public final IGoal makeGoal() {
         if (this.canGenerateGoal()) {
-            Goal goal = this.makeGoalHook();
+            IMutableGoal goal = this.makeGoalHook();
+            goal.addGoalTypes(this.myGoalTypes);
             this.generatedGoal = true;
             return goal;
         }
@@ -30,7 +29,7 @@ public abstract class BaseGoalFactory implements GoalFactory {
         }
     }
 
-    protected abstract Goal makeGoalHook();
+    protected abstract IMutableGoal makeGoalHook();
 
     @Override
     public GoalFactory setMinDifficulty(GoalDifficulty minDifficulty) {
