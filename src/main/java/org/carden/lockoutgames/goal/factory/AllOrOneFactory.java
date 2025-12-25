@@ -23,12 +23,12 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
     @Override
     protected final Goal makeGoalHook() {
         if (this.generateAll()) {
-            this.makeAll(this.possibleValues);
+            return this.makeAll(this.possibleValues);
         }
         else {
             Random rng = LockoutGames.getRng();
             E value = List.copyOf(possibleValues).get(rng.nextInt(possibleValues.size()));
-            this.makeOne(value);
+            return this.makeOne(value);
         }
     }
 
