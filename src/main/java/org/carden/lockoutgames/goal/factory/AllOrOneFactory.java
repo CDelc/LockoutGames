@@ -44,14 +44,15 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
 
     private boolean generateAll() {
         Random rng = LockoutGames.getRng();
+        Set<E> filteredValues = filteredChoices();
         if (this.isValidDifficulty(this.difficultyOne) && this.isValidDifficulty(this.difficultyAll)) {
-            return rng.nextDouble() < this.allProbablility;
+            return !filteredValues.equals(this.possibleValues) && rng.nextDouble() < this.allProbablility;
         }
         else if (this.isValidDifficulty(difficultyOne)) {
             return false;
         }
         else if (this.isValidDifficulty(difficultyAll)) {
-            return true;
+            return !filteredValues.equals(this.possibleValues);
         }
         else {
             throw new IllegalStateException("No valid difficulties to generate");
@@ -60,6 +61,15 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
 
     @Override
     protected boolean canGenerateGoalHook() {
-        return this.isValidDifficulty(this.difficultyOne) || this.isValidDifficulty(this.difficultyAll);
+        return !this.filteredChoices().isEmpty() && (this.isValidDifficulty(this.difficultyOne) || this.isValidDifficulty(this.difficultyAll));
+    }
+
+    /**
+     * Override to filter choices to what is allowed for the game. If the filtered results do not allow
+     * all values, then the "all" goal will not be generated.
+     * @return available choices
+     */
+    protected Set<E> filteredChoices() {
+        return possibleValues;
     }
 }

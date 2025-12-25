@@ -1,9 +1,12 @@
 package org.carden.lockoutgames.goal.factory;
 
 import org.bukkit.block.Biome;
+import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.goal.*;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class VisitCaveBiomes extends AllOrOneFactory<Biome> {
     private static final Set<Biome> CAVE_BIOMES = Set.of(Biome.DRIPSTONE_CAVES, Biome.LUSH_CAVES, Biome.DEEP_DARK);
@@ -30,5 +33,11 @@ public class VisitCaveBiomes extends AllOrOneFactory<Biome> {
         g.setGoalDifficulty(DIFFICULTY_ALL_BIOMES);
         g.setDescription("Visit every cave biome");
         return g;
+    }
+
+    @Override
+    protected Set<Biome> filteredChoices() {
+        GameWorld world = LockoutGames.getGameWorld();
+        return super.filteredChoices().stream().filter(world::hasBiome).collect(Collectors.toSet());
     }
 }
