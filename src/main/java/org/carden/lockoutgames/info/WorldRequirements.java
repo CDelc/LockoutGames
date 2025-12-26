@@ -1687,8 +1687,7 @@ public class WorldRequirements {
          * @return True if this element can be accessed in this game world, false otherwise
          */
         public boolean verify() {
-            if(Debug.isActive()) return requirement.test(GameWorld.getDebugWorld());
-            else return requirement.test(GameWorld.getGameWorld());
+            return requirement.test(GameWorld.getGameWorld());
         }
     }
 

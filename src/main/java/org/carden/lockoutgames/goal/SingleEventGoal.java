@@ -23,7 +23,7 @@ public abstract class SingleEventGoal<E extends Event> extends RegularGoal {
     }
 
     @Override
-    protected final void checkEvent(Event e) {
+    public final void checkEvent(Event e) {
         if (this.eventClass.isInstance(e)) {
             this.checkSpecificEvent(this.eventClass.cast(e));
         }

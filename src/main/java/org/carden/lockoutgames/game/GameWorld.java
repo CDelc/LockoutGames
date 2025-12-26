@@ -47,14 +47,10 @@ public class GameWorld {
     private static final List<Biome> allBiomes = Registry.BIOME.stream().toList();
     private static final List<Structure> allStructures = Registry.STRUCTURE.stream().toList();
 
-    private static final GameWorld gameWorld = new GameWorld(false);
-    private static final GameWorld debugWorld = new GameWorld(true);
+    private static final GameWorld gameWorld = new GameWorld();
 
-    private final boolean debug;
+    private GameWorld() {
 
-    private GameWorld(boolean debug) {
-
-        this.debug = debug;
         this.plugin = LockoutGames.getPluginInstance();
         this.availableBiomes = new HashSet<>();
         this.availableStructures = new HashSet<>();
@@ -67,16 +63,11 @@ public class GameWorld {
         return gameWorld;
     }
 
-    public static GameWorld getDebugWorld() {
-        return debugWorld;
-    }
-
     /**
      *
      * @param value Sets the world border size
      */
     public void setWorldSize(int value) {
-        if(debug) return;
         worldSize = value;
         World overworld = getWorld(World.Environment.NORMAL);
         World nether = getWorld(World.Environment.NETHER);
@@ -128,7 +119,6 @@ public class GameWorld {
      * @param endworld End world name
      */
     private void linkSMPWorlds(String overworld, String netherworld, String endworld) {
-        if(debug) return;
         MultiverseNetherPortals netherPortals = plugin.getMvnetherPortals();
         netherPortals.addWorldLink(overworld, netherworld, PortalType.NETHER);
         netherPortals.addWorldLink(netherworld, overworld, PortalType.NETHER);
@@ -138,7 +128,7 @@ public class GameWorld {
         netherPortals.addWorldLink(endworld, overworld, PortalType.ENDER);
     }
 
-    public CompletableFuture<Boolean> updateLogic(int searchRadius) {
+    public CompletableFuture<Boolean> updateLogic(int searchRadius, boolean debug) {
         CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
         CompletableFuture<Set<Biome>> biomesComplete = scanBiomes(searchRadius);
         CompletableFuture<Set<Structure>> structuresComplete = scanStructures(searchRadius);
@@ -174,21 +164,19 @@ public class GameWorld {
     }
 
     public CompletableFuture<Boolean> setupWorld(@NotNull SettingsImage settings) {
-        if(!debug) this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
-        CompletableFuture<Boolean> isComplete = updateLogic(settings.getSetting(SettingIDS.LOGIC_RADIUS));
-        if(!debug) applySettings(settings);
+        this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
+        CompletableFuture<Boolean> isComplete = updateLogic(settings.getSetting(SettingIDS.LOGIC_RADIUS), false);
+        applySettings(settings);
         return isComplete;
     }
 
     public void applySettings(@NotNull SettingsImage settings) {
-        if(debug) return;
         setProps(settings);
         this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
         getWorld(World.Environment.NORMAL).setTime(1000);
     }
 
     private void setProps(@Nullable SettingsImage settings) {
-        if(debug) return;
         MultiverseWorld[] worlds = {
                 worldManager.getMVWorld(world_name),
                 worldManager.getMVWorld(world_name + "_nether"),

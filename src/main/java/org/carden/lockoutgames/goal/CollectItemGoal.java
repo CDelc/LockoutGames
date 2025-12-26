@@ -92,7 +92,7 @@ public class CollectItemGoal extends ChecklistGoal<Material> {
      * @param e - The event triggering the check
      */
     @Override
-    protected void checkEvent(Event e) {
+    public void checkEvent(Event e) {
         Player p = getPlayerFromCollectEvent(e);
         if(p == null) return;
         GamePlayer gamePlayer = PlayerManager.getPlayerManager().getGamePlayerObject(p.getUniqueId());
