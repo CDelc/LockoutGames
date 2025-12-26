@@ -1,6 +1,7 @@
 package org.carden.lockoutgames.goal.factory;
 
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
 import org.carden.lockoutgames.goal.PlayerEventPredicateGoal;
@@ -8,6 +9,10 @@ import org.carden.lockoutgames.goal.PlayerEventPredicateGoal;
 public class LightLevelZero extends BaseGoalFactory {
     private static final String description = "Reach light level 0";
     private static final GoalDifficulty difficulty = GoalDifficulty.VERY_EASY;
+
+    protected LightLevelZero(SettingsImage settings) {
+        super(settings);
+    }
 
     @Override
     protected IMutableGoal makeGoalHook() {

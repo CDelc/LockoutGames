@@ -1,5 +1,6 @@
 package org.carden.lockoutgames.goal.factory;
 
+import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
 
 import java.util.Collection;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class BaseGoalFactory implements GoalFactory {
+    protected final SettingsImage settings;
+
     protected GoalDifficulty minDifficulty = GoalDifficulty.VERY_EASY;
     protected GoalDifficulty maxDifficulty = GoalDifficulty.VERY_HARD;
     protected Collection<GoalType> usedGoalTypes = Set.of();
@@ -15,6 +18,10 @@ public abstract class BaseGoalFactory implements GoalFactory {
     protected boolean canGenerateMultiple = false;
     private boolean generatedGoal = false;
     protected final Set<GoalType> myGoalTypes = new HashSet<>();
+
+    protected BaseGoalFactory(SettingsImage settings) {
+        this.settings = settings;
+    }
 
     @Override
     public final IGoal makeGoal() {

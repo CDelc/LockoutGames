@@ -1,17 +1,21 @@
 package org.carden.lockoutgames.goal.factory;
 
 import org.bukkit.block.Biome;
+import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.GameWorld;
+import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class VisitEndBiomes extends AllOrOneFactory<Biome> {
     private static final Set<Biome> END_BIOMES = Set.of(Biome.THE_END, Biome.END_BARRENS, Biome.END_MIDLANDS, Biome.END_HIGHLANDS);
     private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.HARD;
     private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.HARD;
 
-    public VisitEndBiomes() {
-        super(END_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
+    public VisitEndBiomes(SettingsImage settings) {
+        super(settings, END_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
         this.setAllProbablility(0.6f);
         this.addGoalTypes(GoalType.VISIT_BIOME);
     }
@@ -30,5 +34,11 @@ public class VisitEndBiomes extends AllOrOneFactory<Biome> {
         g.setGoalDifficulty(DIFFICULTY_ALL_BIOMES);
         g.setDescription("Visit every end biome");
         return g;
+    }
+
+    @Override
+    protected Set<Biome> filteredChoices() {
+        GameWorld world = LockoutGames.getGameWorld();
+        return super.filteredChoices().stream().filter(world::hasBiome).collect(Collectors.toSet());
     }
 }
