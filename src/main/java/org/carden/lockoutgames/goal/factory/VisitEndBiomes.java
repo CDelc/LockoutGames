@@ -5,6 +5,7 @@ import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
+import org.carden.lockoutgames.utils.Utils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public class VisitEndBiomes extends AllOrOneFactory<Biome> {
     protected IMutableGoal makeOne(Biome value) {
         Goal g = new VisitBiomes(Set.of(value));
         g.setGoalDifficulty(DIFFICULTY_ONE_BIOME);
-        g.setDescription(String.format("Visit the %s biome", value));
+        g.setDescription(String.format("Visit the %s biome", Utils.readableEnumString(value.toString())));
         return g;
     }
 
