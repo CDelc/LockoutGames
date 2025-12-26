@@ -106,8 +106,8 @@ public class GoalConstants {
 
     public static class MinMaxPair {
 
-        int min;
-        int max;
+        public int min;
+        public int max;
 
         private MinMaxPair(){}
 

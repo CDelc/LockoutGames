@@ -1,16 +1,15 @@
 package org.carden.lockoutgames.goal.factory;
 
 import org.bukkit.Material;
-import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.selector.SubsetSelector;
 
 import java.util.*;
 
 public class CollectItemBucketed extends QuantitativeDifficultyGoal {
     private final SubsetSelector<Material> itemSelector;
-
 
     protected CollectItemBucketed(Set<Material> itemsToCollect, int minimumItemTypes, int maximumItemTypes, Map<Bucket, GoalDifficulty> bucketDifficulties) {
         super(bucketDifficulties);
@@ -34,7 +33,7 @@ public class CollectItemBucketed extends QuantitativeDifficultyGoal {
 
     @Override
     protected boolean canGenerateGoalHook() {
-        return super.canGenerateGoalHook() && this.itemSelector.canSelectSubset();
+        return super.canGenerateGoalHook() && this.itemSelector.canSelect();
     }
 
     private static List<Integer> makeDifficultyBuckets(int minimumStack, int maximumStack, List<Integer> difficultyThresholds) {

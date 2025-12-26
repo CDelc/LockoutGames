@@ -1,18 +1,15 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.selector;
 
 import org.carden.lockoutgames.LockoutGames;
-import org.carden.lockoutgames.goal.GoalDifficulty;
-import org.carden.lockoutgames.goal.IMutableGoal;
 import org.carden.lockoutgames.utils.Utils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class SubsetSelector<E> {
+public class SubsetSelector<E> implements Selector<Set<E>> {
     private final Set<E> choices;
     private final int minSize;
     private final int maxSize;
@@ -32,7 +29,7 @@ public class SubsetSelector<E> {
         return Set.copyOf(Utils.selectNRandomValuesFromList(List.copyOf(choices), subsetSize, rng));
     }
 
-    protected boolean canSelectSubset() {
+    public boolean canSelect() {
         return !this.filteredChoices().isEmpty();
     }
 
@@ -40,7 +37,7 @@ public class SubsetSelector<E> {
      * Subclasses can further filter choices by overriding.
      * @return choices that may be selected for the game
      */
-    protected Set<E> filteredChoices() {
+    public Set<E> filteredChoices() {
         return this.choices.stream().filter(this.filter).collect(Collectors.toSet());
     }
 

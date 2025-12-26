@@ -2,17 +2,14 @@ package org.carden.lockoutgames.goal.factory;
 
 import org.bukkit.Material;
 import org.carden.lockoutgames.LockoutGames;
-import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.selector.SubsetSelector;
 import org.carden.lockoutgames.info.WorldRequirements;
 
-import java.nio.channels.Selector;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-
-import static org.carden.lockoutgames.utils.Utils.selectNRandomValuesFromList;
 
 public abstract class CollectItem extends BaseGoalFactory {
 
@@ -119,6 +116,6 @@ public abstract class CollectItem extends BaseGoalFactory {
 
     @Override
     protected boolean canGenerateGoalHook() {
-        return this.itemSelector.canSelectSubset();
+        return this.itemSelector.canSelect();
     }
 }

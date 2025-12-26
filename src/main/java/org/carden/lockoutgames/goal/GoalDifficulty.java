@@ -55,4 +55,8 @@ public enum GoalDifficulty {
     public boolean isEqualTo(GoalDifficulty goalDifficulty) {
         return this.difficulty == goalDifficulty.difficulty;
     }
+
+    public static int compare(GoalDifficulty first, GoalDifficulty second) {
+        return first.compareTo(second);
+    }
 }
