@@ -97,6 +97,7 @@ public class Gadmin implements CommandExecutor, TabCompleter {
         if(args.length <= 1) {
             commandSender.sendMessage(Debug.getHelpString());
         }
+        else if(args[1].equalsIgnoreCase("scanworld")) Debug.checkLogicScan();
     }
 
     private List<String> debugTabComplete(@NotNull CommandSender commandSender, @NotNull String[] args) {
