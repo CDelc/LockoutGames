@@ -3,6 +3,7 @@ package org.carden.lockoutgames.game;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
@@ -70,7 +71,9 @@ public class Debug {
     }
 
     public static void checkGoals(Event e) {
-
+        for(IGoal goal : goalInstances) {
+            goal.checkEvent(e);
+        }
     }
 
     public static void clearGoals() {
@@ -89,6 +92,7 @@ public class Debug {
     public static boolean testAllGoals() {
         if(!debugActive) return false;
         clearGoals();
+        Bukkit.getServer().broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "BEGIN GOAL TEST");
         SettingsImage settingsImage = Setting.saveSettings();
         for(GoalFactories goalFactoryEnum : GoalFactories.values()) {
             GoalFactory goalFactory = goalFactoryEnum.getFactory();
@@ -106,7 +110,7 @@ public class Debug {
     }
 
     private static String goalDebugString(IGoal goal) {
-        return ChatColor.RED + Utils.readableEnumString(goal.getGoalDifficulty().name()) + ChatColor.AQUA + goal.getDescription();
+        return ChatColor.GREEN + Utils.readableEnumString(goal.getGoalDifficulty().name()) + ChatColor.WHITE + " | " + ChatColor.AQUA + goal.getDescription();
     }
 
     public static boolean testAllGoalsAllDifficulty(CommandSender sender) {
@@ -114,7 +118,7 @@ public class Debug {
     }
 
     public static void checkLogicScan() {
-        GameWorld.getDebugWorld().updateLogic(Setting.getSettingValue(SettingIDS.LOGIC_RADIUS));
+        GameWorld.getGameWorld().updateLogic(Setting.getSettingValue(SettingIDS.LOGIC_RADIUS), true);
     }
 
     public static void validateLogicList(CommandSender sender) {

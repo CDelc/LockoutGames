@@ -41,6 +41,7 @@ public final class LockoutGames extends JavaPlugin {
         playerManager = PlayerManager.getPlayerManager();
         gameWorld = GameWorld.getGameWorld();
         game = null;
+        rng = new Random();
 
         Loader.loadAll(this);
     }

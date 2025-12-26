@@ -31,4 +31,6 @@ public interface IGoal {
      * @return The set of event classes that this goal should be checked with
      */
     Set<Class<? extends Event>> getCheckEvents();
+
+    public void checkEvent(Event e);
 }

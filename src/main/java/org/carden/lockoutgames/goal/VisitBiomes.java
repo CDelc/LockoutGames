@@ -37,7 +37,7 @@ public class VisitBiomes extends ChecklistGoal<Biome> {
     }
 
     @Override
-    protected void checkEvent(Event e) {
+    public void checkEvent(Event e) {
         Player p = playerEventPlayer(e);
         if (p == null) return;
         Biome biome = p.getLocation().getBlock().getBiome();

@@ -61,7 +61,7 @@ public abstract class Goal implements IMutableGoal {
      * This should invoke a GoalCompleteEvent if the conditions to complete this goal are met.
      * @param e - The event triggering the check
      */
-    protected abstract void checkEvent(Event e);
+    public abstract void checkEvent(Event e);
 
     /**
      * Will try to change this goal to match the desired difficulty. If this cannot be done, returns false.

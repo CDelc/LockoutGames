@@ -7,6 +7,7 @@ import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IGoal;
 import org.carden.lockoutgames.goal.IMutableGoal;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -47,7 +48,8 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
         Random rng = LockoutGames.getRng();
         Set<E> filteredValues = filteredChoices();
         if (this.isValidDifficulty(this.difficultyOne) && this.isValidDifficulty(this.difficultyAll)) {
-            return !filteredValues.equals(this.possibleValues) && rng.nextDouble() < this.allProbablility;
+            double rand = rng.nextDouble();
+            return filteredValues.size() >= possibleValues.size() && rand < this.allProbablility;
         }
         else if (this.isValidDifficulty(difficultyOne)) {
             return false;

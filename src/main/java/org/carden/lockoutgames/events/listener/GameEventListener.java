@@ -5,6 +5,7 @@ import org.bukkit.event.*;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.events.GoalCompleteEvent;
 import org.carden.lockoutgames.events.SettingChangeEvent;
+import org.carden.lockoutgames.game.Debug;
 import org.carden.lockoutgames.game.setting.Setting;
 
 public class GameEventListener implements Listener {
@@ -19,6 +20,7 @@ public class GameEventListener implements Listener {
 
     @EventHandler
     public void onGoalComplete(GoalCompleteEvent e) {
+        if(Debug.isActive()) LockoutGames.broadcastMessage(ChatColor.LIGHT_PURPLE + "" + e.getPlayer() + " " + ChatColor.WHITE + " has completed " + ChatColor.AQUA + e.getGoal().getDescription());
         if(LockoutGames.getGame().isPresent()) LockoutGames.getGame().get().handleGoalEvent(e);
     }
 

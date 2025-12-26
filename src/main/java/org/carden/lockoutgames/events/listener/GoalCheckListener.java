@@ -1,10 +1,12 @@
 package org.carden.lockoutgames.events.listener;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.Debug;
 
@@ -45,6 +47,11 @@ public class GoalCheckListener implements Listener {
     @EventHandler
     public void onInventoryClickEvent(InventoryClickEvent e) {
         sendGoalCheck(InventoryClickEvent.class, e);
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        sendGoalCheck(PlayerMoveEvent.class, e);
     }
 
     private void sendGoalCheck(Class<? extends Event> eventClass, Event e) {
