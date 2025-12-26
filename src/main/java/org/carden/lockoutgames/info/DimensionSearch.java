@@ -6,6 +6,9 @@ import org.bukkit.generator.structure.Structure;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public enum DimensionSearch {
     /**
@@ -151,5 +154,21 @@ public enum DimensionSearch {
      */
     public HashSet<Biome> getBiomes() {
         return biomes;
+    }
+
+    public static List<Biome> getAllBiomes() {
+        return Stream.of(
+                DimensionSearch.NORMAL.getBiomes(),
+                DimensionSearch.NETHER.getBiomes(),
+                DimensionSearch.THE_END.getBiomes()
+        ).flatMap(Set::stream).toList();
+    }
+
+    public static List<Structure> getAllStructures() {
+        return Stream.of(
+                DimensionSearch.NORMAL.getStructures(),
+                DimensionSearch.NETHER.getStructures(),
+                DimensionSearch.THE_END.getStructures()
+        ).flatMap(Set::stream).toList();
     }
 }

@@ -33,7 +33,9 @@ public class Utils {
     public static String readableEnumString(String s) {
         StringBuilder builder = new StringBuilder();
         for(int i = 0; i < s.length(); i++) {
-            if(s.charAt(i) != '_') {
+            if(i == 0) {
+                builder.append(Character.toUpperCase(s.charAt(i)));
+            } else if(s.charAt(i) != '_') {
                 builder.append(Character.toLowerCase(s.charAt(i)));
             } else if(i + 1 == s.length()) {
                 break;

@@ -15,6 +15,8 @@ import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.info.DimensionSearch;
 import org.carden.lockoutgames.info.SettingIDS;
 import org.carden.lockoutgames.info.SettingsConstants;
+import org.carden.lockoutgames.info.StructureStrings;
+import org.carden.lockoutgames.utils.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -29,7 +31,7 @@ public class GameWorld {
      * This will calculate and store information about the contents of the world the game is taking place in
      */
 
-    static final int STRUCTURE_SEARCH_TIMEOUT_SECONDS = 20;
+    static final int STRUCTURE_SEARCH_TIMEOUT_SECONDS = 10;
     static final int BIOME_SEARCH_BORDER_MARGIN_BLOCKS = 30;
 
     LockoutGames plugin;
@@ -41,6 +43,9 @@ public class GameWorld {
 
     private final Set<Biome> availableBiomes;
     private final Set<Structure> availableStructures;
+
+    private static final List<Biome> allBiomes = Registry.BIOME.stream().toList();
+    private static final List<Structure> allStructures = Registry.STRUCTURE.stream().toList();
 
     private static final GameWorld gameWorld = new GameWorld();
 
@@ -123,18 +128,46 @@ public class GameWorld {
         netherPortals.addWorldLink(endworld, overworld, PortalType.ENDER);
     }
 
-    public CompletableFuture<Boolean> updateLogic(int searchRadius) {
+    public CompletableFuture<Boolean> updateLogic(int searchRadius, boolean debug) {
         CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
-        CompletableFuture<Boolean> biomesComplete = scanBiomes(searchRadius);
-        CompletableFuture<Boolean> structuresComplete = scanStructures(searchRadius);
+        CompletableFuture<Set<Biome>> biomesComplete = scanBiomes(searchRadius);
+        CompletableFuture<Set<Structure>> structuresComplete = scanStructures(searchRadius);
         this.isLargeWorld = searchRadius >= SettingsConstants.LOGIC_SPREAD_SCAN_THRESHOLD;
-        CompletableFuture.allOf(biomesComplete, structuresComplete).thenRun(() -> completeCheck.complete(true));
+        biomesComplete.thenAcceptBoth(structuresComplete, (biomeResult, structureResult) -> {
+            if(debug) {
+                Registry.BIOME.stream()
+                        .filter(biomeResult::contains)
+                        .forEach(biome -> LockoutGames.broadcastMessage(ChatColor.GREEN + Utils.readableEnumString(biome.toString()) + ChatColor.DARK_GREEN + " found"));
+                Registry.STRUCTURE.stream()
+                        .filter(structureResult::contains)
+                        .forEach(struct -> LockoutGames.broadcastMessage(ChatColor.BLUE + Utils.readableEnumString(StructureStrings.getStructureName(struct)) + ChatColor.DARK_GREEN + " found"));
+                Registry.BIOME.stream()
+                        .filter(biome -> !biomeResult.contains(biome) && DimensionSearch.getAllBiomes().contains(biome))
+                        .forEach(biome -> LockoutGames.broadcastMessage(ChatColor.GREEN + Utils.readableEnumString(biome.toString()) + ChatColor.RED + " not found"));
+                Registry.STRUCTURE.stream()
+                        .filter(struct -> !structureResult.contains(struct) && DimensionSearch.getAllStructures().contains(struct))
+                        .forEach(struct -> LockoutGames.broadcastMessage(ChatColor.BLUE + Utils.readableEnumString(StructureStrings.getStructureName(struct)) + ChatColor.RED + " not found"));
+                Registry.BIOME.stream()
+                        .filter(biome -> !DimensionSearch.getAllBiomes().contains(biome))
+                        .forEach(biome -> LockoutGames.broadcastMessage(ChatColor.GREEN + Utils.readableEnumString(biome.toString()) + ChatColor.DARK_RED + ChatColor.BOLD + " MISSING"));
+                Registry.STRUCTURE.stream()
+                        .filter(struct -> !DimensionSearch.getAllStructures().contains(struct))
+                        .forEach(struct -> LockoutGames.broadcastMessage(ChatColor.BLUE + Utils.readableEnumString(StructureStrings.getStructureName(struct)) + ChatColor.DARK_RED + ChatColor.BOLD + " MISSING"));
+            }
+            else {
+                availableBiomes.clear();
+                availableBiomes.addAll(biomeResult);
+                availableStructures.clear();
+                availableStructures.addAll(structureResult);
+            }
+            completeCheck.complete(true);
+        });
         return completeCheck;
     }
 
     public CompletableFuture<Boolean> setupWorld(@NotNull SettingsImage settings) {
         this.setWorldSize(settings.getSetting(SettingIDS.WORLD_SIZE));
-        CompletableFuture<Boolean> isComplete = updateLogic(settings.getSetting(SettingIDS.LOGIC_RADIUS));
+        CompletableFuture<Boolean> isComplete = updateLogic(settings.getSetting(SettingIDS.LOGIC_RADIUS), false);
         applySettings(settings);
         return isComplete;
     }
@@ -170,60 +203,52 @@ public class GameWorld {
      * Updated the availableBiomes set to contain the biomes that exist within the world boundary.
      * This scan is done asynchronously in order to not block the main server thread.
      */
-    private CompletableFuture<Boolean> scanBiomes(int searchRadius) {
-        availableBiomes.clear();
-        ArrayList<Biome> allBiomes = new ArrayList<>(DimensionSearch.NORMAL.getBiomes());
-        allBiomes.addAll(DimensionSearch.NETHER.getBiomes());
+    private CompletableFuture<Set<Biome>> scanBiomes(int searchRadius) {
+        Set<Biome> scanResult = new HashSet<>();
         Lock lock = new ReentrantLock();
-        CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
+        CompletableFuture<Set<Biome>> isComplete = new CompletableFuture<>();
 
         if(searchRadius >= SettingsConstants.LOGIC_SPREAD_SCAN_THRESHOLD) {
-            availableBiomes.addAll(allBiomes);
+            scanResult.addAll(allBiomes);
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    isComplete.complete(true);
+                    isComplete.complete(scanResult);
                 }
             }.runTaskLater(plugin, 10);
             return isComplete;
-        }
-
-        new BukkitRunnable() {
-            private int index = 0;
-            private int biomeCount = 0;
-            @Override
-            public void run() {
-                lock.lock();
-                Biome b = allBiomes.get(index);
-                index++;
-                if(index >= allBiomes.size()) cancel();;
-                lock.unlock();
-                World world = getWorld(DimensionSearch.NORMAL.getEnvironment());
-                if(DimensionSearch.NETHER.getBiomes().contains(b)) {
-                    world = getWorld(World.Environment.NETHER);
-                }
-                Location origin = new Location(world, 0, 0, 0);
-
-                if (world.locateNearestBiome(origin, searchRadius - BIOME_SEARCH_BORDER_MARGIN_BLOCKS, b) != null) {
-                    availableBiomes.add(b);
-                }
-                biomeCount++;
-                if(index >= allBiomes.size()) {
+        } else {
+            new BukkitRunnable() {
+                private int index = 0;
+                private int biomeCount = 0;
+                @Override
+                public void run() {
+                    lock.lock();
+                    Biome b = allBiomes.get(index);
+                    index++;
+                    if(index >= allBiomes.size()) cancel();
+                    lock.unlock();
+                    World world = getWorld(DimensionSearch.NORMAL.getEnvironment());
+                    if(DimensionSearch.NETHER.getBiomes().contains(b)) {
+                        world = getWorld(World.Environment.NETHER);
+                    }
+                    else if(DimensionSearch.THE_END.getBiomes().contains(b)) {
+                        scanResult.add(b);
+                        biomeCount++;
+                        return;
+                    }
+                    Location origin = new Location(world, 0, 64, 0);
+                    if (world.locateNearestBiome(origin, searchRadius - BIOME_SEARCH_BORDER_MARGIN_BLOCKS, b) != null) {
+                        scanResult.add(b);
+                    }
+                    biomeCount++;
                     if(biomeCount >= allBiomes.size()){
                         plugin.getServer().broadcastMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Biome Scan complete");
-                        isComplete.complete(true);
+                        isComplete.complete(scanResult);
                     }
-                    cancel();
                 }
-            }
-        }.runTaskTimerAsynchronously(plugin, 0, 1);
-
-        //End dimension has no world border, so all biomes are included.
-        availableBiomes.add(Biome.SMALL_END_ISLANDS);
-        availableBiomes.add(Biome.END_BARRENS);
-        availableBiomes.add(Biome.END_HIGHLANDS);
-        availableBiomes.add(Biome.END_MIDLANDS);
-        availableBiomes.add(Biome.THE_END);
+            }.runTaskTimerAsynchronously(plugin, 0, 1);
+        }
         return isComplete;
     }
 
@@ -232,57 +257,56 @@ public class GameWorld {
      * This scan is done asynchronously in order to not block the main server thread,
      * and all structures are searched for in parallel
      */
-    private CompletableFuture<Boolean> scanStructures(int searchRadius) {
-        availableStructures.clear();
-        ArrayList<Structure> allStructures = new ArrayList<>(DimensionSearch.NORMAL.getStructures());
-        allStructures.addAll(DimensionSearch.NETHER.getStructures());
+    private CompletableFuture<Set<Structure>> scanStructures(int searchRadius) {
+        Set<Structure> scanResult = new HashSet<>();
         Lock lock = new ReentrantLock();
-        CompletableFuture<Boolean> isComplete = new CompletableFuture<>();
+        CompletableFuture<Set<Structure>> isComplete = new CompletableFuture<>();
 
         if(searchRadius >= SettingsConstants.LOGIC_SPREAD_SCAN_THRESHOLD) {
-            availableStructures.addAll(allStructures);
+            scanResult.addAll(allStructures);
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    isComplete.complete(true);
+                    isComplete.complete(scanResult);
                 }
             }.runTaskLater(plugin, 10);
-            return isComplete;
         }
+        else {
+            new BukkitRunnable() {
 
-        new BukkitRunnable() {
-
-            private int index = 0;
-            private int structureCount = 0;
-            @Override
-            public void run() {
-                lock.lock();
-                Structure s = allStructures.get(index);
-                index++;
-                if(index >= allStructures.size()) cancel();;
-                lock.unlock();
-                World world = getWorld(DimensionSearch.NORMAL.getEnvironment());
-                if(DimensionSearch.NETHER.getStructures().contains(s)) {
-                    world = getWorld(World.Environment.NETHER);
-                }
-                Location origin = new Location(world, 0, 0, 0);
-                StructureSearchResult result = structureSearchWithTimeout(world, origin, s, searchRadius);;
-                if(result != null && Math.abs(result.getLocation().getX()) < (double) searchRadius && Math.abs(result.getLocation().getZ()) < (double) searchRadius){
-                    availableStructures.add(s);
-                }
-                structureCount++;
-                if(index >= allStructures.size()) {
-                    if(structureCount >= allStructures.size()){
-                        plugin.getServer().broadcastMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "Structure Scan complete");
-                        isComplete.complete(true);
+                private int index = 0;
+                private int structureCount = 0;
+                @Override
+                public void run() {
+                    lock.lock();
+                    Structure s = allStructures.get(index);
+                    index++;
+                    if(index >= allStructures.size()) cancel();
+                    lock.unlock();
+                    World world = getWorld(DimensionSearch.NORMAL.getEnvironment());
+                    if(DimensionSearch.NETHER.getStructures().contains(s)) {
+                        world = getWorld(World.Environment.NETHER);
+                    } else if(DimensionSearch.THE_END.getStructures().contains(s)) {
+                        scanResult.add(s);
+                        structureCount++;
+                        return;
                     }
-                    cancel();
+                    Location origin = new Location(world, 0, 0, 0);
+                    StructureSearchResult result = structureSearchWithTimeout(world, origin, s, searchRadius);
+                    if(result != null && Math.abs(result.getLocation().getX()) < (double) searchRadius && Math.abs(result.getLocation().getZ()) < (double) searchRadius){
+                        scanResult.add(s);
+                    }
+                    structureCount++;
+                    if(index >= allStructures.size()) {
+                        if(structureCount >= allStructures.size()){
+                            plugin.getServer().broadcastMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "Structure Scan complete");
+                            isComplete.complete(scanResult);
+                        }
+                        cancel();
+                    }
                 }
-            }
-        }.runTaskTimerAsynchronously(plugin, 0, 1);
-
-        //End has no border, end city always included.
-        availableStructures.add(Structure.END_CITY);
+            }.runTaskTimerAsynchronously(plugin, 0, 1);
+        }
         return isComplete;
     }
 
