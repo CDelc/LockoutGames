@@ -1,6 +1,7 @@
 package org.carden.lockoutgames.goal.factory;
 
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.Goal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IGoal;
@@ -16,7 +17,8 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
     private final GoalDifficulty difficultyAll;
     private final Set<E> possibleValues;
 
-    protected AllOrOneFactory(Set<E> possibleValues, GoalDifficulty difficultyOne, GoalDifficulty difficultyAll) {
+    protected AllOrOneFactory(SettingsImage settings, Set<E> possibleValues, GoalDifficulty difficultyOne, GoalDifficulty difficultyAll) {
+        super(settings);
         this.difficultyOne = difficultyOne;
         this.difficultyAll = difficultyAll;
         this.possibleValues = possibleValues;

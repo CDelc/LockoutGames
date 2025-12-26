@@ -3,6 +3,7 @@ package org.carden.lockoutgames.goal.factory;
 import org.bukkit.block.Biome;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.GameWorld;
+import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
 
 import java.util.Set;
@@ -13,8 +14,8 @@ public class VisitCaveBiomes extends AllOrOneFactory<Biome> {
     private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.EASY;
     private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.MEDIUM;
 
-    public VisitCaveBiomes() {
-        super(CAVE_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
+    public VisitCaveBiomes(SettingsImage settings) {
+        super(settings, CAVE_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
         this.addGoalTypes(GoalType.VISIT_BIOME);
         this.setAllProbablility(0.4f);
     }
