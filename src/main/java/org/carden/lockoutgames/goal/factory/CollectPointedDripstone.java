@@ -12,8 +12,8 @@ public class CollectPointedDripstone extends CollectItem {
     private static final int COLLECT_POINTED_DRIPSTONE_MINIMUM = 1;
     private static final int COLLECT_POINTED_DRIPSTONE_MAXIMUM = 32;
 
-    public CollectPointedDripstone(SettingsImage settings) {
-        super(settings, Material.POINTED_DRIPSTONE, COLLECT_POINTED_DRIPSTONE_MINIMUM, COLLECT_POINTED_DRIPSTONE_MAXIMUM);
+    public CollectPointedDripstone() {
+        super(Material.POINTED_DRIPSTONE, COLLECT_POINTED_DRIPSTONE_MINIMUM, COLLECT_POINTED_DRIPSTONE_MAXIMUM);
 
         this.canGenerateMultiple = false;
     }

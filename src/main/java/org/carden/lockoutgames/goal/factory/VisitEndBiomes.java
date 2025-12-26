@@ -14,8 +14,8 @@ public class VisitEndBiomes extends AllOrOneFactory<Biome> {
     private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.HARD;
     private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.HARD;
 
-    public VisitEndBiomes(SettingsImage settings) {
-        super(settings, END_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
+    public VisitEndBiomes() {
+        super(END_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
         this.setAllProbablility(0.6f);
         this.addGoalTypes(GoalType.VISIT_BIOME);
     }

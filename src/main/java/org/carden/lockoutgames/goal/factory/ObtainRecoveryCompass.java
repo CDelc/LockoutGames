@@ -2,28 +2,25 @@ package org.carden.lockoutgames.goal.factory;
 
 import org.bukkit.Material;
 import org.carden.lockoutgames.game.setting.SettingsImage;
-import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
+import org.carden.lockoutgames.goal.GoalType;
 import org.carden.lockoutgames.goal.IMutableGoal;
 
 import java.util.List;
 
-public class CollectGlowLichen extends CollectItem {
+public class ObtainRecoveryCompass extends CollectItem {
 
-    private static final int COLLECT_GLOW_LICKEN_MINIMUM = 1;
-    private static final int COLLECT_GLOW_LICKEN_MAXIMUM = 64;
-
-    public CollectGlowLichen() {
-        super(Material.GLOW_LICHEN, COLLECT_GLOW_LICKEN_MINIMUM, COLLECT_GLOW_LICKEN_MAXIMUM);
-
+    public ObtainRecoveryCompass() {
+        super(Material.RECOVERY_COMPASS);
         this.canGenerateMultiple = false;
+        this.addGoalTypes(GoalType.ECHO_SHARD);
     }
 
     @Override
     protected IMutableGoal makeCollectItemGoal(List<Material> requiredItems, int itemsRequiredPerStack) {
         IMutableGoal goal = super.makeCollectItemGoal(requiredItems, itemsRequiredPerStack);
-        goal.setDescription("Collect " + itemsRequiredPerStack + " glow lichen");
-        goal.setGoalDifficulty(GoalDifficulty.EASY);
+        goal.setDescription("Obtain a recovery compass");
+        goal.setGoalDifficulty(GoalDifficulty.HARD);
         return goal;
     }
 }

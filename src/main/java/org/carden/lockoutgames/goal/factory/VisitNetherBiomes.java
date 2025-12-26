@@ -14,8 +14,8 @@ public class VisitNetherBiomes extends AllOrOneFactory<Biome> {
     private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.EASY;
     private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.MEDIUM;
 
-    public VisitNetherBiomes(SettingsImage settings) {
-        super(settings, NETHER_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
+    public VisitNetherBiomes() {
+        super(NETHER_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
         this.setAllProbablility(0.4f);
         this.addGoalTypes(GoalType.VISIT_BIOME);
     }

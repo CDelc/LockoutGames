@@ -14,8 +14,8 @@ public class VisitCaveBiomes extends AllOrOneFactory<Biome> {
     private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.EASY;
     private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.MEDIUM;
 
-    public VisitCaveBiomes(SettingsImage settings) {
-        super(settings, CAVE_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
+    public VisitCaveBiomes() {
+        super(CAVE_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
         this.addGoalTypes(GoalType.VISIT_BIOME);
         this.setAllProbablility(0.4f);
     }

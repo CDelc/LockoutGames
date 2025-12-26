@@ -17,8 +17,8 @@ public class CollectFlint extends CollectItemBucketed {
     private static final int COLLECT_FLINT_MAXIMUM = 64;
     private static final int EASY_DIFFICULTY_THRESHOLD = 4;
 
-    public CollectFlint(SettingsImage settings) {
-        super(settings, Set.of(Material.FLINT), 1, 1, Map.of(
+    public CollectFlint() {
+        super(Set.of(Material.FLINT), 1, 1, Map.of(
                 new Bucket(COLLECT_FLINT_MINIMUM, EASY_DIFFICULTY_THRESHOLD-1), GoalDifficulty.VERY_EASY,
                 new Bucket(EASY_DIFFICULTY_THRESHOLD, COLLECT_FLINT_MAXIMUM), GoalDifficulty.EASY
         ));

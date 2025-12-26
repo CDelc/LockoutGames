@@ -26,8 +26,7 @@ public abstract class CollectItem extends BaseGoalFactory {
     /**
      * Constructs this goal with all the given parameters
      */
-    protected CollectItem(SettingsImage settings, List<Material> itemsToCollect, int minimumStack, int maximumStack, int minimumItems, int maximumItems) {
-        super(settings);
+    protected CollectItem(List<Material> itemsToCollect, int minimumStack, int maximumStack, int minimumItems, int maximumItems) {
         this.minItemsPerStack = minimumStack;
         this.maxItemsPerStack = maximumStack;
         this.minItemsToSelect = minimumItems;
@@ -38,36 +37,36 @@ public abstract class CollectItem extends BaseGoalFactory {
     /**
      * Constructs the goal, guarantees the entire list will be required. The amount of each item will be randomized.
      */
-    protected CollectItem(SettingsImage settings, List<Material> itemsToCollect, int minimumStack, int maximumStack) {
-        this(settings, itemsToCollect, minimumStack, maximumStack, itemsToCollect.size(), itemsToCollect.size());
+    protected CollectItem(List<Material> itemsToCollect, int minimumStack, int maximumStack) {
+        this(itemsToCollect, minimumStack, maximumStack, itemsToCollect.size(), itemsToCollect.size());
     }
 
     /**
      * Constructs the goal, guarantees the entire list will be required with the provided stacksize per item
      */
-    protected CollectItem(SettingsImage settings, List<Material> itemsToCollect, int stackSize) {
-        this(settings, itemsToCollect, stackSize, stackSize, itemsToCollect.size(), itemsToCollect.size());
+    protected CollectItem(List<Material> itemsToCollect, int stackSize) {
+        this(itemsToCollect, stackSize, stackSize, itemsToCollect.size(), itemsToCollect.size());
     }
 
     /**
      * Constructs the goal, guarantees the entire list will be required with only one item of each type required to complete
      */
-    protected CollectItem(SettingsImage settings, List<Material> itemsToCollect) {
-        this(settings, itemsToCollect, 1, 1, itemsToCollect.size(), itemsToCollect.size());
+    protected CollectItem(List<Material> itemsToCollect) {
+        this(itemsToCollect, 1, 1, itemsToCollect.size(), itemsToCollect.size());
     }
 
     /**
      * Constructs the goal, only requires the given material of a randomized amount
      */
-    protected CollectItem(SettingsImage settings, Material material, int minimumStack, int maximumStack) {
-        this(settings, List.of(material), minimumStack, maximumStack, 1, 1);
+    protected CollectItem(Material material, int minimumStack, int maximumStack) {
+        this(List.of(material), minimumStack, maximumStack, 1, 1);
     }
 
     /**
      * Constructs the goal, guarantees only a single instance of the given material is required
      */
-    protected CollectItem(SettingsImage settings, Material material) {
-        this(settings, List.of(material), 1, 1, 1, 1);
+    protected CollectItem(Material material) {
+        this(List.of(material), 1, 1, 1, 1);
     }
 
     /**

@@ -21,7 +21,7 @@ public abstract class QuantitativeDifficultyGoal extends SelectFromChoices<Quant
     @Override
     protected final IMutableGoal makeGoalFor(Bucket bucket, GoalDifficulty difficulty) {
         Random rng = LockoutGames.getRng();
-        this.makeGoalForNumber(bucket.getRandom(rng), difficulty);
+        return this.makeGoalForNumber(bucket.getRandom(rng), difficulty);
     }
 
     protected abstract IMutableGoal makeGoalForNumber(int n, GoalDifficulty difficulty);

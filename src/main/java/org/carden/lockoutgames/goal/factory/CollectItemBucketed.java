@@ -12,7 +12,7 @@ public class CollectItemBucketed extends QuantitativeDifficultyGoal {
     private final SubsetSelector<Material> itemSelector;
 
 
-    protected CollectItemBucketed(SettingsImage settings, Set<Material> itemsToCollect, int minimumItemTypes, int maximumItemTypes, Map<Bucket, GoalDifficulty> bucketDifficulties) {
+    protected CollectItemBucketed(Set<Material> itemsToCollect, int minimumItemTypes, int maximumItemTypes, Map<Bucket, GoalDifficulty> bucketDifficulties) {
         super(bucketDifficulties);
         this.itemSelector = new SubsetSelector<>(itemsToCollect, minimumItemTypes, maximumItemTypes, CollectItem::itemFilter);
     }
