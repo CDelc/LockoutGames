@@ -99,6 +99,19 @@ public class Gadmin implements CommandExecutor, TabCompleter {
         }
         else if(args[1].equalsIgnoreCase("scanworld")) Debug.checkLogicScan();
         else if(args[1].equalsIgnoreCase("validateLogicList")) Debug.validateLogicList(commandSender);
+        else if(args[1].equalsIgnoreCase("start")) {
+            if (Debug.startDebug()) {
+                LockoutGames.broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "DEBUG SESSION STARTED");
+                commandSender.sendMessage(ChatColor.LIGHT_PURPLE + "Be sure to run /gadmin debug scanWorld to update world logic before testing goals");
+            } else {
+                commandSender.sendMessage(ChatColor.RED + "Failed to start debug session, make sure there is not a game running");
+            }
+        } else if(args[1].equalsIgnoreCase("end")) Debug.endDebug();
+        else if(args[1].equalsIgnoreCase("testallgoals")) {
+            if(!Debug.testAllGoals()) {
+                commandSender.sendMessage(ChatColor.RED + "Debug session not active");
+            }
+        }
     }
 
     private List<String> debugTabComplete(@NotNull CommandSender commandSender, @NotNull String[] args) {

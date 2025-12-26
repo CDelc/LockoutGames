@@ -3,6 +3,7 @@ package org.carden.lockoutgames.info;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.structure.Structure;
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.game.Debug;
 import org.carden.lockoutgames.game.GameWorld;
 
 import java.util.function.Predicate;
@@ -1675,12 +1676,10 @@ public class WorldRequirements {
         UNKNOWN(WorldRequirements::unobtainable);
 
 
-        private final GameWorld world;
         private final Predicate<GameWorld> requirement;
 
         Element(Predicate<GameWorld> requirement) {
             this.requirement = requirement;
-            this.world = LockoutGames.getPluginInstance().getGameWorld();
         }
 
         /**
@@ -1688,7 +1687,8 @@ public class WorldRequirements {
          * @return True if this element can be accessed in this game world, false otherwise
          */
         public boolean verify() {
-            return requirement.test(world);
+            if(Debug.isActive()) return requirement.test(GameWorld.getDebugWorld());
+            else return requirement.test(GameWorld.getGameWorld());
         }
     }
 

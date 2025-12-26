@@ -17,7 +17,7 @@ public abstract class BaseGoalFactory implements GoalFactory {
     protected GoalDifficulty maxDifficulty = GoalDifficulty.VERY_HARD;
 
     @Override
-    public final IGoal makeGoal(SettingsImage settings, List<String> uniquenessStrings) {
+    public final IGoal makeGoal(SettingsImage settings, List<String> uniquenessStrings) throws IllegalStateException{
         if (this.canGenerateGoal(settings, uniquenessStrings)) {
             IMutableGoal goal = this.makeGoalHook();
             goal.addUniquenessStrings(this.baseUniquenessStrings);
