@@ -3,32 +3,24 @@ package org.carden.lockoutgames.goal.factory;
 import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class BaseGoalFactory implements GoalFactory {
-    protected final SettingsImage settings;
+    protected SettingsImage settings;
+    protected Collection<String> usedUniquenessStrings = Set.of();
+    protected boolean canGenerateMultiple = false;
+
+    protected Set<String> baseUniquenessStrings = Set.of();
 
     protected GoalDifficulty minDifficulty = GoalDifficulty.VERY_EASY;
     protected GoalDifficulty maxDifficulty = GoalDifficulty.VERY_HARD;
-    protected Collection<GoalType> usedGoalTypes = Set.of();
-    protected Collection<String> usedUniquenessStrings = Set.of();
-    protected boolean canGenerateMultiple = false;
-    private boolean generatedGoal = false;
-    protected final Set<GoalType> myGoalTypes = new HashSet<>();
-
-    protected BaseGoalFactory(SettingsImage settings) {
-        this.settings = settings;
-    }
 
     @Override
-    public final IGoal makeGoal() {
-        if (this.canGenerateGoal()) {
+    public final IGoal makeGoal(SettingsImage settings, List<String> uniquenessStrings) {
+        if (this.canGenerateGoal(settings, uniquenessStrings)) {
             IMutableGoal goal = this.makeGoalHook();
-            goal.addGoalTypes(this.myGoalTypes);
-            this.generatedGoal = true;
+            goal.addUniquenessStrings(this.baseUniquenessStrings);
             return goal;
         }
         else {
@@ -36,54 +28,47 @@ public abstract class BaseGoalFactory implements GoalFactory {
         }
     }
 
+    private void setupMakeGoalContext(SettingsImage settings, List<String> uniquenessStrings) {
+        this.settings = settings;
+        this.usedUniquenessStrings = uniquenessStrings;
+    }
+
     protected abstract IMutableGoal makeGoalHook();
 
     @Override
-    public GoalFactory setMinDifficulty(GoalDifficulty minDifficulty) {
-        this.minDifficulty = minDifficulty;
-        return this;
-    }
-
-    @Override
-    public GoalFactory setMaxDifficulty(GoalDifficulty maxDifficulty) {
-        this.maxDifficulty = maxDifficulty;
-        return this;
-    }
-
-    @Override
-    public GoalFactory setUsedGoalTypes(Collection<GoalType> goalTypes) {
-        this.usedGoalTypes = goalTypes;
-        return this;
-    }
-
-    @Override
-    public GoalFactory setUsedUniquenessStrings(Collection<String> uniquenessStrings) {
-        this.usedUniquenessStrings = uniquenessStrings;
-        return this;
-    }
-
-    @Override
-    public boolean canGenerateGoal() {
-        if (this.generatedGoal && this.canGenerateMultiple) {
-            return this.canGenerateGoalHook();
-        }
-        if (!this.generatedGoal && !invalidGoalType()) {
+    public final boolean canGenerateGoal(SettingsImage settings, List<String> uniquenessStrings) {
+        this.setupMakeGoalContext(settings, uniquenessStrings);
+        if (!invalidGoalType()) {
             return this.canGenerateGoalHook();
         }
         return false;
     }
 
-    private boolean invalidGoalType() {
-        return this.usedGoalTypes.stream().anyMatch((gt) -> this.myGoalTypes.contains(gt));
+    public boolean canGenerateMultiple() {
+        return this.canGenerateMultiple;
     }
 
-    protected void addGoalTypes(GoalType... goalTypes) {
-        this.myGoalTypes.addAll(List.of(goalTypes));
+    private boolean invalidGoalType() {
+        return this.usedUniquenessStrings.stream().anyMatch((gt) -> this.baseUniquenessStrings.contains(gt));
     }
 
     protected final boolean isValidDifficulty(GoalDifficulty difficulty) {
         return difficulty.isInRange(this.minDifficulty, this.maxDifficulty);
     }
 
+    public final GoalFactory setMinDifficulty(GoalDifficulty difficulty) {
+        this.minDifficulty = difficulty;
+        return this;
+    }
+
+    public final GoalFactory setMaxDifficulty(GoalDifficulty difficulty) {
+        this.maxDifficulty = difficulty;
+        return this;
+    }
+
     protected abstract boolean canGenerateGoalHook();
+
+    protected void addGoalTypes(GoalType... goalTypes) {
+        this.baseUniquenessStrings.addAll(Arrays.stream(goalTypes).map(Objects::toString).collect(Collectors.toSet()));
+    }
 }

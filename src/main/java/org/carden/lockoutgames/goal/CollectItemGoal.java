@@ -16,7 +16,7 @@ import java.util.*;
 
 import static org.carden.lockoutgames.utils.Utils.selectNRandomValuesFromList;
 
-public abstract class CollectItemGoal extends ChecklistGoal<Material> {
+public class CollectItemGoal extends ChecklistGoal<Material> {
     /**
      * Generalized goal for obtaining a single item or a set of items.
      */
@@ -106,7 +106,7 @@ public abstract class CollectItemGoal extends ChecklistGoal<Material> {
     /**
      * failedToGenerate is true by default because a construct() method must be called before this goal is usable
      */
-    protected CollectItemGoal() {
+    public CollectItemGoal(List<Material> requiredItems, int itemsRequiredPerStack) {
         super(eventsToCheck);
         this.failedToGenerate = true;
     }
