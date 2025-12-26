@@ -10,7 +10,7 @@ public class LightLevelZero extends BaseGoalFactory {
     private static final String description = "Reach light level 0";
     private static final GoalDifficulty difficulty = GoalDifficulty.VERY_EASY;
 
-    protected LightLevelZero() {
+    public LightLevelZero() {
         super();
     }
 

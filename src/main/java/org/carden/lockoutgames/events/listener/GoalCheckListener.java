@@ -29,6 +29,10 @@ public class GoalCheckListener implements Listener {
         eventsToListenFor.add(eventClass);
     }
 
+    public void enableEventListener(Set<Class<? extends Event>> eventClasses) {
+        eventsToListenFor.addAll(eventClasses);
+    }
+
     public void clearEventListeners() {
         eventsToListenFor.clear();
     }
@@ -49,7 +53,7 @@ public class GoalCheckListener implements Listener {
             LockoutGames.getGame().get().checkGoals(e);
         }
         if(Debug.isActive()) {
-            Debug.checkGoals();
+            Debug.checkGoals(e);
         }
     }
 }

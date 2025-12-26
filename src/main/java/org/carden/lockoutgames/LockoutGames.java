@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.carden.lockoutgames.game.Debug;
 import org.carden.lockoutgames.game.GameWorld;
 import org.carden.lockoutgames.game.gametypes.Lockout;
 import org.carden.lockoutgames.game.player.PlayerManager;
@@ -53,7 +54,7 @@ public final class LockoutGames extends JavaPlugin {
      * @return False if a game is already running, true if the game begins successfully.
      */
     public static boolean startGame() {
-        if (getGame().isPresent()) return false;
+        if (getGame().isPresent() || Debug.isActive()) return false;
         SettingsImage settingsImage = Setting.saveSettings();
         gameWorld.setupWorld(settingsImage).thenRun(new BukkitRunnable() {
             @Override

@@ -4,14 +4,18 @@ import org.carden.lockoutgames.goal.factory.*;
 
 public enum GoalFactories {
 
-    LIGHT_LEVEL_ZERO(LightLevelZero.class),
-    VISIT_CAVE_BIOMES(VisitCaveBiomes.class),
-    VISIT_NETHER_BIOMES(VisitNetherBiomes.class),
-    VISIT_END_BIOMES(VisitEndBiomes.class);
+    LIGHT_LEVEL_ZERO(new LightLevelZero()),
+    VISIT_CAVE_BIOMES(new VisitCaveBiomes()),
+    VISIT_NETHER_BIOMES(new VisitNetherBiomes()),
+    VISIT_END_BIOMES(new VisitEndBiomes());
 
-    public final Class<? extends GoalFactory> classObject;
-    GoalFactories(Class<? extends GoalFactory> goalClass) {
-        this.classObject = goalClass;
+    private final GoalFactory goalFactory;
+    GoalFactories(GoalFactory goalFactory) {
+        this.goalFactory = goalFactory;
+    }
+
+    public GoalFactory getFactory() {
+        return this.goalFactory;
     }
 
 }

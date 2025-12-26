@@ -1,33 +1,46 @@
 package org.carden.lockoutgames.game;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.Event;
 import org.carden.lockoutgames.LockoutGames;
+import org.carden.lockoutgames.events.listener.GoalCheckListener;
 import org.carden.lockoutgames.game.setting.Setting;
-import org.carden.lockoutgames.goal.Goal;
+import org.carden.lockoutgames.game.setting.SettingsImage;
+import org.carden.lockoutgames.goal.GoalDifficulty;
+import org.carden.lockoutgames.goal.GoalFactories;
+import org.carden.lockoutgames.goal.IGoal;
 import org.carden.lockoutgames.goal.factory.GoalFactory;
 import org.carden.lockoutgames.info.SettingIDS;
 import org.carden.lockoutgames.info.WorldRequirements;
+import org.carden.lockoutgames.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class Debug {
 
-    private static List<Goal> goalInstances;
+    private static List<IGoal> goalInstances = new ArrayList<>();
     private static boolean debugActive = false;
 
     private static final Map<String, String> commandDescription = Map.of(
             "start", "Start a debug session",
             "end", "Close the debug session",
             "scanWorld", "Run the scan for biomes and structures and summarize the results, flagging any biomes/structures that are not being scanned for",
-            "validateLogicList", "Check for incongruencies between the Material or Mob enums and WorldRequirements logic entries"
+            "validateLogicList", "Check for incongruencies between the Material or Mob enums and WorldRequirements logic entries",
+            "testGoal", "Generate a specific goal and test it",
+            "testAllGoals", "Generate one of every goal at once and test them freely"
     );
 
-    public static void startDebug() {
+    public static boolean startDebug() {
+        if(LockoutGames.getGame().isPresent()) return false;
         debugActive = true;
+        return true;
     }
 
     public static void endDebug() {
@@ -56,20 +69,52 @@ public class Debug {
         return debugActive;
     }
 
-    public static void checkGoals() {
+    public static void checkGoals(Event e) {
 
     }
 
-    public static void testGoal(GoalFactory goalFactory) {
-
+    public static void clearGoals() {
+        goalInstances.clear();
+        GoalCheckListener.getInstance().clearEventListeners();
     }
 
-    public static void testAllGoals() {
+    public static boolean testGoal(GoalFactory goalFactory) {
+        return false;
+    }
 
+    public static boolean testGoal(GoalFactory goalFactory, GoalDifficulty difficulty) {
+        return false;
+    }
+
+    public static boolean testAllGoals() {
+        if(!debugActive) return false;
+        clearGoals();
+        SettingsImage settingsImage = Setting.saveSettings();
+        for(GoalFactories goalFactoryEnum : GoalFactories.values()) {
+            GoalFactory goalFactory = goalFactoryEnum.getFactory();
+            IGoal goal;
+            try {
+                goal = goalFactory.makeGoal(settingsImage, Collections.emptyList());
+                Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + goalDebugString(goal));
+                goalInstances.add(goal);
+                GoalCheckListener.getInstance().enableEventListener(goal.getCheckEvents());
+            } catch(IllegalStateException e) {
+                Bukkit.getServer().broadcastMessage(ChatColor.BLUE + Utils.camelCaseEnumString(goalFactoryEnum.name()) + ChatColor.WHITE + " | " + ChatColor.RED + "Failed to generate");
+            }
+        }
+        return true;
+    }
+
+    private static String goalDebugString(IGoal goal) {
+        return ChatColor.RED + Utils.readableEnumString(goal.getGoalDifficulty().name()) + ChatColor.AQUA + goal.getDescription();
+    }
+
+    public static boolean testAllGoalsAllDifficulty(CommandSender sender) {
+        return false;
     }
 
     public static void checkLogicScan() {
-        LockoutGames.getGameWorld().updateLogic(Setting.getSettingValue(SettingIDS.LOGIC_RADIUS), true);
+        GameWorld.getDebugWorld().updateLogic(Setting.getSettingValue(SettingIDS.LOGIC_RADIUS));
     }
 
     public static void validateLogicList(CommandSender sender) {
