@@ -11,7 +11,7 @@ public abstract class BaseGoalFactory implements GoalFactory {
     protected Collection<String> usedUniquenessStrings = Set.of();
     protected boolean canGenerateMultiple = false;
 
-    protected Set<String> baseUniquenessStrings = Set.of();
+    protected Set<String> baseUniquenessStrings = new HashSet<>();
 
     protected GoalDifficulty minDifficulty = GoalDifficulty.VERY_EASY;
     protected GoalDifficulty maxDifficulty = GoalDifficulty.VERY_HARD;
