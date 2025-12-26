@@ -12,6 +12,8 @@ public class PlayerEventPredicateGoal<E extends PlayerEvent> extends SingleEvent
     public PlayerEventPredicateGoal(Class<E> eventClass, Predicate<E> predicate, GoalDifficulty difficulty, String description) {
         super(eventClass);
         this.predicate = predicate;
+        this.goalDifficulty = difficulty;
+        this.description = description;
     }
 
     @Override

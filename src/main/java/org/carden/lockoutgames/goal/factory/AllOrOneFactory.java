@@ -47,24 +47,20 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
     private boolean generateAll() {
         Random rng = LockoutGames.getRng();
         Set<E> filteredValues = filteredChoices();
-        if (this.isValidDifficulty(this.difficultyOne) && this.isValidDifficulty(this.difficultyAll)) {
+        if (this.isValidDifficulty(this.difficultyAll) && this.isAllValues(this.filteredChoices())) {
             double rand = rng.nextDouble();
-            return filteredValues.size() >= possibleValues.size() && rand < this.allProbablility;
-        }
-        else if (this.isValidDifficulty(difficultyOne)) {
-            return false;
-        }
-        else if (this.isValidDifficulty(difficultyAll)) {
-            return !filteredValues.equals(this.possibleValues);
+            return rand < this.allProbablility;
         }
         else {
-            throw new IllegalStateException("No valid difficulties to generate");
+            return false;
         }
     }
 
     @Override
     protected boolean canGenerateGoalHook() {
-        return !this.filteredChoices().isEmpty() && (this.isValidDifficulty(this.difficultyOne) || this.isValidDifficulty(this.difficultyAll));
+        Set<E> filteredChoices = this.filteredChoices();
+        return (!filteredChoices.isEmpty() && this.isValidDifficulty(this.difficultyOne)) ||
+                (this.isValidDifficulty(this.difficultyAll) && this.isAllValues(filteredChoices));
     }
 
     /**
@@ -74,5 +70,9 @@ public abstract class AllOrOneFactory<E> extends BaseGoalFactory {
      */
     protected Set<E> filteredChoices() {
         return possibleValues;
+    }
+
+    protected boolean isAllValues(Set<E> filteredValues) {
+        return filteredValues.size() == this.possibleValues.size();
     }
 }
