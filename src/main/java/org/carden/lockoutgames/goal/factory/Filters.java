@@ -13,6 +13,6 @@ public final class Filters {
     }
 
     public static Predicate<Material> singleItemFilter(Supplier<Set<String>> uniquenessStrings) {
-        return (item) -> Filters.itemAvailable(item) && uniquenessStrings.get().contains(UniquenessStrings.collect(item));
+        return (item) -> Filters.itemAvailable(item) && !uniquenessStrings.get().contains(UniquenessStrings.collect(item));
     }
 }
