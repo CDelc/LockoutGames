@@ -14,7 +14,7 @@ public abstract class RegularGoal extends Goal {
      * This tracks a list of all players that have completed the objective, including who was first.
      */
 
-    private ArrayList<GamePlayer> completedPlayers;
+    private final ArrayList<GamePlayer> completedPlayers = new ArrayList<>();
 
     protected RegularGoal(Set<Class<? extends Event>> checkEvents, GoalDifficulty difficulty, String description, Set<GoalType> goalTypes, Set<String> uniquenessStrings) {
         super(checkEvents, difficulty, description, goalTypes, uniquenessStrings);
