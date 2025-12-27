@@ -1,10 +1,10 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.instance;
 
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
 import org.carden.lockoutgames.goal.PlayerEventPredicateGoal;
+import org.carden.lockoutgames.goal.factory.base.BaseGoalFactory;
 
 public class LightLevelZero extends BaseGoalFactory {
     private static final String description = "Reach light level 0";

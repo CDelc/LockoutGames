@@ -1,6 +1,7 @@
 package org.carden.lockoutgames.goal;
 
 import org.carden.lockoutgames.goal.factory.*;
+import org.carden.lockoutgames.goal.factory.instance.*;
 
 public enum GoalFactories {
 

@@ -1,9 +1,9 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.instance;
 
 import org.bukkit.Material;
-import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.base.CollectItem;
 
 import java.util.List;
 

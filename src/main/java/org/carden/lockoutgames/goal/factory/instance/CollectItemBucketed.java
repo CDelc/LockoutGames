@@ -1,11 +1,12 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.instance;
 
 import org.bukkit.Material;
 import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.base.CollectItem;
+import org.carden.lockoutgames.goal.factory.base.QuantitativeDifficultyGoal;
 import org.carden.lockoutgames.goal.factory.selector.SingleSelector;
-import org.carden.lockoutgames.goal.factory.selector.SubsetSelector;
 
 import java.util.*;
 

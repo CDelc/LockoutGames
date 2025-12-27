@@ -1,7 +1,8 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.base;
 
 import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
+import org.carden.lockoutgames.goal.factory.GoalFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;

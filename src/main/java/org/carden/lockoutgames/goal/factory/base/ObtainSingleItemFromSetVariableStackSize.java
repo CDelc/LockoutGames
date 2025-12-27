@@ -1,4 +1,4 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.base;
 
 import org.bukkit.Material;
 import org.carden.lockoutgames.LockoutGames;
