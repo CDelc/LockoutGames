@@ -3,11 +3,9 @@ package org.carden.lockoutgames.game.setting;
 import java.util.Collections;
 import java.util.Map;
 
-public class SettingsImage {
+public record SettingsImage(Map<Integer, Setting<?>> settings_map) {
 
-    private final Map<Integer, Setting<?>> settings_map;
-
-    protected SettingsImage(Map<Integer, Setting<?>> settings_map) {
+    public SettingsImage(Map<Integer, Setting<?>> settings_map) {
         this.settings_map = Collections.unmodifiableMap(settings_map);
     }
 

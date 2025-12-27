@@ -1,9 +1,6 @@
 package org.carden.lockoutgames;
 
-import com.onarandombox.MultiverseCore.MultiverseCore;
-import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.carden.lockoutgames.game.Debug;
@@ -22,9 +19,6 @@ import java.util.Random;
  */
 public final class LockoutGames extends JavaPlugin {
 
-    private MultiverseCore multiverseCore;
-    private MultiverseNetherPortals mvnetherPortals;
-
     private static GameWorld gameWorld;
     private static org.carden.lockoutgames.game.gametypes.Game game;
     private PlayerManager playerManager;
@@ -37,7 +31,6 @@ public final class LockoutGames extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        setupMultiverseDependencies();
         playerManager = PlayerManager.getPlayerManager();
         gameWorld = GameWorld.getGameWorld();
         game = null;
@@ -94,42 +87,34 @@ public final class LockoutGames extends JavaPlugin {
         instance.getServer().broadcastMessage(BROADCAST_PREFIX + " " + s);
     }
 
-    private void setupMultiverseDependencies() {
-        if(!setupMultiverseCore()) {
-            getLogger().severe("Multiverse-Core not found! Please install the Multiverse-core plugin to your server.\n" +
-                    "Plugin disabled.");
-            getServer().getPluginManager().disablePlugin(this);
-        }
-        if(!setupNetherPortals()) {
-            getLogger().severe("Multiverse-NetherPortals not found! Please install the Multiverse-core plugin to your server.\n" +
-                    "Plugin disabled.");
-            getServer().getPluginManager().disablePlugin(this);
-        }
-    }
+//    private void setupMultiverseDependencies() {
+//        if(!setupMultiverseCore()) {
+//            getLogger().severe("Multiverse-Core not found! Please install the Multiverse-core plugin to your server.\n" +
+//                    "Plugin disabled.");
+//            getServer().getPluginManager().disablePlugin(this);
+//        }
+//        if(!setupNetherPortals()) {
+//            getLogger().severe("Multiverse-NetherPortals not found! Please install the Multiverse-core plugin to your server.\n" +
+//                    "Plugin disabled.");
+//            getServer().getPluginManager().disablePlugin(this);
+//        }
+//    }
 
-    private boolean setupMultiverseCore() {
-        Plugin plugin = getServer().getPluginManager().getPlugin("Multiverse-Core");
-        if (!(plugin instanceof MultiverseCore)) {
-            return false;
-        }
-        multiverseCore = (MultiverseCore) plugin;
-        return true;
-    }
-
-    private boolean setupNetherPortals() {
-        Plugin plugin = getServer().getPluginManager().getPlugin("Multiverse-NetherPortals");
-        if (!(plugin instanceof MultiverseNetherPortals)) {
-            return false;
-        }
-        mvnetherPortals = (MultiverseNetherPortals) plugin;
-        return true;
-    }
-
-    public MultiverseCore getMultiverseCore() {
-        return multiverseCore;
-    }
-
-    public MultiverseNetherPortals getMvnetherPortals() {
-        return mvnetherPortals;
-    }
+//    private boolean setupMultiverseCore() {
+//        Plugin plugin = getServer().getPluginManager().getPlugin("Multiverse-Core");
+//        if (!(plugin instanceof MultiverseCore)) {
+//            return false;
+//        }
+//        multiverseCore = (MultiverseCore) plugin;
+//        return true;
+//    }
+//
+//    private boolean setupNetherPortals() {
+//        Plugin plugin = getServer().getPluginManager().getPlugin("Multiverse-NetherPortals");
+//        if (!(plugin instanceof MultiverseNetherPortals)) {
+//            return false;
+//        }
+//        mvnetherPortals = (MultiverseNetherPortals) plugin;
+//        return true;
+//    }
 }
