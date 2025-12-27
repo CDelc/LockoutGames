@@ -16,7 +16,6 @@ public class ObtainMusicDisc5 extends CollectItem {
     protected IMutableGoal makeCollectItemGoal(Material item, int itemsRequiredPerStack) {
         IMutableGoal goal = super.makeCollectItemGoal(item, itemsRequiredPerStack);
         goal.setDescription("Obtain music disc 5");
-        goal.setGoalDifficulty(GoalDifficulty.HARD);
         return goal;
     }
 }

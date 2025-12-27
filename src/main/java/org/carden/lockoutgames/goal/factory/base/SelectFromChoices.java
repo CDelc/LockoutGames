@@ -4,10 +4,7 @@ import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class SelectFromChoices<E> extends BaseGoalFactory {
