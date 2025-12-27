@@ -1,4 +1,4 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.base;
 
 import org.bukkit.Material;
 import org.carden.lockoutgames.LockoutGames;
@@ -14,7 +14,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ObtainSubsetOrFullSetOfItems extends BaseGoalFactory {
+public abstract class ObtainSubsetOrFullSetOfItems extends BaseGoalFactory {
 
     protected int stackPercentChance = 40;
     protected int minStackSize = 2;
@@ -39,9 +39,9 @@ public class ObtainSubsetOrFullSetOfItems extends BaseGoalFactory {
             GoalDifficulty fullSetDifficulty
     ) {
         this.difficultyMap = difficultyMap;
-        this.itemSelector = new SubsetOrFullSetSelector<Material>(
+        this.itemSelector = new SubsetOrFullSetSelector<>(
                 setOfItems, subsetMinSize, subsetMaxSize, subsetPercentChance,
-                (item) -> CollectItem.itemFilter(item) && this.isValidDifficulty(this.difficultyMap.get(item))
+                (item) -> CollectItems.itemFilter(item) && this.isValidDifficulty(this.difficultyMap.get(item))
                 );
         this.stackPercentChance = stackPercentChance;
         this.minStackSize = minStackSize;

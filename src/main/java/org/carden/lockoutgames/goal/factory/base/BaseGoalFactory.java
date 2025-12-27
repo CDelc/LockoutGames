@@ -1,18 +1,18 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.base;
 
 import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
+import org.carden.lockoutgames.goal.factory.GoalFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class BaseGoalFactory implements GoalFactory {
-    protected SettingsImage settings;
-    protected Collection<String> usedUniquenessStrings = Set.of();
+    private SettingsImage settings;
+    private Set<String> usedUniquenessStrings = Set.of();
+    private final Set<String> baseUniquenessStrings = new HashSet<>();
+
     protected boolean canGenerateMultiple = false;
-
-    protected Set<String> baseUniquenessStrings = new HashSet<>();
-
     protected GoalDifficulty minDifficulty = GoalDifficulty.VERY_EASY;
     protected GoalDifficulty maxDifficulty = GoalDifficulty.VERY_HARD;
 
@@ -30,7 +30,7 @@ public abstract class BaseGoalFactory implements GoalFactory {
 
     private void setupMakeGoalContext(SettingsImage settings, List<String> uniquenessStrings) {
         this.settings = settings;
-        this.usedUniquenessStrings = uniquenessStrings;
+        this.usedUniquenessStrings = Set.copyOf(uniquenessStrings);
     }
 
     protected abstract IMutableGoal makeGoalHook();
@@ -70,5 +70,13 @@ public abstract class BaseGoalFactory implements GoalFactory {
 
     protected void addGoalTypes(GoalType... goalTypes) {
         this.baseUniquenessStrings.addAll(Arrays.stream(goalTypes).map(Objects::toString).collect(Collectors.toSet()));
+    }
+
+    protected Set<String> usedUniquenessStrings() {
+        return this.usedUniquenessStrings;
+    }
+
+    protected SettingsImage settings() {
+        return this.settings;
     }
 }

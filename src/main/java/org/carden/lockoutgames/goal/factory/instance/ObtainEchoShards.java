@@ -1,10 +1,11 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.instance;
 
 import org.bukkit.Material;
-import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.GoalType;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.base.CollectItem;
+import org.carden.lockoutgames.goal.factory.base.CollectItems;
 
 import java.util.List;
 
@@ -14,16 +15,15 @@ public class ObtainEchoShards extends CollectItem {
     private static final int COLLECT_SHARD_MAX = 8;
 
     public ObtainEchoShards() {
-        super(Material.ECHO_SHARD, COLLECT_SHARD_MIN, COLLECT_SHARD_MAX);
+        super(Material.ECHO_SHARD, GoalDifficulty.HARD, COLLECT_SHARD_MIN, COLLECT_SHARD_MAX);
         this.canGenerateMultiple = false;
         this.addGoalTypes(GoalType.ECHO_SHARD);
     }
 
     @Override
-    protected IMutableGoal makeCollectItemGoal(List<Material> requiredItems, int itemsRequiredPerStack) {
-        IMutableGoal goal = super.makeCollectItemGoal(requiredItems, itemsRequiredPerStack);
+    protected IMutableGoal makeCollectItemGoal(Material item, int itemsRequiredPerStack) {
+        IMutableGoal goal = super.makeCollectItemGoal(item, itemsRequiredPerStack);
         goal.setDescription("Obtain " + itemsRequiredPerStack + " echo shards");
-        goal.setGoalDifficulty(GoalDifficulty.HARD);
         return goal;
     }
 }

@@ -1,8 +1,9 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.instance;
 
 import org.carden.lockoutgames.goal.GoalConstants;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.GoalType;
+import org.carden.lockoutgames.goal.factory.base.ObtainSubsetOrFullSetOfItems;
 
 public class ObtainCaveBlocksMultiple extends ObtainSubsetOrFullSetOfItems {
 

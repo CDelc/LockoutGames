@@ -1,4 +1,4 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.base;
 
 import org.bukkit.Material;
 import org.carden.lockoutgames.LockoutGames;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ObtainSingleItemFromSetVariableStackSize extends BaseGoalFactory {
+public abstract class ObtainSingleItemFromSetVariableStackSize extends BaseGoalFactory {
 
     Map<Material, GoalConstants.MinMaxPair> stackSizeMap;
     private final MapSelector<Material, GoalDifficulty> itemSelector;
@@ -33,7 +33,7 @@ public class ObtainSingleItemFromSetVariableStackSize extends BaseGoalFactory {
             throw new IllegalArgumentException("stack size map and difficulty map must have the same materials");
         }
         this.stackSizeMap = stackSizeMap;
-        this.itemSelector = new MapSelector<>(difficultyMap, CollectItem::itemFilter, this::isValidDifficulty);
+        this.itemSelector = new MapSelector<>(difficultyMap, CollectItems.singleItemFilter(this::usedUniquenessStrings), this::isValidDifficulty);
         this.canGenerateMultiple = false;
     }
 
@@ -49,7 +49,7 @@ public class ObtainSingleItemFromSetVariableStackSize extends BaseGoalFactory {
         IMutableGoal goal = new CollectItemGoal(List.of(targetMaterial), stackSize);
         goal.setDescription("Collect " + stackSize + " " + Utils.readableEnumString(targetMaterial.name()));
         goal.setGoalDifficulty(difficulty);
-        goal.addUniquenessStrings(Set.of(CollectItem.uniquenessString(targetMaterial)));
+        goal.addUniquenessStrings(Set.of(CollectItems.uniquenessString(targetMaterial)));
         return goal;
     }
 

@@ -1,10 +1,10 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.instance;
 
 import org.bukkit.block.Biome;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.GameWorld;
-import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
+import org.carden.lockoutgames.goal.factory.base.AllOrOneFactory;
 import org.carden.lockoutgames.utils.Utils;
 
 import java.util.Set;

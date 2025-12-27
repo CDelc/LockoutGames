@@ -1,4 +1,4 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.base;
 
 import org.bukkit.Material;
 import org.carden.lockoutgames.LockoutGames;
@@ -10,8 +10,10 @@ import org.carden.lockoutgames.info.WorldRequirements;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-public abstract class CollectItem extends BaseGoalFactory {
+public abstract class CollectItems extends BaseGoalFactory {
 
     //Setup fields
     private int minItemsPerStack;
@@ -23,46 +25,48 @@ public abstract class CollectItem extends BaseGoalFactory {
     /**
      * Constructs this goal with all the given parameters
      */
-    protected CollectItem(List<Material> itemsToCollect, int minimumStack, int maximumStack, int minimumItems, int maximumItems) {
+    protected CollectItems(List<Material> itemsToCollect, int minimumStack, int maximumStack, int minimumItems, int maximumItems) {
         this.minItemsPerStack = minimumStack;
         this.maxItemsPerStack = maximumStack;
         this.minItemsToSelect = minimumItems;
         this.maxItemsToSelect = maximumItems;
-        this.itemSelector = new SubsetSelector<>(Set.copyOf(itemsToCollect), minimumItems, maximumItems, CollectItem::itemFilter);
+        this.itemSelector = new SubsetSelector<>(Set.copyOf(itemsToCollect), minimumItems, maximumItems,
+                (item) -> CollectItems.itemFilter(item) && CollectItems.isUnique(item, this.usedUniquenessStrings())
+        );
     }
 
     /**
      * Constructs the goal, guarantees the entire list will be required. The amount of each item will be randomized.
      */
-    protected CollectItem(List<Material> itemsToCollect, int minimumStack, int maximumStack) {
+    protected CollectItems(List<Material> itemsToCollect, int minimumStack, int maximumStack) {
         this(itemsToCollect, minimumStack, maximumStack, itemsToCollect.size(), itemsToCollect.size());
     }
 
     /**
      * Constructs the goal, guarantees the entire list will be required with the provided stacksize per item
      */
-    protected CollectItem(List<Material> itemsToCollect, int stackSize) {
+    protected CollectItems(List<Material> itemsToCollect, int stackSize) {
         this(itemsToCollect, stackSize, stackSize, itemsToCollect.size(), itemsToCollect.size());
     }
 
     /**
      * Constructs the goal, guarantees the entire list will be required with only one item of each type required to complete
      */
-    protected CollectItem(List<Material> itemsToCollect) {
+    protected CollectItems(List<Material> itemsToCollect) {
         this(itemsToCollect, 1, 1, itemsToCollect.size(), itemsToCollect.size());
     }
 
     /**
      * Constructs the goal, only requires the given material of a randomized amount
      */
-    protected CollectItem(Material material, int minimumStack, int maximumStack) {
+    protected CollectItems(Material material, int minimumStack, int maximumStack) {
         this(List.of(material), minimumStack, maximumStack, 1, 1);
     }
 
     /**
      * Constructs the goal, guarantees only a single instance of the given material is required
      */
-    protected CollectItem(Material material) {
+    protected CollectItems(Material material) {
         this(List.of(material), 1, 1, 1, 1);
     }
 
@@ -112,6 +116,14 @@ public abstract class CollectItem extends BaseGoalFactory {
 
     public static boolean itemFilter(Material item) {
         return WorldRequirements.checkElement(item.name());
+    }
+
+    public static boolean isUnique(Material item, Set<String> uniquenessStrings) {
+        return uniquenessStrings.contains(CollectItems.uniquenessString(item));
+    }
+
+    public static Predicate<Material> singleItemFilter(final Supplier<Set<String>> uniquenessStrings) {
+        return (item) -> CollectItems.itemFilter(item) && CollectItems.isUnique(item, uniquenessStrings.get());
     }
 
     @Override

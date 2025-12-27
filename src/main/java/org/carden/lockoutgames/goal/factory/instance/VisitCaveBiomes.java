@@ -1,24 +1,24 @@
-package org.carden.lockoutgames.goal.factory;
+package org.carden.lockoutgames.goal.factory.instance;
 
 import org.bukkit.block.Biome;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.GameWorld;
-import org.carden.lockoutgames.game.setting.SettingsImage;
 import org.carden.lockoutgames.goal.*;
+import org.carden.lockoutgames.goal.factory.base.AllOrOneFactory;
 import org.carden.lockoutgames.utils.Utils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class VisitEndBiomes extends AllOrOneFactory<Biome> {
-    private static final Set<Biome> END_BIOMES = Set.of(Biome.THE_END, Biome.END_BARRENS, Biome.END_MIDLANDS, Biome.END_HIGHLANDS);
-    private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.HARD;
-    private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.HARD;
+public class VisitCaveBiomes extends AllOrOneFactory<Biome> {
+    private static final Set<Biome> CAVE_BIOMES = Set.of(Biome.DRIPSTONE_CAVES, Biome.LUSH_CAVES, Biome.DEEP_DARK);
+    private static final GoalDifficulty DIFFICULTY_ONE_BIOME = GoalDifficulty.EASY;
+    private static final GoalDifficulty DIFFICULTY_ALL_BIOMES = GoalDifficulty.MEDIUM;
 
-    public VisitEndBiomes() {
-        super(END_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
-        this.setAllProbablility(0.6f);
+    public VisitCaveBiomes() {
+        super(CAVE_BIOMES, DIFFICULTY_ONE_BIOME, DIFFICULTY_ALL_BIOMES);
         this.addGoalTypes(GoalType.VISIT_BIOME);
+        this.setAllProbablility(0.4f);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class VisitEndBiomes extends AllOrOneFactory<Biome> {
     protected IMutableGoal makeAll(Set<Biome> values) {
         Goal g = new VisitBiomes(values);
         g.setGoalDifficulty(DIFFICULTY_ALL_BIOMES);
-        g.setDescription("Visit every end biome");
+        g.setDescription("Visit every cave biome");
         return g;
     }
 
