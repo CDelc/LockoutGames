@@ -12,6 +12,6 @@ commands:
   game:
     descriptions: Game options
     usage: /game [..args]
-depend:
-  - Multiverse-Core
-  - Multiverse-NetherPortals
+#depend:
+#  - Multiverse-Core
+#  - Multiverse-NetherPortals
