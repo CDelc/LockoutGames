@@ -20,7 +20,7 @@ public class GameEventListener implements Listener {
 
     @EventHandler
     public void onGoalComplete(GoalCompleteEvent e) {
-        if(Debug.isActive()) LockoutGames.broadcastMessage(ChatColor.LIGHT_PURPLE + "" + e.getPlayer() + " " + ChatColor.WHITE + " has completed " + ChatColor.AQUA + e.getGoal().getDescription());
+        if(Debug.isActive()) LockoutGames.broadcastMessage(ChatColor.LIGHT_PURPLE + e.getPlayer().getCBPlayer().getName() + ChatColor.WHITE + " has completed " + ChatColor.AQUA + e.getGoal().getDescription());
         if(LockoutGames.getGame().isPresent()) LockoutGames.getGame().get().handleGoalEvent(e);
     }
 

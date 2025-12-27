@@ -86,11 +86,7 @@ public class GamePlayer {
     }
 
     public Location getDefaultSpawnPoint() {
-        if(defaultSpawnPoint != null) {
-            return defaultSpawnPoint;
-        } else {
-            return LockoutGames.getPluginInstance().getGameWorld().getWorld(World.Environment.NORMAL).getSpawnLocation();
-        }
+        return Objects.requireNonNullElseGet(defaultSpawnPoint, () -> LockoutGames.getGameWorld().getWorld(World.Environment.NORMAL).getSpawnLocation());
     }
 
     public boolean isOnline() {
