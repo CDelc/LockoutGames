@@ -17,11 +17,9 @@ import static org.bukkit.Bukkit.getServer;
 public class Loader {
 
     private static boolean settingsLoaded = false;
-    private static boolean goalsLoaded = false;
 
     public static void loadAll(LockoutGames plugin) {
         loadSettingsAPI();
-        loadGoalsApi();
         loadEventListeners(plugin);
         loadCommands(plugin);
     }
@@ -40,19 +38,16 @@ public class Loader {
         settingsLoaded = true;
     }
 
-    public static void loadGoalsApi() {
-        goalsLoaded = true;
-    }
 
     public static void loadEventListeners(LockoutGames plugin) {
-        if(!(settingsLoaded && goalsLoaded)) throw new RuntimeException("Settings and Goals not loaded before event listeners");
+        if(!settingsLoaded) throw new RuntimeException("Settings not loaded before event listeners");
         for(Listener listener : OtherConstants.EVENT_LISTENERS) {
             getServer().getPluginManager().registerEvents(listener, plugin);
         }
     }
 
     public static void loadCommands(LockoutGames plugin) {
-        if(!(settingsLoaded && goalsLoaded)) throw new RuntimeException("Settings and Goals not loaded before commands");
+        if(!settingsLoaded) throw new RuntimeException("Settings not loaded before commands");
         for(String command : OtherConstants.COMMAND_EXECUTOR_MAP.keySet()) {
             try {
                 Objects.requireNonNull(plugin.getCommand(command)).setExecutor((CommandExecutor) OtherConstants.COMMAND_EXECUTOR_MAP.get(command));

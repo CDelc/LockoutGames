@@ -1,9 +1,5 @@
 package org.carden.lockoutgames.game;
 
-import com.onarandombox.MultiverseCore.api.MVWorldManager;
-import com.onarandombox.MultiverseCore.api.MultiverseWorld;
-import com.onarandombox.MultiverseCore.enums.AllowedPortalType;
-import com.onarandombox.MultiverseNetherPortals.MultiverseNetherPortals;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.structure.Structure;
@@ -35,11 +31,8 @@ public class GameWorld {
     static final int BIOME_SEARCH_BORDER_MARGIN_BLOCKS = 30;
 
     LockoutGames plugin;
-    MVWorldManager worldManager;
 
-    private int worldSize;
     private boolean isLargeWorld = false;
-    private final String world_name;
 
     private final Set<Biome> availableBiomes;
     private final Set<Structure> availableStructures;
@@ -54,8 +47,6 @@ public class GameWorld {
         this.plugin = LockoutGames.getPluginInstance();
         this.availableBiomes = new HashSet<>();
         this.availableStructures = new HashSet<>();
-        this.world_name = "world";
-        worldManager = plugin.getMultiverseCore().getMVWorldManager();
         setProps(null);
     }
 
@@ -65,10 +56,9 @@ public class GameWorld {
 
     /**
      *
-     * @param value Sets the world border size
+     * @param worldSize Sets the world border size
      */
-    public void setWorldSize(int value) {
-        worldSize = value;
+    public void setWorldSize(int worldSize) {
         World overworld = getWorld(World.Environment.NORMAL);
         World nether = getWorld(World.Environment.NETHER);
         if(overworld != null) overworld.getWorldBorder().setSize(worldSize);
@@ -100,33 +90,35 @@ public class GameWorld {
      * (Default overworld) returns null if worlds have not been generated
      */
     public World getWorld(World.Environment type) {
+        World defaultWorld = Bukkit.getWorlds().getFirst();
+        String world_name = defaultWorld.getName();
         try{
             return switch (type) {
-                case NORMAL -> worldManager.getMVWorld(world_name).getCBWorld();
-                case NETHER -> worldManager.getMVWorld(world_name + "_nether").getCBWorld();
-                case THE_END -> worldManager.getMVWorld(world_name + "_the_end").getCBWorld();
-                default -> worldManager.getMVWorld("world").getCBWorld();
+                case NORMAL -> defaultWorld;
+                case NETHER -> Bukkit.getWorld(world_name + "_nether");
+                case THE_END -> Bukkit.getWorld(world_name + "_the_end");
+                default -> Bukkit.getWorld("world");
             };
         }catch(NullPointerException e){
             return null;
         }
     }
 
-    /**
-     * Creates the nether and end portal connections between dimensions
-     * @param overworld Overworld world name
-     * @param netherworld Nether world name
-     * @param endworld End world name
-     */
-    private void linkSMPWorlds(String overworld, String netherworld, String endworld) {
-        MultiverseNetherPortals netherPortals = plugin.getMvnetherPortals();
-        netherPortals.addWorldLink(overworld, netherworld, PortalType.NETHER);
-        netherPortals.addWorldLink(netherworld, overworld, PortalType.NETHER);
-
-        // Linking end portals both ways
-        netherPortals.addWorldLink(overworld, endworld, PortalType.ENDER);
-        netherPortals.addWorldLink(endworld, overworld, PortalType.ENDER);
-    }
+//    /**
+//     * Creates the nether and end portal connections between dimensions
+//     * @param overworld Overworld world name
+//     * @param netherworld Nether world name
+//     * @param endworld End world name
+//     */
+//    private void linkSMPWorlds(String overworld, String netherworld, String endworld) {
+//        MultiverseNetherPortals netherPortals = plugin.getMvnetherPortals();
+//        netherPortals.addWorldLink(overworld, netherworld, PortalType.NETHER);
+//        netherPortals.addWorldLink(netherworld, overworld, PortalType.NETHER);
+//
+//        // Linking end portals both ways
+//        netherPortals.addWorldLink(overworld, endworld, PortalType.ENDER);
+//        netherPortals.addWorldLink(endworld, overworld, PortalType.ENDER);
+//    }
 
     public CompletableFuture<Boolean> updateLogic(int searchRadius, boolean debug) {
         CompletableFuture<Boolean> completeCheck = new CompletableFuture<>();
@@ -177,23 +169,15 @@ public class GameWorld {
     }
 
     private void setProps(@Nullable SettingsImage settings) {
-        MultiverseWorld[] worlds = {
-                worldManager.getMVWorld(world_name),
-                worldManager.getMVWorld(world_name + "_nether"),
-                worldManager.getMVWorld(world_name + "_the_end")
+        World[] worlds = {
+                getWorld(World.Environment.NORMAL),
+                getWorld(World.Environment.NORMAL),
+                getWorld(World.Environment.NORMAL)
         };
 
-        for(MultiverseWorld world : worlds) {
-            world.setAdjustSpawn(true);
-            world.setPVPMode(settings != null && settings.getSetting(SettingIDS.PVP));
-            world.setAllowAnimalSpawn(true);
-            world.setAllowMonsterSpawn(true);
+        for(World world : worlds) {
             world.setDifficulty(settings != null ? settings.getSetting(SettingIDS.DIFFICULTY) : SettingsConstants.DIFFICULTY_DEFAULT);
-            world.allowPortalMaking(AllowedPortalType.ALL);
-            world.setBedRespawn(true);
-            world.setHunger(settings == null || settings.getSetting(SettingIDS.HUNGER));
-            world.setEnableWeather(true);
-            world.setSpawnLocation(world.getCBWorld().getSpawnLocation());
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule doHunger " + (settings == null || settings.getSetting(SettingIDS.HUNGER)));
         }
     }
 
