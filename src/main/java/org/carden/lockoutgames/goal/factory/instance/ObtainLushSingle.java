@@ -9,7 +9,7 @@ import org.carden.lockoutgames.goal.factory.base.ObtainSingleItemFromSetVariable
 public class ObtainLushSingle extends ObtainSingleItemFromSetVariableStackSize {
 
     public ObtainLushSingle() {
-        super(GoalConstants.LUSH_BLOCKS, GoalDifficulty.MEDIUM);
+        super(GoalConstants.LUSH_BLOCKS, GoalDifficulty.EASY);
 
         this.addGoalTypes(GoalType.OBTAIN_LUSH);
         this.canGenerateMultiple = false;
