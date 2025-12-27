@@ -28,4 +28,6 @@ public interface GoalFactory {
     GoalFactory setMinDifficulty(GoalDifficulty difficulty);
 
     GoalFactory setMaxDifficulty(GoalDifficulty difficulty);
+
+    GoalFactory setFixedDifficulty(GoalDifficulty difficulty);
 }

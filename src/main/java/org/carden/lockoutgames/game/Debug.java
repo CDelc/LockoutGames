@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class Debug {
 
-    private static List<IGoal> goalInstances = new ArrayList<>();
+    private static final List<IGoal> goalInstances = new ArrayList<>();
     private static boolean debugActive = false;
 
     private static final Map<String, String> commandDescription = Map.of(
@@ -80,12 +80,37 @@ public class Debug {
         GoalCheckListener.getInstance().clearEventListeners();
     }
 
-    public static boolean testGoal(GoalFactory goalFactory) {
-        return false;
+    public static boolean testGoal(GoalFactories goalFactoryEnum) {
+        if(!debugActive) return false;
+        IGoal goal;
+        SettingsImage settingsImage = Setting.saveSettings();
+        GoalFactory goalFactory = goalFactoryEnum.getFactory();
+        try {
+            goal = goalFactory.makeGoal(settingsImage, Collections.emptyList());
+            Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + goalDebugString(goal));
+            goalInstances.add(goal);
+            GoalCheckListener.getInstance().enableEventListener(goal.getCheckEvents());
+        } catch(IllegalStateException e) {
+            Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + ChatColor.RED + "Failed to generate");
+        }
+        return true;
     }
 
-    public static boolean testGoal(GoalFactory goalFactory, GoalDifficulty difficulty) {
-        return false;
+    public static boolean testGoal(GoalFactories goalFactoryEnum, GoalDifficulty difficulty) {
+        if(!debugActive) return false;
+        IGoal goal;
+        SettingsImage settingsImage = Setting.saveSettings();
+        GoalFactory goalFactory = goalFactoryEnum.getFactory();
+        goalFactory.setFixedDifficulty(difficulty);
+        try {
+            goal = goalFactory.makeGoal(settingsImage, Collections.emptyList());
+            Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + goalDebugString(goal));
+            goalInstances.add(goal);
+            GoalCheckListener.getInstance().enableEventListener(goal.getCheckEvents());
+        } catch(IllegalStateException e) {
+            Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + ChatColor.RED + "Failed to generate");
+        }
+        return true;
     }
 
     public static boolean testAllGoals() {
@@ -102,18 +127,31 @@ public class Debug {
                 goalInstances.add(goal);
                 GoalCheckListener.getInstance().enableEventListener(goal.getCheckEvents());
             } catch(IllegalStateException e) {
-                Bukkit.getServer().broadcastMessage(ChatColor.BLUE + Utils.camelCaseEnumString(goalFactoryEnum.name()) + ChatColor.WHITE + " | " + ChatColor.RED + "Failed to generate");
+                Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + ChatColor.RED + "Failed to generate");
             }
         }
         return true;
     }
 
-    private static String goalDebugString(IGoal goal) {
-        return ChatColor.GREEN + Utils.readableEnumString(goal.getGoalDifficulty().name()) + ChatColor.WHITE + " | " + ChatColor.AQUA + goal.getDescription();
-    }
-
-    public static boolean testAllGoalsAllDifficulty(CommandSender sender) {
-        return false;
+    public static boolean testAllGoals(GoalDifficulty difficulty) {
+        if(!debugActive) return false;
+        clearGoals();
+        Bukkit.getServer().broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "BEGIN GOAL TEST" + ChatColor.BLUE + difficulty.name());
+        SettingsImage settingsImage = Setting.saveSettings();
+        for(GoalFactories goalFactoryEnum : GoalFactories.values()) {
+            GoalFactory goalFactory = goalFactoryEnum.getFactory();
+            goalFactory.setFixedDifficulty(difficulty);
+            IGoal goal;
+            try {
+                goal = goalFactory.makeGoal(settingsImage, Collections.emptyList());
+                Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + goalDebugString(goal));
+                goalInstances.add(goal);
+                GoalCheckListener.getInstance().enableEventListener(goal.getCheckEvents());
+            } catch(IllegalStateException e) {
+                Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + ChatColor.RED + "Failed to generate");
+            }
+        }
+        return true;
     }
 
     public static void checkLogicScan() {
@@ -149,6 +187,10 @@ public class Debug {
                 }
             }
         }
+    }
+
+    private static String goalDebugString(IGoal goal) {
+        return ChatColor.GREEN + Utils.readableEnumString(goal.getGoalDifficulty().name()) + ChatColor.WHITE + " | " + ChatColor.AQUA + goal.getDescription();
     }
 
 }

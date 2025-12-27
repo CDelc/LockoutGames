@@ -9,6 +9,8 @@ import org.bukkit.command.TabCompleter;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.game.Debug;
 import org.carden.lockoutgames.game.setting.Setting;
+import org.carden.lockoutgames.goal.GoalDifficulty;
+import org.carden.lockoutgames.goal.GoalFactories;
 import org.carden.lockoutgames.info.SettingIDS;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -108,8 +110,43 @@ public class Gadmin implements CommandExecutor, TabCompleter {
             }
         } else if(args[1].equalsIgnoreCase("end")) Debug.endDebug();
         else if(args[1].equalsIgnoreCase("testallgoals")) {
-            if(!Debug.testAllGoals()) {
+            if(args.length == 2 && !Debug.testAllGoals()) {
                 commandSender.sendMessage(ChatColor.RED + "Debug session not active");
+            } else if(args.length > 2) {
+                try {
+                    if(!Debug.testAllGoals(Enum.valueOf(GoalDifficulty.class, args[2].toUpperCase()))) {
+                        commandSender.sendMessage(ChatColor.RED + "Debug session not active");
+                    }
+                } catch(IllegalArgumentException e) {
+                    commandSender.sendMessage(ChatColor.RED + args[2] + " is not a valid difficulty");
+                }
+            }
+        }
+        else if(args[1].equalsIgnoreCase("testgoal")) {
+            if(args.length == 2) {
+                commandSender.sendMessage(ChatColor.RED + "Usage: /gadmin debug testgoal {goal_name} [difficulty]");
+            } else if(args.length == 3) {
+                try {
+                    if(!Debug.testGoal(Enum.valueOf(GoalFactories.class, args[2].toUpperCase()))) commandSender.sendMessage(ChatColor.RED + "Debug session not active");;
+                } catch(IllegalArgumentException e) {
+                    commandSender.sendMessage(ChatColor.RED + args[2] + " is not a valid goal name");
+                }
+            } else if(args.length == 4) {
+                GoalFactories goalFactory;
+                GoalDifficulty difficulty;
+                try{
+                    goalFactory = Enum.valueOf(GoalFactories.class, args[2].toUpperCase());
+                } catch(IllegalArgumentException e) {
+                    commandSender.sendMessage(ChatColor.RED + args[2] + " is not a goal name");
+                    return;
+                }
+                try{
+                    difficulty = Enum.valueOf(GoalDifficulty.class, args[3].toUpperCase());
+                } catch(IllegalArgumentException e) {
+                    commandSender.sendMessage(ChatColor.RED + args[2] + " is not a valid difficulty");
+                    return;
+                }
+                if(!Debug.testGoal(goalFactory, difficulty)) commandSender.sendMessage(ChatColor.RED + "Debug session not active");;
             }
         }
     }
@@ -117,6 +154,12 @@ public class Gadmin implements CommandExecutor, TabCompleter {
     private List<String> debugTabComplete(@NotNull CommandSender commandSender, @NotNull String[] args) {
         if(args.length == 2) {
             return Debug.getValidArgs();
+        } else if (args.length == 3) {
+            if(args[1].equalsIgnoreCase("testallgoals")) return Arrays.stream(GoalDifficulty.values()).map(difficulty -> difficulty.name().toLowerCase()).toList();
+            if(args[1].equalsIgnoreCase("testGoal")) return Arrays.stream(GoalFactories.values()).map(Enum::name).toList();
+        }
+        else if (args.length == 4) {
+            if(args[1].equalsIgnoreCase("testGoal")) return Arrays.stream(GoalDifficulty.values()).map(difficulty -> difficulty.name().toLowerCase()).toList();
         }
         return new ArrayList<String>();
     }
