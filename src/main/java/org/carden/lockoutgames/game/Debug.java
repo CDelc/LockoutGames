@@ -82,9 +82,11 @@ public class Debug {
 
     public static boolean testGoal(GoalFactories goalFactoryEnum) {
         if(!debugActive) return false;
+        clearGoals();
         IGoal goal;
         SettingsImage settingsImage = Setting.saveSettings();
         GoalFactory goalFactory = goalFactoryEnum.getFactory();
+        goalFactory.setNoDifficulty();
         try {
             goal = goalFactory.makeGoal(settingsImage, Collections.emptyList());
             Bukkit.getServer().broadcastMessage(ChatColor.BLUE + goalFactoryEnum.name() + ChatColor.WHITE + " | " + goalDebugString(goal));
@@ -98,6 +100,7 @@ public class Debug {
 
     public static boolean testGoal(GoalFactories goalFactoryEnum, GoalDifficulty difficulty) {
         if(!debugActive) return false;
+        clearGoals();
         IGoal goal;
         SettingsImage settingsImage = Setting.saveSettings();
         GoalFactory goalFactory = goalFactoryEnum.getFactory();
@@ -120,6 +123,7 @@ public class Debug {
         SettingsImage settingsImage = Setting.saveSettings();
         for(GoalFactories goalFactoryEnum : GoalFactories.values()) {
             GoalFactory goalFactory = goalFactoryEnum.getFactory();
+            goalFactory.setNoDifficulty();
             IGoal goal;
             try {
                 goal = goalFactory.makeGoal(settingsImage, Collections.emptyList());
@@ -136,7 +140,7 @@ public class Debug {
     public static boolean testAllGoals(GoalDifficulty difficulty) {
         if(!debugActive) return false;
         clearGoals();
-        Bukkit.getServer().broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "BEGIN GOAL TEST" + ChatColor.BLUE + difficulty.name());
+        Bukkit.getServer().broadcastMessage(ChatColor.RED + "" + ChatColor.BOLD + "BEGIN GOAL TEST " + ChatColor.YELLOW + "" + ChatColor.BOLD + difficulty.name());
         SettingsImage settingsImage = Setting.saveSettings();
         for(GoalFactories goalFactoryEnum : GoalFactories.values()) {
             GoalFactory goalFactory = goalFactoryEnum.getFactory();

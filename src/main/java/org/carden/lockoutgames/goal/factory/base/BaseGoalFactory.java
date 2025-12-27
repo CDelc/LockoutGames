@@ -72,6 +72,12 @@ public abstract class BaseGoalFactory implements GoalFactory {
         return this;
     }
 
+    public final GoalFactory setNoDifficulty() {
+        this.minDifficulty = GoalDifficulty.VERY_EASY;
+        this.maxDifficulty = GoalDifficulty.VERY_HARD;
+        return this;
+    }
+
     protected abstract boolean canGenerateGoalHook();
 
     protected void addGoalTypes(GoalType... goalTypes) {
