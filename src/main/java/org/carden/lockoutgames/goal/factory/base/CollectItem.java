@@ -3,127 +3,52 @@ package org.carden.lockoutgames.goal.factory.base;
 import org.bukkit.Material;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.goal.CollectItemGoal;
+import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
-import org.carden.lockoutgames.goal.factory.selector.SubsetSelector;
-import org.carden.lockoutgames.info.WorldRequirements;
+import org.carden.lockoutgames.goal.factory.selector.SingleSelector;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
-public abstract class CollectItem extends BaseGoalFactory {
+public class CollectItem extends BaseGoalFactory {
+    private final SingleSelector<Material> itemSelector;
+    private final int minStack;
+    private final int maxStack;
+    private final Map<Material, GoalDifficulty> difficultyMap;
 
-    //Setup fields
-    private int minItemsPerStack;
-    private int maxItemsPerStack;
-    private int minItemsToSelect; //(Minimum) Number of different items from preFilteredItemList that may be selected for this goal
-    private int maxItemsToSelect; //(Maximum inclusive)
-    private final SubsetSelector<Material> itemSelector;
-
-    /**
-     * Constructs this goal with all the given parameters
-     */
-    protected CollectItem(List<Material> itemsToCollect, int minimumStack, int maximumStack, int minimumItems, int maximumItems) {
-        this.minItemsPerStack = minimumStack;
-        this.maxItemsPerStack = maximumStack;
-        this.minItemsToSelect = minimumItems;
-        this.maxItemsToSelect = maximumItems;
-        this.itemSelector = new SubsetSelector<>(Set.copyOf(itemsToCollect), minimumItems, maximumItems,
-                (item) -> CollectItem.itemFilter(item) && CollectItem.isUnique(item, this.usedUniquenessStrings())
-        );
+    protected CollectItem(Map<Material, GoalDifficulty> items, int minStack, int maxStack) {
+        final Predicate<Material> itemFilter = CollectItems.singleItemFilter(this::usedUniquenessStrings);
+        this.minStack = minStack;
+        this.maxStack = maxStack;
+        this.difficultyMap = items;
+        this.itemSelector = new SingleSelector<>(items.keySet(),
+                (item) -> itemFilter.test(item) && this.isValidDifficulty(this.difficultyMap.get(item)));
     }
 
-    /**
-     * Constructs the goal, guarantees the entire list will be required. The amount of each item will be randomized.
-     */
-    protected CollectItem(List<Material> itemsToCollect, int minimumStack, int maximumStack) {
-        this(itemsToCollect, minimumStack, maximumStack, itemsToCollect.size(), itemsToCollect.size());
+    protected CollectItem(Material item, GoalDifficulty difficulty, int minStack, int maxStack) {
+        this(Map.of(item, difficulty), minStack, maxStack);
     }
 
-    /**
-     * Constructs the goal, guarantees the entire list will be required with the provided stacksize per item
-     */
-    protected CollectItem(List<Material> itemsToCollect, int stackSize) {
-        this(itemsToCollect, stackSize, stackSize, itemsToCollect.size(), itemsToCollect.size());
+    protected CollectItem(Material item, GoalDifficulty difficulty) {
+        this(item, difficulty, 1, 1);
     }
 
-    /**
-     * Constructs the goal, guarantees the entire list will be required with only one item of each type required to complete
-     */
-    protected CollectItem(List<Material> itemsToCollect) {
-        this(itemsToCollect, 1, 1, itemsToCollect.size(), itemsToCollect.size());
-    }
-
-    /**
-     * Constructs the goal, only requires the given material of a randomized amount
-     */
-    protected CollectItem(Material material, int minimumStack, int maximumStack) {
-        this(List.of(material), minimumStack, maximumStack, 1, 1);
-    }
-
-    /**
-     * Constructs the goal, guarantees only a single instance of the given material is required
-     */
-    protected CollectItem(Material material) {
-        this(List.of(material), 1, 1, 1, 1);
-    }
-
-    /**
-     * Handles all the randomization for the goal. If fewer items in preFilteredItemList are possible to obtain in
-     * GameWorld than minItemsToSelect requires, the goal is flagged as invalid
-     * itemsRequiredPerStack is selected here and the final list of items after logic filtering and random selection is determined.
-     */
     @Override
-    protected IMutableGoal makeGoalHook() {
-        return randomizeCollectItemGoal(minItemsPerStack, maxItemsPerStack, minItemsToSelect, maxItemsToSelect);
-    }
-
-    protected IMutableGoal randomizeCollectItemGoal(int minItemsPerStack, int maxItemsPerStack, int minItemsToSelect, int maxItemsToSelect) {
-        //Filter items down by world logic
+    protected final IMutableGoal makeGoalHook() {
+        Material item = this.itemSelector.select();
         Random rng = LockoutGames.getRng();
-
-        //Randomize values
-        int itemsRequiredPerStack = rng.nextInt(Math.max(1, minItemsPerStack), maxItemsPerStack + 1);
-
-        //Select items
-        List<Material> requiredItems = List.copyOf(this.itemSelector.select());
-
-        IMutableGoal g = this.makeCollectItemGoal(requiredItems, itemsRequiredPerStack);
-
-        //If this is only for one item, add to uniqueness strings to prevent duplicates
-        if(requiredItems.size() == 1) {
-            g.addUniquenessStrings(Set.of(uniquenessString(requiredItems.getFirst())));
-        }
-
-        return g;
+        int stackSize = rng.nextInt(minStack, maxStack+1);
+        IMutableGoal goal = this.makeCollectItemGoal(item, stackSize);
+        goal.setGoalDifficulty(this.difficultyMap.get(item));
+        goal.addUniquenessStrings(Set.of(CollectItems.uniquenessString(item)));
+        return goal;
     }
 
-    public static String uniquenessString(Material item) {
-        return "collect" + item.name();
-    }
-
-    /**
-     * Post-randomization constructor. Overridable
-     * @param requiredItems
-     * @param itemsRequiredPerStack
-     * @return
-     */
-    protected IMutableGoal makeCollectItemGoal(List<Material> requiredItems, int itemsRequiredPerStack) {
-        return new CollectItemGoal(requiredItems, itemsRequiredPerStack);
-    }
-
-    public static boolean itemFilter(Material item) {
-        return WorldRequirements.checkElement(item.name());
-    }
-
-    public static boolean isUnique(Material item, Set<String> uniquenessStrings) {
-        return uniquenessStrings.contains(CollectItem.uniquenessString(item));
-    }
-
-    public static Predicate<Material> singleItemFilter(final Supplier<Set<String>> uniquenessStrings) {
-        return (item) -> CollectItem.itemFilter(item) && CollectItem.isUnique(item, uniquenessStrings.get());
+    protected IMutableGoal makeCollectItemGoal(Material item, int stackSize) {
+        return new CollectItemGoal(List.of(item), stackSize);
     }
 
     @Override

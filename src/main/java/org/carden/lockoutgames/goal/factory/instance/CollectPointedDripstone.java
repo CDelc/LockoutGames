@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
 import org.carden.lockoutgames.goal.factory.base.CollectItem;
+import org.carden.lockoutgames.goal.factory.base.CollectItems;
 
 import java.util.List;
 
@@ -13,16 +14,15 @@ public class CollectPointedDripstone extends CollectItem {
     private static final int COLLECT_POINTED_DRIPSTONE_MAXIMUM = 32;
 
     public CollectPointedDripstone() {
-        super(Material.POINTED_DRIPSTONE, COLLECT_POINTED_DRIPSTONE_MINIMUM, COLLECT_POINTED_DRIPSTONE_MAXIMUM);
+        super(Material.POINTED_DRIPSTONE, GoalDifficulty.MEDIUM, COLLECT_POINTED_DRIPSTONE_MINIMUM, COLLECT_POINTED_DRIPSTONE_MAXIMUM);
 
         this.canGenerateMultiple = false;
     }
 
     @Override
-    protected IMutableGoal makeCollectItemGoal(List<Material> requiredItems, int itemsRequiredPerStack) {
-        IMutableGoal goal = super.makeCollectItemGoal(requiredItems, itemsRequiredPerStack);
+    protected IMutableGoal makeCollectItemGoal(Material item, int itemsRequiredPerStack) {
+        IMutableGoal goal = super.makeCollectItemGoal(item, itemsRequiredPerStack);
         goal.setDescription("Collect " + itemsRequiredPerStack + " pointed dripstone");
-        goal.setGoalDifficulty(GoalDifficulty.MEDIUM);
         return goal;
     }
 }
