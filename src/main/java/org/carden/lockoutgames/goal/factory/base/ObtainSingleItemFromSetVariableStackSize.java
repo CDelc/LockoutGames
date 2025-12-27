@@ -6,6 +6,8 @@ import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.GoalConstants;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.Filters;
+import org.carden.lockoutgames.goal.factory.UniquenessStrings;
 import org.carden.lockoutgames.goal.factory.selector.MapSelector;
 import org.carden.lockoutgames.utils.Utils;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +35,7 @@ public abstract class ObtainSingleItemFromSetVariableStackSize extends BaseGoalF
             throw new IllegalArgumentException("stack size map and difficulty map must have the same materials");
         }
         this.stackSizeMap = stackSizeMap;
-        this.itemSelector = new MapSelector<>(difficultyMap, CollectItems.singleItemFilter(this::usedUniquenessStrings), this::isValidDifficulty);
+        this.itemSelector = new MapSelector<>(difficultyMap, Filters.singleItemFilter(this::usedUniquenessStrings), this::isValidDifficulty);
         this.canGenerateMultiple = false;
     }
 
@@ -49,7 +51,7 @@ public abstract class ObtainSingleItemFromSetVariableStackSize extends BaseGoalF
         IMutableGoal goal = new CollectItemGoal(List.of(targetMaterial), stackSize);
         goal.setDescription("Collect " + stackSize + " " + Utils.readableEnumString(targetMaterial.name()));
         goal.setGoalDifficulty(difficulty);
-        goal.addUniquenessStrings(Set.of(CollectItems.uniquenessString(targetMaterial)));
+        goal.addUniquenessStrings(Set.of(UniquenessStrings.collect(targetMaterial)));
         return goal;
     }
 

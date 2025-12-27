@@ -4,6 +4,8 @@ import org.bukkit.Material;
 import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.Filters;
+import org.carden.lockoutgames.goal.factory.UniquenessStrings;
 import org.carden.lockoutgames.goal.factory.selector.SingleSelector;
 
 import java.util.*;
@@ -14,7 +16,7 @@ public class CollectItemBucketed extends QuantitativeDifficultyGoal {
     protected CollectItemBucketed(Set<Material> itemsToCollect, Map<Bucket, GoalDifficulty> bucketDifficulties) {
         super(bucketDifficulties);
         this.itemSelector = new SingleSelector<>(itemsToCollect,
-                CollectItems.singleItemFilter(this::usedUniquenessStrings)
+                Filters.singleItemFilter(this::usedUniquenessStrings)
         );
     }
 
@@ -26,7 +28,7 @@ public class CollectItemBucketed extends QuantitativeDifficultyGoal {
     protected IMutableGoal makeGoalForItem(Material item, int stackSize, GoalDifficulty difficulty) {
         IMutableGoal g = new CollectItemGoal(List.of(item), stackSize);
         g.setGoalDifficulty(difficulty);
-        g.addUniquenessStrings(Set.of(CollectItems.uniquenessString(item)));
+        g.addUniquenessStrings(Set.of(UniquenessStrings.collect(item)));
         return g;
     }
 

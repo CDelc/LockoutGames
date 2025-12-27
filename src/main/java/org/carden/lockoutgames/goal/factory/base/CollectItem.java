@@ -5,6 +5,8 @@ import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.Filters;
+import org.carden.lockoutgames.goal.factory.UniquenessStrings;
 import org.carden.lockoutgames.goal.factory.selector.SingleSelector;
 
 import java.util.List;
@@ -20,7 +22,7 @@ public class CollectItem extends BaseGoalFactory {
     private final Map<Material, GoalDifficulty> difficultyMap;
 
     protected CollectItem(Map<Material, GoalDifficulty> items, int minStack, int maxStack) {
-        final Predicate<Material> itemFilter = CollectItems.singleItemFilter(this::usedUniquenessStrings);
+        final Predicate<Material> itemFilter = Filters.singleItemFilter(this::usedUniquenessStrings);
         this.minStack = minStack;
         this.maxStack = maxStack;
         this.difficultyMap = items;
@@ -43,7 +45,7 @@ public class CollectItem extends BaseGoalFactory {
         int stackSize = rng.nextInt(minStack, maxStack+1);
         IMutableGoal goal = this.makeCollectItemGoal(item, stackSize);
         goal.setGoalDifficulty(this.difficultyMap.get(item));
-        goal.addUniquenessStrings(Set.of(CollectItems.uniquenessString(item)));
+        goal.addUniquenessStrings(Set.of(UniquenessStrings.collect(item)));
         return goal;
     }
 

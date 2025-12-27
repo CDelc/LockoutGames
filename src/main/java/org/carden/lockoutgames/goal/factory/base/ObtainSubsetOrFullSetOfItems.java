@@ -5,6 +5,7 @@ import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.Filters;
 import org.carden.lockoutgames.goal.factory.selector.SubsetOrFullSetSelector;
 import org.carden.lockoutgames.utils.Utils;
 
@@ -41,7 +42,7 @@ public abstract class ObtainSubsetOrFullSetOfItems extends BaseGoalFactory {
         this.difficultyMap = difficultyMap;
         this.itemSelector = new SubsetOrFullSetSelector<>(
                 setOfItems, subsetMinSize, subsetMaxSize, subsetPercentChance,
-                (item) -> CollectItems.itemFilter(item) && this.isValidDifficulty(this.difficultyMap.get(item))
+                (item) -> Filters.itemAvailable(item) && this.isValidDifficulty(this.difficultyMap.get(item))
                 );
         this.stackPercentChance = stackPercentChance;
         this.minStackSize = minStackSize;

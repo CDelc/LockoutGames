@@ -4,9 +4,6 @@ import org.bukkit.Material;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
 import org.carden.lockoutgames.goal.factory.base.CollectItem;
-import org.carden.lockoutgames.goal.factory.base.CollectItems;
-
-import java.util.List;
 
 public class CollectGlowLichen extends CollectItem {
 
