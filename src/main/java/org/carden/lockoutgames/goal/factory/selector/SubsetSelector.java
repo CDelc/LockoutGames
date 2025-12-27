@@ -17,15 +17,14 @@ public class SubsetSelector<E> implements Selector<Set<E>> {
 
     public SubsetSelector(Set<E> choices, int minSize, int maxSize, Predicate<E> filter) {
         this.choices = choices;
-        this.minSize = minSize;
-        this.maxSize = maxSize;
+        this.minSize = Math.max(2, minSize);
+        this.maxSize = Math.min(choices.size(), maxSize);
         this.filter = filter;
     }
 
     public Set<E> select() {
         Random rng = LockoutGames.getRng();
-        int maxSize = Math.min(this.maxSize + 1, this.choices.size());
-        int subsetSize = rng.nextInt(this.minSize, maxSize);
+        int subsetSize = rng.nextInt(this.minSize, this.maxSize+1);
         return Set.copyOf(Utils.selectNRandomValuesFromList(List.copyOf(choices), subsetSize, rng));
     }
 

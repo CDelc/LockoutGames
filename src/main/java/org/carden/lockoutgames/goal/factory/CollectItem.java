@@ -10,6 +10,8 @@ import org.carden.lockoutgames.info.WorldRequirements;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public abstract class CollectItem extends BaseGoalFactory {
 
@@ -28,7 +30,9 @@ public abstract class CollectItem extends BaseGoalFactory {
         this.maxItemsPerStack = maximumStack;
         this.minItemsToSelect = minimumItems;
         this.maxItemsToSelect = maximumItems;
-        this.itemSelector = new SubsetSelector<>(Set.copyOf(itemsToCollect), minimumItems, maximumItems, CollectItem::itemFilter);
+        this.itemSelector = new SubsetSelector<>(Set.copyOf(itemsToCollect), minimumItems, maximumItems,
+                (item) -> CollectItem.itemFilter(item) && CollectItem.isUnique(item, this.usedUniquenessStrings())
+        );
     }
 
     /**
@@ -112,6 +116,14 @@ public abstract class CollectItem extends BaseGoalFactory {
 
     public static boolean itemFilter(Material item) {
         return WorldRequirements.checkElement(item.name());
+    }
+
+    public static boolean isUnique(Material item, Set<String> uniquenessStrings) {
+        return uniquenessStrings.contains(CollectItem.uniquenessString(item));
+    }
+
+    public static Predicate<Material> singleItemFilter(final Supplier<Set<String>> uniquenessStrings) {
+        return (item) -> CollectItem.itemFilter(item) && CollectItem.isUnique(item, uniquenessStrings.get());
     }
 
     @Override

@@ -33,7 +33,7 @@ public class ObtainSingleItemFromSetVariableStackSize extends BaseGoalFactory {
             throw new IllegalArgumentException("stack size map and difficulty map must have the same materials");
         }
         this.stackSizeMap = stackSizeMap;
-        this.itemSelector = new MapSelector<>(difficultyMap, CollectItem::itemFilter, this::isValidDifficulty);
+        this.itemSelector = new MapSelector<>(difficultyMap, CollectItem.singleItemFilter(this::usedUniquenessStrings), this::isValidDifficulty);
         this.canGenerateMultiple = false;
     }
 

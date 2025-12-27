@@ -18,7 +18,7 @@ public class CollectFlint extends CollectItemBucketed {
     private static final int EASY_DIFFICULTY_THRESHOLD = 4;
 
     public CollectFlint() {
-        super(Set.of(Material.FLINT), 1, 1, Map.of(
+        super(Set.of(Material.FLINT), Map.of(
                 new Bucket(COLLECT_FLINT_MINIMUM, EASY_DIFFICULTY_THRESHOLD-1), GoalDifficulty.VERY_EASY,
                 new Bucket(EASY_DIFFICULTY_THRESHOLD, COLLECT_FLINT_MAXIMUM), GoalDifficulty.EASY
         ));
@@ -27,8 +27,8 @@ public class CollectFlint extends CollectItemBucketed {
     }
 
     @Override
-    protected IMutableGoal makeGoalForItems(Set<Material> items, int stackSize, GoalDifficulty difficulty) {
-        IMutableGoal g = super.makeGoalForItems(items, stackSize, difficulty);
+    protected IMutableGoal makeGoalForItem(Material item, int stackSize, GoalDifficulty difficulty) {
+        IMutableGoal g = super.makeGoalForItem(item, stackSize, difficulty);
         g.setDescription("Collect " + stackSize + " flint");
         return g;
     }

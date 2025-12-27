@@ -39,7 +39,7 @@ public class ObtainSubsetOrFullSetOfItems extends BaseGoalFactory {
             GoalDifficulty fullSetDifficulty
     ) {
         this.difficultyMap = difficultyMap;
-        this.itemSelector = new SubsetOrFullSetSelector<Material>(
+        this.itemSelector = new SubsetOrFullSetSelector<>(
                 setOfItems, subsetMinSize, subsetMaxSize, subsetPercentChance,
                 (item) -> CollectItem.itemFilter(item) && this.isValidDifficulty(this.difficultyMap.get(item))
                 );

@@ -4,59 +4,35 @@ import org.bukkit.Material;
 import org.carden.lockoutgames.goal.CollectItemGoal;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
+import org.carden.lockoutgames.goal.factory.selector.SingleSelector;
 import org.carden.lockoutgames.goal.factory.selector.SubsetSelector;
 
 import java.util.*;
 
 public class CollectItemBucketed extends QuantitativeDifficultyGoal {
-    private final SubsetSelector<Material> itemSelector;
+    private final SingleSelector<Material> itemSelector;
 
-    protected CollectItemBucketed(Set<Material> itemsToCollect, int minimumItemTypes, int maximumItemTypes, Map<Bucket, GoalDifficulty> bucketDifficulties) {
+    protected CollectItemBucketed(Set<Material> itemsToCollect, Map<Bucket, GoalDifficulty> bucketDifficulties) {
         super(bucketDifficulties);
-        this.itemSelector = new SubsetSelector<>(itemsToCollect, minimumItemTypes, maximumItemTypes, CollectItem::itemFilter);
+        this.itemSelector = new SingleSelector<>(itemsToCollect,
+                CollectItem.singleItemFilter(this::usedUniquenessStrings)
+        );
     }
 
     @Override
     protected final IMutableGoal makeGoalForNumber(int value, GoalDifficulty difficulty) {
-        return this.makeGoalForItems(this.itemSelector.select(), value, difficulty);
+        return this.makeGoalForItem(this.itemSelector.select(), value, difficulty);
     }
 
-    protected IMutableGoal makeGoalForItems(Set<Material> items, int stackSize, GoalDifficulty difficulty) {
-        List<Material> itemList = List.copyOf(items);
-        IMutableGoal g = new CollectItemGoal(itemList, stackSize);
+    protected IMutableGoal makeGoalForItem(Material item, int stackSize, GoalDifficulty difficulty) {
+        IMutableGoal g = new CollectItemGoal(List.of(item), stackSize);
         g.setGoalDifficulty(difficulty);
-        if (itemList.size() == 1) {
-            g.addUniquenessStrings(Set.of(CollectItem.uniquenessString(itemList.getFirst())));
-        }
+        g.addUniquenessStrings(Set.of(CollectItem.uniquenessString(item)));
         return g;
     }
 
     @Override
     protected boolean canGenerateGoalHook() {
         return super.canGenerateGoalHook() && this.itemSelector.canSelect();
-    }
-
-    private static List<Integer> makeDifficultyBuckets(int minimumStack, int maximumStack, List<Integer> difficultyThresholds) {
-        List<Integer> buckets = new ArrayList<>(difficultyThresholds);
-        buckets.sort(Integer::compareTo);
-        if (buckets.getFirst() <= minimumStack || buckets.getLast() >= maximumStack) {
-            throw new IllegalArgumentException("Bucket thresholds are not between min and max stack sizes");
-        }
-        buckets.addFirst(minimumStack);
-        buckets.addLast(maximumStack + 1);
-        return buckets;
-    }
-
-    private static Map<GoalDifficulty, Integer> makeBucketMap(GoalDifficulty baseDifficulty, int numBuckets) {
-        Map<GoalDifficulty, Integer> bucketMap = new HashMap<>();
-        GoalDifficulty difficulty = baseDifficulty;
-        for (int bucket = 0; bucket < numBuckets; bucket++) {
-            if (difficulty == null) {
-                throw new IllegalStateException("Too many difficulty buckets");
-            }
-            bucketMap.put(difficulty, bucket);
-            difficulty = difficulty.getNextDifficulty();
-        }
-        return bucketMap;
     }
 }
