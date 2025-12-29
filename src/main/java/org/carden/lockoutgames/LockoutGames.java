@@ -87,6 +87,12 @@ public final class LockoutGames extends JavaPlugin {
         instance.getServer().broadcastMessage(BROADCAST_PREFIX + " " + s);
     }
 
+    public static void broadcastDebug(String s) {
+        if (Debug.isActive()) {
+            LockoutGames.broadcastMessage(ChatColor.YELLOW + "[DEBUG] " + s);
+        }
+    }
+
 //    private void setupMultiverseDependencies() {
 //        if(!setupMultiverseCore()) {
 //            getLogger().severe("Multiverse-Core not found! Please install the Multiverse-core plugin to your server.\n" +

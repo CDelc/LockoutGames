@@ -7,6 +7,7 @@ import org.carden.lockoutgames.game.player.GamePlayer;
 import org.carden.lockoutgames.game.player.PlayerManager;
 import org.carden.lockoutgames.goal.*;
 import org.carden.lockoutgames.goal.factory.base.SelectFromChoices;
+import org.carden.lockoutgames.utils.Utils;
 
 import java.util.*;
 
@@ -37,6 +38,6 @@ public final class TameEntity extends SelectFromChoices<EntityType> {
                         return Set.of(gamePlayer);
                     } else return Set.of();
                 },
-                difficulty, String.format("Tame a %s", entity));
+                difficulty, String.format("Tame a %s", Utils.readableEnumString(entity.name())));
     }
 }

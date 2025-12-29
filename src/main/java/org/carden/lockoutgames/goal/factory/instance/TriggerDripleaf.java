@@ -1,18 +1,12 @@
 package org.carden.lockoutgames.goal.factory.instance;
 
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.carden.lockoutgames.game.player.GamePlayer;
-import org.carden.lockoutgames.game.player.PlayerManager;
 import org.carden.lockoutgames.goal.GoalDifficulty;
 import org.carden.lockoutgames.goal.IMutableGoal;
 import org.carden.lockoutgames.goal.PlayerEntityEventPredicateGoal;
-import org.carden.lockoutgames.goal.SingleEventGoal;
 import org.carden.lockoutgames.goal.factory.base.BaseGoalFactory;
 import org.carden.lockoutgames.info.WorldRequirements;
-
-import static org.carden.lockoutgames.utils.Utils.playerEventPlayer;
 
 public final class TriggerDripleaf extends BaseGoalFactory {
     @Override

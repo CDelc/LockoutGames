@@ -2,11 +2,14 @@ package org.carden.lockoutgames.goal;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.carden.lockoutgames.LockoutGames;
 import org.carden.lockoutgames.events.GoalCompleteEvent;
 import org.carden.lockoutgames.events.listener.GoalCheckListener;
+import org.carden.lockoutgames.game.Debug;
 import org.carden.lockoutgames.game.player.GamePlayer;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +35,8 @@ public abstract class Goal implements IMutableGoal {
         this.goalDifficulty = difficulty;
         this.description = description;
     }
+
+
 
     protected Goal(Set<Class<? extends Event>> checkEvents, GoalDifficulty difficulty, String description) {
         this(checkEvents, difficulty, description, new HashSet<>(), new HashSet<>());
