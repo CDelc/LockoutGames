@@ -74,10 +74,10 @@ public class GoalCheckListener implements Listener {
         sendGoalCheck(EntityChangeBlockEvent.class, e);
     }
 
-//    @EventHandler
-//    public void onEntityTame(EntityTameEvent e) {
-//        sendGoalCheck(EntityTameEvent.class, e);
-//    }
+    @EventHandler
+    public void onEntityTame(EntityTameEvent e) {
+        sendGoalCheck(EntityTameEvent.class, e);
+    }
 
     private void sendGoalCheck(Class<? extends Event> eventClass, Event e) {
         if(!eventsToListenFor.contains(eventClass)) return;
